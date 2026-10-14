@@ -12,6 +12,8 @@ function App() {
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
   const [workItems, setWorkItems] = useState<WorkItem[]>([])
+  const [itemsLoading, setItemsLoading] = useState(true)
+  const [itemsError, setItemsError] = useState('')
 
   useEffect(() => {
     const controller = new AbortController()
@@ -47,22 +49,22 @@ function App() {
   useEffect(() => {
     const controller = new AbortController()
     async function checkWorkItem() {
-      setLoading(true)
-      setError('')
-      setHealth(null)
+      setItemsLoading(true)
+      setItemsError('')
+      setWorkItems(null)
       try {
         const data = await getWorkItems(controller.signal)
         setWorkItems(data)
       } catch (error) {
         if (controller.signal.aborted) return
-        setError(
+        setItemsError(
           error instanceof Error
             ? error.message
             : 'Did not receive an answer',
         )
       } finally {
         if (!controller.signal.aborted) {
-          setLoading(false)
+          setItemsLoading(false)
         }
       }
     }
@@ -92,6 +94,15 @@ function App() {
           <p>Статус: {health.status}</p>
         </div>
       )}
+      <div>
+        workItems.map((item)=>{
+          return(
+          <p key={item.id}>
+            {item.id}, {item.title},{item.description}, {item.status},{item.created_at}
+          </p>
+          )
+        })
+      </div>
     </main>
   )
 }
