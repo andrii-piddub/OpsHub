@@ -3,7 +3,7 @@ import type { FormEvent } from 'react'
 import { getHealth } from './api/health'
 import type { HealthResponse } from './api/health'
 import type { WorkItem } from './api/workitems'
-import { getWorkItems, postWorkItems} from './api/workitems'
+import { getWorkItems, postWorkItems } from './api/workitems'
 
 
 
@@ -18,6 +18,7 @@ function App() {
   const [itemsError, setItemsError] = useState('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [createError, setCreateError] = useState('')
   useEffect(() => {
     const controller = new AbortController()
 
@@ -74,15 +75,25 @@ function App() {
     checkWorkItem()
     return () => controller.abort()
   }, [retryCount])
-function handleSubmit(e: FormEvent<HTMLFormElement>){
-  e.preventDefault();
-  postWorkItems(title, description)
-  setTitle('')
-  setDescription('')
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setCreateError('')
+    try {
+      const newItem = await postWorkItems(title, description)
+      setWorkItems((previousItems) => [...previousItems, newItem])
+      setTitle('')
+      setDescription('')
+    } catch (error) {
+      setCreateError(
+      error instanceof Error
+        ? error.message
+        : 'Failed to create WorkItem'
+      )
+  }
 
 
 
-}
+  }
   return (
     <main>
       <h1>OpsHub</h1>
@@ -146,6 +157,9 @@ function handleSubmit(e: FormEvent<HTMLFormElement>){
         </div>
         <button type='submit'>Submit</button>
       </form>
+      <p>
+{createError && <p role="alert">Error: {createError}</p>}
+      </p>
     </main>
   )
 }
