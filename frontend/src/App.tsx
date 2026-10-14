@@ -19,7 +19,7 @@ function App() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [createError, setCreateError] = useState('')
-  const [creatingItem, setCreatingItem] = useState(true)
+  const [creatingItem, setCreatingItem] = useState(false)
   useEffect(() => {
     const controller = new AbortController()
 
@@ -76,9 +76,11 @@ function App() {
     checkWorkItem()
     return () => controller.abort()
   }, [retryCount])
+
+
+  // HANDLESUBMIT
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const controller = new AbortController()
     setCreatingItem(true)
     setCreateError('')
     try {
@@ -93,10 +95,9 @@ function App() {
           : 'Failed to create WorkItem'
       )
     } finally {
-      if (!controller.signal.aborted) {
         setCreatingItem(false)
       }
-    }
+    
   }
       return (
         <main>
