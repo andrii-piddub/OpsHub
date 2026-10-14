@@ -157,9 +157,9 @@ function App() {
         </div>
         <button type='submit'>Submit</button>
       </form>
-      <p>
+      <div>
 {createError && <p role="alert">Error: {createError}</p>}
-      </p>
+      </div>
     </main>
   )
 }
