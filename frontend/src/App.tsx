@@ -3,7 +3,8 @@ import type { FormEvent } from 'react'
 import { getHealth } from './api/health'
 import type { HealthResponse } from './api/health'
 import type { WorkItem } from './api/workitems'
-import { getWorkItems } from './api/workitems'
+import { getWorkItems, postWorkItems} from './api/workitems'
+
 
 
 
@@ -75,6 +76,11 @@ function App() {
   }, [retryCount])
 function handleSubmit(e: FormEvent<HTMLFormElement>){
   e.preventDefault();
+  postWorkItems(title, description)
+  setTitle('')
+  setDescription('')
+
+
 
 }
   return (
