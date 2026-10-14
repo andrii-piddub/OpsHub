@@ -15,8 +15,11 @@ def health_check(request):
     'status':'ok',
     'service':'OpsHub API',
   })
-
-def WorkItem(request):
-  workItem = WorkItem.objects.all().values()
-  serializer = WorkItemSerializer(workItem, many=True)
+  
+  
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def work_item(request):
+  work_item_list = WorkItem.objects.all()
+  serializer = WorkItemSerializer(work_item_list, many=True)
   return Response(serializer.data, status=status.HTTP_200_OK)
