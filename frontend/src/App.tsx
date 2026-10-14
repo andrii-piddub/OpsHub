@@ -95,78 +95,81 @@ function App() {
           : 'Failed to create WorkItem'
       )
     } finally {
-        setCreatingItem(false)
-      }
-    
+      setCreatingItem(false)
+    }
+
   }
-      return (
-        <main>
-          <h1>OpsHub</h1>
-          <button
-            type="button"
-            onClick={() =>
-              setRetryCount((previous) => previous + 1)}
-            disabled={loading || itemsLoading || creatingItem}
-          >
-            {loading || itemsLoading ? 'Checking' : 'Checking again'}
-          </button>
+  return (
+    <main>
+      <h1>OpsHub</h1>
+      <button
+        type="button"
+        onClick={() =>
+          setRetryCount((previous) => previous + 1)}
+        disabled={loading || itemsLoading}
+      >
+        {loading || itemsLoading ? 'Checking' : 'Checking again'}
+      </button>
 
-          {loading && <p>Checking connection with server</p>}
+      {loading && <p>Checking connection with server</p>}
 
-          {error && <p role="alert">Error: {error}</p>}
+      {error && <p role="alert">Error: {error}</p>}
 
-          {health && (
-            <div>
-              <p>Сервіс: {health.service}</p>
-              <p>Статус: {health.status}</p>
-            </div>
-          )}
-          <div>
-            {workItems.map((item) => {
-              return (
-                <p key={item.id}>
-                  {item.id} {item.title},{item.description}, {item.status}
-                </p>
-              )
-            })}
-            {itemsLoading && <p>Loading work items</p>}
+      {health && (
+        <div>
+          <p>Сервіс: {health.service}</p>
+          <p>Статус: {health.status}</p>
+        </div>
+      )}
+      <div>
+        {workItems.map((item) => {
+          return (
+            <p key={item.id}>
+              {item.id} {item.title},{item.description}, {item.status}
+            </p>
+          )
+        })}
+        {itemsLoading && <p>Loading work items</p>}
 
-            {itemsError && <p role="alert">Error: {itemsError}</p>}
-          </div>
-          <div>
-            {workItems.length === 0 && !itemsLoading && !itemsError && ('There are no Work Items yet')}
-          </div>
-          <form onSubmit={handleSubmit}>
-            <div>
-              <p>TITLE</p>
-              <input
-                type='text'
-                placeholder='title'
-                value={title}
-                onChange={(event) => {
-                  setTitle(event.target.value)
-                }}
-              />
-            </div>
-            <div>
-              <p>DESCRIPTION</p>
-              <input
-                type='text'
-                placeholder='description'
-                value={description}
-                onChange={(event) => {
-                  setDescription(event.target.value)
-                }}
-              />
+        {itemsError && <p role="alert">Error: {itemsError}</p>}
+      </div>
+      <div>
+        {workItems.length === 0 && !itemsLoading && !itemsError && ('There are no Work Items yet')}
+      </div>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <p>TITLE</p>
+          <input
+            type='text'
+            placeholder='title'
+            value={title}
+            onChange={(event) => {
+              setTitle(event.target.value)
+            }}
+          />
+        </div>
+        <div>
+          <p>DESCRIPTION</p>
+          <input
+            type='text'
+            placeholder='description'
+            value={description}
+            onChange={(event) => {
+              setDescription(event.target.value)
+            }}
+          />
 
-            </div>
-            <button type='submit'>Submit</button>
-          </form>
-          <div>
-            {createError && <p role="alert">Error: {createError}</p>}
-          </div>
-        </main>
-      )
+        </div>
+        <button
+          type='submit'
+          disabled={creatingItem}
+        >Submit</button>
+      </form>
+      <div>
+        {createError && <p role="alert">Error: {createError}</p>}
+      </div>
+    </main>
+  )
 }
 
-    export default App
+export default App
