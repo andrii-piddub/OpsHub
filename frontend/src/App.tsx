@@ -110,7 +110,7 @@ function App() {
       <div>
         {workItems.length === 0 && !itemsLoading && !itemsError && ('There are no Work Items yet')}
       </div>
-      <form>
+      <form onSubmit={}>
         <div>
           <p>TITLE</p>
           <input
@@ -134,7 +134,7 @@ function App() {
           />
 
         </div>
-        <button>Submit</button>
+        <button type='submit'>Submit</button>
       </form>
     </main>
   )
