@@ -42,8 +42,9 @@ class ItemPartialUpdateView(APIView):
             return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = PatchWorkitemSerializer(item, data=request.data, partial=True)
+        serializer_full = WorkItemSerializer(item, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer_full.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
