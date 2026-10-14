@@ -7,9 +7,9 @@ type WorkItem = {
   created_at:string
 }
 
-async function getWorkItems(){
-  const url = 'http://127.0.0.1:8000/api/v1/workitem/'
-  const response = await fetch(url)
+export async function getWorkItems(signal: AbortSignal): Promise<WorkItem[]>{
+  const url = '/api/v1/workitem/'
+  const response = await fetch(url, {signal})
   if (!response.ok){
     throw new Error(`Request failed: ${response.status}`)
    }
