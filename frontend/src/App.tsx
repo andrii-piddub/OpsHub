@@ -93,10 +93,9 @@ function App() {
     } finally {
       if (!controller.signal.aborted) {
         setItemsLoading(false)
-
-
-
       }
+    }
+  }
       return (
         <main>
           <h1>OpsHub</h1>
