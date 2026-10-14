@@ -1,5 +1,5 @@
 type WorkItemStatus = 'OP'|'IP'|'DN';
-type WorkItem = {
+export type WorkItem = {
   id:number;
   title:string;
   description:string;
