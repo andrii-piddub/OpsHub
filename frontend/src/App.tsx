@@ -72,7 +72,10 @@ function App() {
     checkWorkItem()
     return () => controller.abort()
   }, [retryCount])
+function handleSubmit(e: FormEvent<HTMLFormElement>){
+  e.preventDefault();
 
+}
   return (
     <main>
       <h1>OpsHub</h1>
@@ -110,7 +113,7 @@ function App() {
       <div>
         {workItems.length === 0 && !itemsLoading && !itemsError && ('There are no Work Items yet')}
       </div>
-      <form onSubmit={}>
+      <form onSubmit={handleSubmit}>
         <div>
           <p>TITLE</p>
           <input
