@@ -4,29 +4,46 @@ from rest_framework.response import Response
 from .models import WorkItem
 from .serializers import WorkItemSerializer
 from rest_framework import status
+from rest_framework.views import APIView
 
 
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def health_check(request):
-  return Response({
-    'status':'ok',
-    'service':'OpsHub API',
-  })
-  
-  
+    return Response({
+        "status": "ok",
+        "service": "OpsHub API",
+    })
+
+
 @api_view(["GET","POST"])
 @permission_classes([AllowAny])
 def work_item(request):
-  if request.method == 'GET':
-    work_item_list = WorkItem.objects.all()
-    serializer = WorkItemSerializer(work_item_list, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-  elif request.method == 'POST':
+    if request.method == "GET":
+        work_item_list = WorkItem.objects.all()
+        serializer = WorkItemSerializer(work_item_list, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     serializer = WorkItemSerializer(data=request.data)
     if serializer.is_valid():
-      serializer.save()
-      return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
+class ItemPartialUpdateView(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request, item_id):
+        try:
+            item = WorkItem.objects.get(id=item_id)
+        except WorkItem.DoesNotExist:
+            return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = WorkItemSerializer(item, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
