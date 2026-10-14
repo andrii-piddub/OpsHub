@@ -16,7 +16,7 @@ export async function getWorkItems(signal: AbortSignal): Promise<WorkItem[]> {
   return (await response.json()) as WorkItem[]
 }
 
-export async function postWorkItems(title, description) {
+export async function postWorkItems(title:string, description:string) {
   const response = await fetch(
     '/api/v1/workitem/',   
     {
