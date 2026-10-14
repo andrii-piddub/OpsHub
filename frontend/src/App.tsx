@@ -163,7 +163,7 @@ function App() {
         <button
           type='submit'
           disabled={creatingItem}
-        >Submit</button>
+        >{creatingItem?'Creating':'Submit'}</button>
       </form>
       <div>
         {createError && <p role="alert">Error: {createError}</p>}
