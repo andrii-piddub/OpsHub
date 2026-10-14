@@ -19,6 +19,7 @@ function App() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [createError, setCreateError] = useState('')
+  const [creatingItem, setCreatingItem] = useState(true)
   useEffect(() => {
     const controller = new AbortController()
 
@@ -78,6 +79,7 @@ function App() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const controller = new AbortController()
+    setCreatingItem(true)
     setCreateError('')
     try {
       const newItem = await postWorkItems(title, description)
@@ -92,7 +94,7 @@ function App() {
       )
     } finally {
       if (!controller.signal.aborted) {
-        setItemsLoading(false)
+        setCreatingItem(false)
       }
     }
   }
@@ -103,7 +105,7 @@ function App() {
             type="button"
             onClick={() =>
               setRetryCount((previous) => previous + 1)}
-            disabled={loading || itemsLoading}
+            disabled={loading || itemsLoading || creatingItem}
           >
             {loading || itemsLoading ? 'Checking' : 'Checking again'}
           </button>
@@ -164,6 +166,6 @@ function App() {
           </div>
         </main>
       )
-    }
+}
 
     export default App
