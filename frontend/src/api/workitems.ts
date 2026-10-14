@@ -1,17 +1,30 @@
-type WorkItemStatus = 'OP'|'IP'|'DN';
+type WorkItemStatus = 'OP' | 'IP' | 'DN';
 export type WorkItem = {
-  id:number;
-  title:string;
-  description:string;
-  status:WorkItemStatus
-  created_at:string
+  id: number;
+  title: string;
+  description: string;
+  status: WorkItemStatus
+  created_at: string
 }
 
-export async function getWorkItems(signal: AbortSignal): Promise<WorkItem[]>{
+export async function getWorkItems(signal: AbortSignal): Promise<WorkItem[]> {
   const url = '/api/v1/workitem/'
-  const response = await fetch(url, {signal})
-  if (!response.ok){
+  const response = await fetch(url, { signal })
+  if (!response.ok) {
     throw new Error(`Request failed: ${response.status}`)
-   }
+  }
   return (await response.json()) as WorkItem[]
+}
+
+export async function postWorkItems() {
+  await fetch(
+    '/api/v1/workitem/',   
+    {
+      method: 'POST',                           
+      headers: {
+        'Content-Type': 'application/json',      
+      },
+      body: JSON.stringify({ title: 'Test', description:'Description' }),  
+    },
+  )
 }
