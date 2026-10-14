@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import type { FormEvent } from 'react'
 import { getHealth } from './api/health'
 import type { HealthResponse } from './api/health'
 import type { WorkItem } from './api/workitems'
