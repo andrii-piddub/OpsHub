@@ -51,7 +51,7 @@ function App() {
     async function checkWorkItem() {
       setItemsLoading(true)
       setItemsError('')
-      setWorkItems(null)
+      setWorkItems([])
       try {
         const data = await getWorkItems(controller.signal)
         setWorkItems(data)
@@ -68,7 +68,7 @@ function App() {
         }
       }
     }
-    checkWorkItem ()
+    checkWorkItem()
     return () => controller.abort()
   }, [retryCount])
 
@@ -95,13 +95,16 @@ function App() {
         </div>
       )}
       <div>
-        workItems.map((item)=>{
-          return(
-          <p key={item.id}>
-            {item.id}, {item.title},{item.description}, {item.status},{item.created_at}
-          </p>
+        {workItems.map((item) => {
+          return (
+            <p key={item.id}>
+              {item.id}, {item.title},{item.description}, {item.status},{item.created_at}
+            </p>
           )
-        })
+        })}
+        {itemsLoading && <p>Checking connection with server</p>}
+
+        {itemsError && <p role="alert">Error: {error}</p>}
       </div>
     </main>
   )
