@@ -98,13 +98,16 @@ function App() {
         {workItems.map((item) => {
           return (
             <p key={item.id}>
-              {item.id}, {item.title},{item.description}, {item.status},{item.created_at}
+              {item.id} {item.title},{item.description}, {item.status}
             </p>
           )
         })}
         {itemsLoading && <p>Loading work items</p>}
 
         {itemsError && <p role="alert">Error: {itemsError}</p>}
+      </div>
+      <div>
+        {workItems.length == 0 && itemsLoading && !itemsError && ('There is no Work Items yet')}
       </div>
     </main>
   )
