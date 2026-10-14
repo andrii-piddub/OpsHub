@@ -79,7 +79,7 @@ function App() {
         type="button"
         onClick={() =>
           setRetryCount((previous) => previous + 1)}
-        disabled={loading}
+        disabled={loading || itemsLoading}
       >
         {loading ? 'Checking' : 'Checking again'}
       </button>
@@ -102,9 +102,9 @@ function App() {
             </p>
           )
         })}
-        {itemsLoading && <p>Checking connection with server</p>}
+        {itemsLoading && <p>Checking loading execution works</p>}
 
-        {itemsError && <p role="alert">Error: {error}</p>}
+        {itemsError && <p role="alert">Error: {itemsError}</p>}
       </div>
     </main>
   )
