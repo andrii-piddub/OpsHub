@@ -1,6 +1,8 @@
-import {useState, useEffect} from 'react'
-import {getHealth} from './api/health'
+import { useState, useEffect } from 'react'
+import { getHealth } from './api/health'
 import type { HealthResponse } from './api/health'
+import type { WorkItem } from './api/workitems'
+import { getWorkItems } from './api/workitems'
 
 
 
@@ -9,6 +11,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
+  const [workItems, setWorkItems] = useState<WorkItem[]>([])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -21,7 +24,7 @@ function App() {
       try {
         const data = await getHealth(controller.signal)
         setHealth(data)
-       } catch (error) {
+      } catch (error) {
         if (controller.signal.aborted) return
 
         setError(
@@ -41,16 +44,42 @@ function App() {
     return () => controller.abort()
   }, [retryCount])
 
+  useEffect(() => {
+    const controller = new AbortController()
+    async function checkWorkItem() {
+      setLoading(true)
+      setError('')
+      setHealth(null)
+      try {
+        const data = await getWorkItems(controller.signal)
+        setWorkItems(data)
+      } catch (error) {
+        if (controller.signal.aborted) return
+        setError(
+          error instanceof Error
+            ? error.message
+            : 'Did not receive an answer',
+        )
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
+      }
+    }
+    checkWorkItem ()
+    return () => controller.abort()
+  }, [retryCount])
+
   return (
     <main>
       <h1>OpsHub</h1>
       <button
         type="button"
-        onClick={()=>
-          setRetryCount((previous)=>previous+1)}
-          disabled={loading}
+        onClick={() =>
+          setRetryCount((previous) => previous + 1)}
+        disabled={loading}
       >
-        {loading?'Checking':'Checking again'}
+        {loading ? 'Checking' : 'Checking again'}
       </button>
 
       {loading && <p>Checking connection with server</p>}
