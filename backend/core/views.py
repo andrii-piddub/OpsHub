@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from .models import WorkItem
-from .serializers import WorkItemSerializer
+from .serializers import WorkItemSerializer, PatchWorkitemSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 
@@ -41,7 +41,7 @@ class ItemPartialUpdateView(APIView):
         except WorkItem.DoesNotExist:
             return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = WorkItemSerializer(item, data=request.data, partial=True)
+        serializer = PatchWorkitemSerializer(item, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

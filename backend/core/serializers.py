@@ -6,3 +6,9 @@ class WorkItemSerializer(serializers.ModelSerializer):
   class Meta:
     model = WorkItem
     fields = ['id', 'title', 'description', 'status', 'created_at']
+    
+    
+class PatchWorkitemSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = WorkItem
+    fields = ['status']
