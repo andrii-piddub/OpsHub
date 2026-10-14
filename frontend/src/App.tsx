@@ -14,7 +14,8 @@ function App() {
   const [workItems, setWorkItems] = useState<WorkItem[]>([])
   const [itemsLoading, setItemsLoading] = useState(true)
   const [itemsError, setItemsError] = useState('')
-
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
   useEffect(() => {
     const controller = new AbortController()
 
@@ -109,6 +110,32 @@ function App() {
       <div>
         {workItems.length === 0 && !itemsLoading && !itemsError && ('There are no Work Items yet')}
       </div>
+      <form>
+        <div>
+          <p>TITLE</p>
+          <input
+            type='text'
+            placeholder='title'
+            value={title}
+            onChange={(event) => {
+              setTitle(event.target.value)
+            }}
+          />
+        </div>
+        <div>
+          <p>DESCRIPTION</p>
+          <input
+            type='text'
+            placeholder='description'
+            value={description}
+            onChange={(event) => {
+              setDescription(event.target.value)
+            }}
+          />
+
+        </div>
+        <button>Submit</button>
+      </form>
     </main>
   )
 }
