@@ -107,7 +107,7 @@ function App() {
         {itemsError && <p role="alert">Error: {itemsError}</p>}
       </div>
       <div>
-        {workItems.length == 0 && itemsLoading && !itemsError && ('There is no Work Items yet')}
+        {workItems.length === 0 && !itemsLoading && !itemsError && ('There is no Work Items yet')}
       </div>
     </main>
   )
