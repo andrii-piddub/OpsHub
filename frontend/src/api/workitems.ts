@@ -16,7 +16,7 @@ export async function getWorkItems(signal: AbortSignal): Promise<WorkItem[]> {
   return (await response.json()) as WorkItem[]
 }
 
-export async function postWorkItems(title:string, description:string) {
+export async function postWorkItems(title, description) {
   const response = await fetch(
     '/api/v1/workitem/',   
     {
@@ -30,5 +30,5 @@ export async function postWorkItems(title:string, description:string) {
    if (!response.ok) {
     throw new Error(`Request failed: ${response.status}`)
   }
-    return (await response.json()) as WorkItem[]
+    return (await response.json()) as WorkItem
 }
