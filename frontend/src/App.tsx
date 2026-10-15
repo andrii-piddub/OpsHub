@@ -2,11 +2,15 @@ import { useState, useEffect } from 'react'
 import type { FormEvent } from 'react'
 import { getHealth } from './api/health'
 import type { HealthResponse } from './api/health'
-import type { WorkItem } from './api/workitems'
+import type { WorkItem, WorkItemStatus } from './api/workitems'
 import { getWorkItems, postWorkItems } from './api/workitems'
 
 
 
+const statuses: {value:WorkItemStatus, label:string}[] = [
+  {value:'OP', label:'Open'},
+  {value:'IP', label:'In Progress'},
+  {value:'DN', label:'Done'}]
 
 function App() {
   const [health, setHealth] = useState<HealthResponse | null>(null)
@@ -20,6 +24,12 @@ function App() {
   const [description, setDescription] = useState('')
   const [createError, setCreateError] = useState('')
   const [creatingItem, setCreatingItem] = useState(false)
+  const [newStatus, setNewStatus] = useState('')
+
+  const handleStatusChange = () => {
+    setNewStatus(event.target.value)
+
+  }
   useEffect(() => {
     const controller = new AbortController()
 
@@ -124,9 +134,42 @@ function App() {
       <div>
         {workItems.map((item) => {
           return (
-            <p key={item.id}>
-              {item.id} {item.title},{item.description}, {item.status}
-            </p>
+            <div key={item.id}>
+              <table>
+                <tr>
+                  <th style={{ padding: '12px', width: '200px' }}>
+                    {item.id}
+                  </th>
+                  <th style={{ padding: '12px', width: '200px' }}>
+                    {item.title},
+                  </th>
+                  <th style={{ padding: '12px', width: '200px' }}>
+                    {item.description},
+                  </th>
+                  <th style={{ padding: '12px', width: '200px' }}>
+                    {item.status}
+                  </th>
+                  <th style={{ padding: '12px', width: '200px' }}>
+                    <select
+                      value={item.status}
+                      onChange={(event) => {
+                        handleStatusChange(item.id, event.target.value as WorkItemStatus)
+                      }}>
+                      {statuses.map((status) => {
+                        return (
+                          <option key={status.value} value={status.value}>
+                            {newStatus? newStatus:status.label}
+                          </option>)
+                      })}
+                    </select>
+                  </th>
+                  <th style={{ padding: '5px', width: '200px' }}>
+                    <button>Save</button>
+                  </th>
+                </tr>
+
+              </table>
+            </div>
           )
         })}
         {itemsLoading && <p>Loading work items</p>}
@@ -163,7 +206,7 @@ function App() {
         <button
           type='submit'
           disabled={creatingItem}
-        >{creatingItem?'Creating':'Submit'}</button>
+        >{creatingItem ? 'Creating' : 'Submit'}</button>
       </form>
       <div>
         {createError && <p role="alert">Error: {createError}</p>}
