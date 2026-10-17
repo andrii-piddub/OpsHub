@@ -260,6 +260,7 @@ function App() {
                         event.target.value as WorkItemStatus,
                       )
                     }
+                    disabled={savingItemId === item.id}
                   >
                     {statuses.map((status) => (
                       <option key={status.value} value={status.value}>
