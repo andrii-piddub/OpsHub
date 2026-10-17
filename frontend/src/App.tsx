@@ -273,7 +273,7 @@ function App() {
                     type="button"
                     onClick={() => handleSaveStatus(item.id)}
                   >
-                    Save
+                    {savingItemId === item.id? 'Saving':'Save'}
                   </button>
                 </td>
               </tr>
