@@ -10,3 +10,7 @@ type WorkItemsTableProps = {
   onStatusChange (itemId:number, status:WorkItemStatus):void;
   onSaveStatus(ID:number):void;
 }
+
+function WorkItemsTable() {
+  return ()
+}
