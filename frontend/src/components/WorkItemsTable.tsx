@@ -6,7 +6,7 @@ import type {WorkItemStatus} from '../api/workitems.ts'
 type WorkItemsTableProps = {
   workItems:WorkItem[];
   draftStatuses: Record<number, WorkItemStatus>;
-  savingItemId:<number | null>;
+  savingItemId:number | null;
   function onStatusChange (ID){
     return
   }
