@@ -181,7 +181,10 @@ function App() {
       setItemsError(
         error instanceof Error ? error.message : 'Failed to update status',
       )
+    } finally {
+      setSavingItemId(null);
     }
+
   }
 
 
