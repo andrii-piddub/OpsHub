@@ -1,5 +1,5 @@
-import type {WorkItem} from '../src/api/workitems.ts';
-import type {WorkItemStatus} from '../src/api/workitems.ts'
+import type {WorkItem} from '../api/workitems.ts';
+import type {WorkItemStatus} from '../api/workitems.ts'
 
 
 
