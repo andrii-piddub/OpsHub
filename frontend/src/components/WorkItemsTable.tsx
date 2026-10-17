@@ -8,6 +8,5 @@ type WorkItemsTableProps = {
   draftStatuses: Record<number, WorkItemStatus>;
   savingItemId:number | null;
   onStatusChange (itemId:number, status:WorkItemStatus):void;
-  
-  async onSaveStatus(ID:number):void
+  onSaveStatus(ID:number):void;
 }
