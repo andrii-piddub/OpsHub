@@ -35,7 +35,7 @@ function App() {
   const [draftStatuses, setDraftStatuses] = useState<
     Record<number, WorkItemStatus>
   >({})
-  const [savingItemId, setSavingItemId] = useState('')
+  const [savingItemId, setSavingItemId] = useState<number | null>(null)
 
   const handleStatusChange = (itemId: number, status: WorkItemStatus) => {
     setDraftStatuses((previous) => ({
