@@ -272,6 +272,7 @@ function App() {
                   <button
                     type="button"
                     onClick={() => handleSaveStatus(item.id)}
+                    disabled={savingItemId !== null}
                   >
                     {savingItemId === item.id? 'Saving':'Save'}
                   </button>
