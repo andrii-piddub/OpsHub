@@ -160,14 +160,14 @@ function App() {
     if (!selectedStatus) return
 
     setItemsError('')
+    setSavingItemId(itemId);
 
     try {
       const updatedItem = await patchWorkitems(itemId, selectedStatus)
 
       setWorkItems((previousItems) =>
         previousItems.map((item) =>
-          item.id === updatedItem.id ? updatedItem : item;
-          setSavingItemId(item.id);
+          item.id === updatedItem.id ? updatedItem : item,
         ),
       )
 
