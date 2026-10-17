@@ -15,6 +15,11 @@ const statuses: { value: WorkItemStatus; label: string }[] = [
   { value: 'DN', label: 'Done' },
 ]
 
+
+
+
+
+
 function App() {
   const [health, setHealth] = useState<HealthResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -30,6 +35,7 @@ function App() {
   const [draftStatuses, setDraftStatuses] = useState<
     Record<number, WorkItemStatus>
   >({})
+  const [savingItemId, setSavingItemId] = useState('')
 
   const handleStatusChange = (itemId: number, status: WorkItemStatus) => {
     setDraftStatuses((previous) => ({
@@ -37,6 +43,13 @@ function App() {
       [itemId]: status,
     }))
   }
+
+
+
+
+
+
+
 
   useEffect(() => {
     const controller = new AbortController()
@@ -69,6 +82,12 @@ function App() {
     return () => controller.abort()
   }, [retryCount])
 
+
+
+
+
+
+
   useEffect(() => {
     const controller = new AbortController()
 
@@ -100,6 +119,12 @@ function App() {
     return () => controller.abort()
   }, [retryCount])
 
+
+
+
+
+
+// #region handleSubmit
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setCreatingItem(true)
@@ -121,6 +146,14 @@ function App() {
     }
   }
 
+
+
+
+
+
+
+
+
   async function handleSaveStatus(itemId: number) {
     const selectedStatus = draftStatuses[itemId]
 
@@ -133,12 +166,14 @@ function App() {
 
       setWorkItems((previousItems) =>
         previousItems.map((item) =>
-          item.id === updatedItem.id ? updatedItem : item,
+          item.id === updatedItem.id ? updatedItem : item;
+          setSavingItemId(item.id);
         ),
       )
 
       setDraftStatuses((previous) => {
         const remaining = { ...previous }
+
         delete remaining[itemId]
         return remaining
       })
@@ -148,6 +183,14 @@ function App() {
       )
     }
   }
+
+
+
+
+
+
+
+
 
   return (
     <main>
@@ -161,6 +204,12 @@ function App() {
         {loading || itemsLoading ? 'Checking' : 'Checking again'}
       </button>
 
+
+
+
+
+
+
       {loading && <p>Checking connection with server</p>}
       {error && <p role="alert">Error: {error}</p>}
 
@@ -170,6 +219,14 @@ function App() {
           <p>Статус: {health.status}</p>
         </div>
       )}
+
+
+
+
+
+
+
+
 
       <div>
         <table>
@@ -220,6 +277,14 @@ function App() {
             ))}
           </tbody>
         </table>
+
+
+
+
+
+
+
+
 
         {itemsLoading && <p>Loading work items</p>}
         {itemsError && <p role="alert">Error: {itemsError}</p>}
