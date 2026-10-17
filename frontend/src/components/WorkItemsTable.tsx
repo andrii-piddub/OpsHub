@@ -11,6 +11,6 @@ type WorkItemsTableProps = {
   onSaveStatus(ID:number):void;
 }
 
-function WorkItemsTable(WorkItemsTableProps) {
+function WorkItemsTable(props:WorkItemsTableProps) {
   return (null)
 }
