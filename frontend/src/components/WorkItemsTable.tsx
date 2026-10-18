@@ -1,6 +1,10 @@
 import type {WorkItem} from '../api/workitems.ts';
 import type {WorkItemStatus} from '../api/workitems.ts'
-
+const statuses: { value: WorkItemStatus; label: string }[] = [
+  { value: 'OP', label: 'Open' },
+  { value: 'IP', label: 'In Progress' },
+  { value: 'DN', label: 'Done' },
+]
 
 
 type WorkItemsTableProps = {
@@ -11,6 +15,7 @@ type WorkItemsTableProps = {
   onSaveStatus(ID:number):void;
 }
 
-export function WorkItemsTable(props:WorkItemsTableProps) {
+function WorkItemsTable(props:WorkItemsTableProps) {
   return (null)
 }
+export default WorkItemsTable

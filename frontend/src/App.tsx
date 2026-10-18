@@ -8,7 +8,7 @@ import {
   postWorkItems,
   patchWorkitems,
 } from './api/workitems'
-
+import WorkItemsTable from './components/WorkItemsTable.tsx'
 const statuses: { value: WorkItemStatus; label: string }[] = [
   { value: 'OP', label: 'Open' },
   { value: 'IP', label: 'In Progress' },
