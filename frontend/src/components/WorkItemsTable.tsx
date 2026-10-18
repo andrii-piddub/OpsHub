@@ -35,7 +35,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
       </thead>
 
       <tbody>
-        {workItems.map((item) => (
+        {props.workItems.map((item) => (
           <tr key={item.id}>
             <td>{item.id}</td>
             <td>{item.title}</td>
@@ -43,14 +43,14 @@ function WorkItemsTable(props: WorkItemsTableProps) {
             <td>{item.status}</td>
             <td>
               <select
-                value={draftStatuses[item.id] ?? item.status}
+                value={props.draftStatuses[item.id] ?? item.status}
                 onChange={(event) =>
-                  handleStatusChange(
+                  props.onStatusChange(
                     item.id,
                     event.target.value as WorkItemStatus,
                   )
                 }
-                disabled={savingItemId === item.id}
+                disabled={props.savingItemId === item.id}
               >
                 {statuses.map((status) => (
                   <option key={status.value} value={status.value}>
@@ -62,10 +62,10 @@ function WorkItemsTable(props: WorkItemsTableProps) {
             <td>
               <button
                 type="button"
-                onClick={() => handleSaveStatus(item.id)}
-                disabled={savingItemId !== null}
+                onClick={() => props.onSaveStatus(item.id)}
+                disabled={props.savingItemId !== null}
               >
-                {savingItemId === item.id ? 'Saving' : 'Save'}
+                {props.savingItemId === item.id ? 'Saving' : 'Save'}
               </button>
             </td>
           </tr>
