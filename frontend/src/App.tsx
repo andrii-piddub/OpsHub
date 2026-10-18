@@ -232,7 +232,7 @@ function App() {
 
 
       <div>
-<WorkItemsTable workItems={workItems} draftStatuses={draftStatuses} savingItemId={savingItemId} onStatusChange={onStatusChange} onSaveStatus={onSaveStatus} />
+<WorkItemsTable workItems={workItems} draftStatuses={draftStatuses} savingItemId={savingItemId} onStatusChange={handleStatusChange} onSaveStatus={handleSaveStatus} />
 
 
 
