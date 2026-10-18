@@ -11,6 +11,6 @@ type WorkItemsTableProps = {
   onSaveStatus(ID:number):void;
 }
 
-function WorkItemsTable(props:WorkItemsTableProps) {
+export function WorkItemsTable(props:WorkItemsTableProps) {
   return (null)
 }
