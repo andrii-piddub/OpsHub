@@ -232,56 +232,7 @@ function App() {
 
 
       <div>
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">ID</th>
-              <th scope="col">Title</th>
-              <th scope="col">Description</th>
-              <th scope="col">Current status</th>
-              <th scope="col">Change status</th>
-              <th scope="col">Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {workItems.map((item) => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td>{item.title}</td>
-                <td>{item.description}</td>
-                <td>{item.status}</td>
-                <td>
-                  <select
-                    value={draftStatuses[item.id] ?? item.status}
-                    onChange={(event) =>
-                      handleStatusChange(
-                        item.id,
-                        event.target.value as WorkItemStatus,
-                      )
-                    }
-                    disabled={savingItemId === item.id}
-                  >
-                    {statuses.map((status) => (
-                      <option key={status.value} value={status.value}>
-                        {status.label}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    onClick={() => handleSaveStatus(item.id)}
-                    disabled={savingItemId !== null}
-                  >
-                    {savingItemId === item.id? 'Saving':'Save'}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+<WorkItemsTable workItems={workItems} draftStatuses={draftStatuses} savingItemId={savingItemId} onStatusChange={onStatusChange} onSaveStatus={onSaveStatus} />
 
 
 
