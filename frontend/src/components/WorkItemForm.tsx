@@ -1,3 +1,3 @@
-function WorkItemForm({props}){
+function WorkItemForm({title, description}){
   return (null)
 }
