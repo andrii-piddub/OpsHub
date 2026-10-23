@@ -2,6 +2,7 @@ type WorkItemFormProps = {
   title:string;
   description:string;
  onTitleChange:(value:string)=>void;
+ onDescriptionChange(value:string)=>void;
 }
 
 function WorkItemForm({title, description, onTitleChange}:WorkItemFormProps){
