@@ -3,6 +3,11 @@ type WorkItemFormProps = {
   description:string;
 }
 
-function WorkItemForm({title, description}){
-  return (null)
+function WorkItemForm({title, description}:WorkItemFormProps){
+  return (<>
+  <h3>
+    {title}
+  </h3>
+  <p>{description}</p>
+  </>)
 }
