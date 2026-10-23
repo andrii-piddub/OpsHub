@@ -1,9 +1,10 @@
 type WorkItemFormProps = {
   title:string;
   description:string;
+ onTitleChange:(value:string)=>void;
 }
 
-function WorkItemForm({title, description}:WorkItemFormProps){
+function WorkItemForm({title, description, onTitleChange}:WorkItemFormProps){
   return (<>
   <h3>
     {title}
@@ -11,3 +12,5 @@ function WorkItemForm({title, description}:WorkItemFormProps){
   <p>{description}</p>
   </>)
 }
+
+export default WorkItemForm
