@@ -6,9 +6,9 @@ type WorkItemFormProps = {
 
 function WorkItemForm({title, description, onTitleChange}:WorkItemFormProps){
   return (<>
-  <h3>
-    {title}
-  </h3>
+  <input
+  type="text"
+  value={title} />
   <p>{description}</p>
   </>)
 }
