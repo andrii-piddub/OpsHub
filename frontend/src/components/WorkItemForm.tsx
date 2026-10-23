@@ -10,8 +10,7 @@ function WorkItemForm({title, description, onTitleChange}:WorkItemFormProps){
   type="text"
   value={title} 
   onChange={(event)=>{
-    value=event.target.value
-    onTitleChange(value)
+    onTitleChange(event.target.value)
   }}/>
   <p>{description}</p>
   </>)
