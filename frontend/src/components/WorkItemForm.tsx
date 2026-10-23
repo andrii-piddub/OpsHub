@@ -11,10 +11,13 @@ function WorkItemForm({title, description, onTitleChange, onDescriptionChange}:W
   type="text"
   value={title} 
   onChange={(event)=>{
-    onTitleChange(event.target.value)
+   onTitleChange(event.target.value)
   }}/>
   <textarea
-  value={description} />
+  value={description} 
+  onChange={(event)=>{
+    onDescriptionChange(event.target.value)
+  }}/>
   </>)
 }
 
