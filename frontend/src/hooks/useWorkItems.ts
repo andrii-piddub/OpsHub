@@ -83,6 +83,20 @@ export function useWorkItems(retryCount: number = 0) {
     async function createWorkItem(title: string, description: string) {
         setCreatingItem(true);
         setCreateError('')
+        try {
+            const newItem = await postWorkItems(title, description)
+            setWorkItems((previousItems) => [...previousItems, newItem])
+            setTitle('')
+            setDescription('')
+        } catch (error) {
+            setCreateError(
+                error instanceof Error
+                    ? error.message
+                    : 'Failed to create WorkItem',
+            )
+        } finally {
+            setCreatingItem(false)
+        }
     }
 
 
