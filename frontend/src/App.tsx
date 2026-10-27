@@ -5,7 +5,6 @@ import type { HealthResponse } from './api/health'
 import {useWorkItems} from './hooks/useWorkItems.ts'
 import {
   postWorkItems,
-  patchWorkitems,
 } from './api/workitems'
 import WorkItemsTable from './components/WorkItemsTable.tsx'
 import WorkItemForm from './components/WorkItemForm.tsx'
