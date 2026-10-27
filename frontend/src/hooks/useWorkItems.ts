@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
 import type { WorkItem } from '../api/workitems.ts';
-import {getWorkItems} from '../api/workitems.ts'
+import { getWorkItems } from '../api/workitems.ts'
 export function useWorkItems() {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
     const [itemsError, setItemsError] = useState('')
-    useEffect(()=>{
+    useEffect(() => {
         const controller = new AbortController()
-        async function checkWorkItem(){
-
+        async function checkWorkItem() {
+            setItemsLoading(true);
+            setItemsError('');
+            setWorkItems([]);
         }
-        return (()=>{
+        return (() => {
             controller.abort()
         })
-    },[])
-    return { workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError, setItemsError}
+    }, [])
+    return { workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError, setItemsError }
 }
