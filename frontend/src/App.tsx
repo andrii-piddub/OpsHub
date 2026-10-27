@@ -4,7 +4,6 @@ import { getHealth } from './api/health'
 import type { HealthResponse } from './api/health'
 import {useWorkItems} from './hooks/useWorkItems.ts'
 import {
-  getWorkItems,
   postWorkItems,
   patchWorkitems,
 } from './api/workitems'
@@ -22,7 +21,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
-  const {workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError, setItemsError} = useWorkItems()
+  const {workItems, setWorkItems, itemsLoading, itemsError, setItemsError} = useWorkItems()
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -81,39 +80,6 @@ function App() {
 
 
 
-
-
-
-  useEffect(() => {
-    const controller = new AbortController()
-
-    async function checkWorkItem() {
-      setItemsLoading(true)
-      setItemsError('')
-      setWorkItems([])
-
-      try {
-        const data = await getWorkItems(controller.signal)
-        setWorkItems(data)
-      } catch (error) {
-        if (controller.signal.aborted) return
-
-        setItemsError(
-          error instanceof Error
-            ? error.message
-            : 'Did not receive an answer',
-        )
-      } finally {
-        if (!controller.signal.aborted) {
-          setItemsLoading(false)
-        }
-      }
-    }
-
-    checkWorkItem()
-
-    return () => controller.abort()
-  }, [retryCount])
 
 
 
