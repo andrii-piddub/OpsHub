@@ -79,6 +79,12 @@ export function useWorkItems(retryCount: number = 0) {
             controller.abort()
         })
     }, [retryCount])
+
+    async function createWorkItem (title:string, description:string){
+        
+    }
+
+
     return {
         workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
         setItemsError, creatingItem, setCreatingItem, createError, setCreateError,
