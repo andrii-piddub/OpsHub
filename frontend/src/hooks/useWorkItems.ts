@@ -7,8 +7,8 @@ export function useWorkItems() {
     const [itemsError, setItemsError] = useState('')
     useEffect(()=>{
         const controller = new AbortController()
-        async checkWorkItem(){
-            
+        async function checkWorkItem(){
+
         }
         return (()=>{
             controller.abort()
