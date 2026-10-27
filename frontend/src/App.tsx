@@ -247,25 +247,12 @@ function App() {
       )}
 
       <form onSubmit={handleSubmit}>
-        <div>
-          <p>TITLE</p>
-          <input
-            type="text"
-            placeholder="title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-          />
-        </div>
-
-        <div>
-          <p>DESCRIPTION</p>
-          <input
-            type="text"
-            placeholder="description"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-          />
-        </div>
+       <WorkItemForm 
+       title={title}
+       description={description} 
+       onTitleChange={setTitle}
+       onDescriptionChange={setDescription}
+       />
 
         <button type="submit" disabled={creatingItem}>
           {creatingItem ? 'Creating' : 'Submit'}
