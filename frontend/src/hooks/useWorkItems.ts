@@ -5,6 +5,6 @@ export function useWorkItems() {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
     const [itemsError, setItemsError] = useState('')
-    useEffect(()=>{},[])
+    useEffect(()=>{const controller = new AbortController()},[])
     return { workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError, setItemsError}
 }
