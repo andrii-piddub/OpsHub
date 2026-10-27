@@ -13,10 +13,10 @@ export function useWorkItems() {
             setWorkItems([]);
             try{
 
-            }catch(){
+            }catch(error){
 
             }finally{
-                
+
             }
         }
         return (() => {
