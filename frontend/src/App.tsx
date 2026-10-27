@@ -21,7 +21,7 @@ function App() {
   const [retryCount, setRetryCount] = useState(0)
   const {workItems, setWorkItems, itemsLoading, itemsError, setItemsError,
      creatingItem, setCreatingItem, createError,setCreateError, savingItemId, setSavingItemId, 
-     draftStatuses, setDraftStatuses, handleStatusChange } = useWorkItems(retryCount)
+     draftStatuses, setDraftStatuses, handleStatusChange, handleSaveStatus } = useWorkItems(retryCount)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
 
@@ -103,38 +103,7 @@ function App() {
 
 
 
-  async function handleSaveStatus(itemId: number) {
-    const selectedStatus = draftStatuses[itemId]
 
-    if (!selectedStatus) return
-
-    setItemsError('')
-    setSavingItemId(itemId);
-
-    try {
-      const updatedItem = await patchWorkitems(itemId, selectedStatus)
-
-      setWorkItems((previousItems) =>
-        previousItems.map((item) =>
-          item.id === updatedItem.id ? updatedItem : item,
-        ),
-      )
-
-      setDraftStatuses((previous) => {
-        const remaining = { ...previous }
-
-        delete remaining[itemId]
-        return remaining
-      })
-    } catch (error) {
-      setItemsError(
-        error instanceof Error ? error.message : 'Failed to update status',
-      )
-    } finally {
-      setSavingItemId(null);
-    }
-
-  }
 
 
 

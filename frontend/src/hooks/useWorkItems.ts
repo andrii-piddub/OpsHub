@@ -18,6 +18,39 @@ export function useWorkItems(retryCount: number = 0) {
             [itemId]: status,
         }))
     }
+    async function handleSaveStatus(itemId: number) {
+        const selectedStatus = draftStatuses[itemId]
+
+        if (!selectedStatus) return
+
+        setItemsError('')
+        setSavingItemId(itemId);
+
+        try {
+            const updatedItem = await patchWorkitems(itemId, selectedStatus)
+
+            setWorkItems((previousItems) =>
+                previousItems.map((item) =>
+                    item.id === updatedItem.id ? updatedItem : item,
+                ),
+            )
+
+            setDraftStatuses((previous) => {
+                const remaining = { ...previous }
+
+                delete remaining[itemId]
+                return remaining
+            })
+        } catch (error) {
+            setItemsError(
+                error instanceof Error ? error.message : 'Failed to update status',
+            )
+        } finally {
+            setSavingItemId(null);
+        }
+
+    }
+
     useEffect(() => {
         const controller = new AbortController()
         async function checkWorkItem() {
@@ -49,6 +82,6 @@ export function useWorkItems(retryCount: number = 0) {
     return {
         workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
         setItemsError, creatingItem, setCreatingItem, createError, setCreateError,
-        savingItemId, setSavingItemId, draftStatuses, setDraftStatuses, handleStatusChange
+        savingItemId, setSavingItemId, draftStatuses, setDraftStatuses, handleStatusChange, handleSaveStatus
     }
 }
