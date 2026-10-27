@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import type { FormEvent } from 'react'
 import { getHealth } from './api/health'
 import type { HealthResponse } from './api/health'
-import type { WorkItem, WorkItemStatus } from './api/workitems'
 import {useWorkItems} from './hooks/useWorkItems.ts'
 import {
   getWorkItems,
