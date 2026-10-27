@@ -7,6 +7,7 @@ export function useWorkItems(retryCount: number = 0) {
     const [itemsError, setItemsError] = useState('')
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
+    const [savingItemId, setSavingItemId] = useState<number | null>(null)
     useEffect(() => {
         const controller = new AbortController()
         async function checkWorkItem() {
@@ -35,5 +36,8 @@ export function useWorkItems(retryCount: number = 0) {
             controller.abort()
         })
     }, [retryCount])
-    return { workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError, setItemsError, creatingItem, setCreatingItem, createError, setCreateError }
+    return {
+        workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
+        setItemsError, creatingItem, setCreatingItem, createError, setCreateError, savingItemId, setSavingItemId
+    }
 }

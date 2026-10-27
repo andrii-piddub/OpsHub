@@ -19,7 +19,8 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
-  const {workItems, setWorkItems, itemsLoading, itemsError, setItemsError, creatingItem, setCreatingItem, createError,setCreateError } = useWorkItems(retryCount)
+  const {workItems, setWorkItems, itemsLoading, itemsError, setItemsError,
+     creatingItem, setCreatingItem, createError,setCreateError, savingItemId, setSavingItemId } = useWorkItems(retryCount)
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -28,7 +29,7 @@ function App() {
   const [draftStatuses, setDraftStatuses] = useState<
     Record<number, WorkItemStatus>
   >({})
-  const [savingItemId, setSavingItemId] = useState<number | null>(null)
+
 
   const handleStatusChange = (itemId: number, status: WorkItemStatus) => {
     setDraftStatuses((previous) => ({
