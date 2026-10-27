@@ -22,9 +22,8 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
-  const {workItems, setWorkItems, itemsLoading, setItemsLoading} = useWorkItems()
+  const {workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError, setItemsError} = useWorkItems()
 
-  const [itemsError, setItemsError] = useState('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [createError, setCreateError] = useState('')
