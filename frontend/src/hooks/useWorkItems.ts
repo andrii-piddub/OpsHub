@@ -28,6 +28,7 @@ export function useWorkItems() {
                 }
             }
         }
+        checkWorkItem()
         return (() => {
             controller.abort()
         })
