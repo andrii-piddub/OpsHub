@@ -11,6 +11,13 @@ export function useWorkItems() {
             setItemsLoading(true);
             setItemsError('');
             setWorkItems([]);
+            try{
+
+            }catch(){
+
+            }finally{
+                
+            }
         }
         return (() => {
             controller.abort()
