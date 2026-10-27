@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems } from '../api/workitems.ts'
+import type {WorkItemStatus} from '../api/workitems'
 export function useWorkItems(retryCount: number = 0) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
@@ -8,6 +9,9 @@ export function useWorkItems(retryCount: number = 0) {
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
+    const [draftStatuses, setDraftStatuses] = useState<
+        Record<number, WorkItemStatus>
+    >({})
     useEffect(() => {
         const controller = new AbortController()
         async function checkWorkItem() {
@@ -38,6 +42,7 @@ export function useWorkItems(retryCount: number = 0) {
     }, [retryCount])
     return {
         workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
-        setItemsError, creatingItem, setCreatingItem, createError, setCreateError, savingItemId, setSavingItemId
+        setItemsError, creatingItem, setCreatingItem, createError, setCreateError, 
+        savingItemId, setSavingItemId, draftStatuses, setDraftStatuses
     }
 }
