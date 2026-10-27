@@ -26,7 +26,7 @@ function App() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [createError, setCreateError] = useState('')
-  const [creatingItem, setCreatingItem] = useState(false)
+
   const [draftStatuses, setDraftStatuses] = useState<
     Record<number, WorkItemStatus>
   >({})

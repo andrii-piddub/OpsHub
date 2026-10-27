@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems } from '../api/workitems.ts'
-export function useWorkItems(retryCount:number=0) {
+export function useWorkItems(retryCount: number = 0) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
     const [itemsError, setItemsError] = useState('')
+    const [creatingItem, setCreatingItem] = useState(false)
     useEffect(() => {
         const controller = new AbortController()
         async function checkWorkItem() {
@@ -33,5 +34,5 @@ export function useWorkItems(retryCount:number=0) {
             controller.abort()
         })
     }, [retryCount])
-    return { workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError, setItemsError }
+    return { workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError, setItemsError, creatingItem, setCreatingItem  }
 }
