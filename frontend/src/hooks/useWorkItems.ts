@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems } from '../api/workitems.ts'
-import type {WorkItemStatus} from '../api/workitems'
+import type { WorkItemStatus } from '../api/workitems'
 export function useWorkItems(retryCount: number = 0) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
@@ -12,6 +12,12 @@ export function useWorkItems(retryCount: number = 0) {
     const [draftStatuses, setDraftStatuses] = useState<
         Record<number, WorkItemStatus>
     >({})
+    const handleStatusChange = (itemId: number, status: WorkItemStatus) => {
+        setDraftStatuses((previous) => ({
+            ...previous,
+            [itemId]: status,
+        }))
+    }
     useEffect(() => {
         const controller = new AbortController()
         async function checkWorkItem() {
@@ -42,7 +48,7 @@ export function useWorkItems(retryCount: number = 0) {
     }, [retryCount])
     return {
         workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
-        setItemsError, creatingItem, setCreatingItem, createError, setCreateError, 
-        savingItemId, setSavingItemId, draftStatuses, setDraftStatuses
+        setItemsError, creatingItem, setCreatingItem, createError, setCreateError,
+        savingItemId, setSavingItemId, draftStatuses, setDraftStatuses, handleStatusChange
     }
 }

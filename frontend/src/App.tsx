@@ -20,15 +20,11 @@ function App() {
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
   const {workItems, setWorkItems, itemsLoading, itemsError, setItemsError,
-     creatingItem, setCreatingItem, createError,setCreateError, savingItemId, setSavingItemId, draftStatuses, setDraftStatuses } = useWorkItems(retryCount)
+     creatingItem, setCreatingItem, createError,setCreateError, savingItemId, setSavingItemId, 
+     draftStatuses, setDraftStatuses, handleStatusChange } = useWorkItems(retryCount)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const handleStatusChange = (itemId: number, status: WorkItemStatus) => {
-    setDraftStatuses((previous) => ({
-      ...previous,
-      [itemId]: status,
-    }))
-  }
+
 
 
 
