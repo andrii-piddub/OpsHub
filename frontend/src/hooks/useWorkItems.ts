@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems } from '../api/workitems.ts'
-export function useWorkItems() {
+export function useWorkItems(retryCount:number=0) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
     const [itemsError, setItemsError] = useState('')
@@ -32,6 +32,6 @@ export function useWorkItems() {
         return (() => {
             controller.abort()
         })
-    }, [])
+    }, [retryCount])
     return { workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError, setItemsError }
 }
