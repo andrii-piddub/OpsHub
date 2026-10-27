@@ -80,8 +80,9 @@ export function useWorkItems(retryCount: number = 0) {
         })
     }, [retryCount])
 
-    async function createWorkItem (title:string, description:string){
-        
+    async function createWorkItem(title: string, description: string) {
+        setCreatingItem(true);
+        setCreateError('')
     }
 
 
