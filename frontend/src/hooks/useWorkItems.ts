@@ -11,12 +11,21 @@ export function useWorkItems() {
             setItemsLoading(true);
             setItemsError('');
             setWorkItems([]);
-            try{
+            try {
+                const data = await getWorkItems(controller.signal)
+                setWorkItems(data)
+            } catch (error) {
+                if (controller.signal.aborted) return
 
-            }catch(error){
-
-            }finally{
-
+                setItemsError(
+                    error instanceof Error
+                        ? error.message
+                        : 'Did not receive an answer',
+                )
+            } finally {
+                if (!controller.signal.aborted) {
+                    setItemsLoading(false)
+                }
             }
         }
         return (() => {
