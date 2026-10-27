@@ -14,18 +14,16 @@ import WorkItemForm from './components/WorkItemForm.tsx'
 
 
 
-
-
 function App() {
   const [health, setHealth] = useState<HealthResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
-  const {workItems, setWorkItems, itemsLoading, itemsError, setItemsError, creatingItem, setCreatingItem} = useWorkItems(retryCount)
+  const {workItems, setWorkItems, itemsLoading, itemsError, setItemsError, creatingItem, setCreatingItem, createError,setCreateError } = useWorkItems(retryCount)
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [createError, setCreateError] = useState('')
+
 
   const [draftStatuses, setDraftStatuses] = useState<
     Record<number, WorkItemStatus>
