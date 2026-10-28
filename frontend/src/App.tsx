@@ -77,21 +77,8 @@ function App() {
     e.preventDefault()
     setCreatingItem(true)
     setCreateError('')
-
-    try {
-      const newItem = await postWorkItems(title, description)
-      setWorkItems((previousItems) => [...previousItems, newItem])
-      setTitle('')
-      setDescription('')
-    } catch (error) {
-      setCreateError(
-        error instanceof Error
-          ? error.message
-          : 'Failed to create WorkItem',
-      )
-    } finally {
-      setCreatingItem(false)
-    }
+    await createWorkItem(title,description)
+    
   }
 
 
