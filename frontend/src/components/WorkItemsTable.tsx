@@ -67,7 +67,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
               <button
                 type="button"
                 onClick={() => props.onSaveStatus(item.id)}
-                disabled={props.savingItemId !== null}
+                disabled={props.savingItemId !== null || props.deletingItemId !== null}
               >
                 {props.savingItemId === item.id ? 'Saving' : 'Save'}
               </button>
