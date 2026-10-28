@@ -10,4 +10,5 @@ class WorkItemDeleteTests(TestCase):
         self.assertEqual(response.status_code,204)
         self.assertFalse(WorkItem.objects.filter(id=new_Item.id).exists())
     def test_delete_nonexistent_work_item(self):
-        response = self.client.delete(path=f"/api/v1/workitem/9999999/")
+        response = self.client.delete(path="/api/v1/workitem/9999999/")
+        self.assertEqual(response.status_code,404)
