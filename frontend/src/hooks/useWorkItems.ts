@@ -86,6 +86,7 @@ export function useWorkItems(retryCount: number = 0) {
         try {
             const newItem = await postWorkItems(title, description)
             setWorkItems((previousItems) => [...previousItems, newItem])
+            return true
 
         } catch (error) {
             setCreateError(
