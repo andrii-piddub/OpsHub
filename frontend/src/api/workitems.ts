@@ -59,5 +59,5 @@ export async function deleteWorkItem(
   id: number,
 ): Promise<void> {
   const url = `/api/v1/workitem/${id}/`
-  const response = await fetch(url,{method:'POST'} )
+  const response = await fetch(url,{method:'DELETE'} )
 }
