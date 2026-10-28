@@ -15,4 +15,4 @@ class WorkItemDeleteTests(TestCase):
 
 class WorkItemCreateTests(TestCase):
     def test_create_work_item(self):
-        pass
+        response = self.client.post({"title":"Test item","description":"Test description"}, path='api/v1/workitem')
