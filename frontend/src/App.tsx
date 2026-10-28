@@ -137,7 +137,7 @@ function App() {
 
       <div>
 <WorkItemsTable workItems={workItems} draftStatuses={draftStatuses} savingItemId={savingItemId} 
-onStatusChange={handleStatusChange} onSaveStatus={handleSaveStatus} onDeleteWorkItem={handleDeleteWorkItem}/>
+onStatusChange={handleStatusChange} onSaveStatus={handleSaveStatus} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId}/>
 
 
 
