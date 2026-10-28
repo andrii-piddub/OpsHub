@@ -18,7 +18,7 @@ function WorkItemForm({title, description, onTitleChange, onDescriptionChange}:W
    onTitleChange(event.target.value)
   }}/>
   <label
-  htmlFor="description">description</label>
+  htmlFor="description">Description</label>
   <textarea
   id="description"
   value={description} 
