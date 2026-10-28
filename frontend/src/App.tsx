@@ -75,8 +75,6 @@ function App() {
 // #region handleSubmit
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setCreatingItem(true)
-    setCreateError('')
     await createWorkItem(title,description)
     
   }
