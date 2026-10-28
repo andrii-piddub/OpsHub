@@ -52,7 +52,7 @@ export function useWorkItems(retryCount: number = 0) {
     }
     async function handleDeleteWorkItem(id:number){
         await deleteWorkItem(id)
-        setWorkItems((...previousItems)=>{
+        setWorkItems((previousItems)=>{
             previousItems.filter((item)=>item.id!==id)})
     
 
