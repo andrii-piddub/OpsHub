@@ -48,3 +48,5 @@ class ItemPartialUpdateView(APIView):
             return Response(serializer_full.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def delete(self, request, item_id):
+        pass
