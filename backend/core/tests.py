@@ -14,4 +14,5 @@ class WorkItemDeleteTests(TestCase):
         self.assertEqual(response.status_code,404)
 
 class WorkItemCreateTests(TestCase):
-    pass
+    def test_create_work_item(self):
+        pass
