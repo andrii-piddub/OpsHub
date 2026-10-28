@@ -155,7 +155,9 @@ onStatusChange={handleStatusChange} onSaveStatus={handleSaveStatus} onDeleteWork
         <p>There are no Work Items yet</p>
       )}
 
-      <form onSubmit={handleSubmit}>
+      <form 
+      className="workitem-form"
+      onSubmit={handleSubmit}>
        <WorkItemForm 
        title={title}
        description={description} 
