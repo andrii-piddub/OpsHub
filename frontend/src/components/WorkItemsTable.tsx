@@ -13,6 +13,7 @@ type WorkItemsTableProps = {
   savingItemId: number | null;
   onStatusChange(itemId: number, status: WorkItemStatus): void;
   onSaveStatus(ID: number): void;
+  onDeleteWorkItem(id:number):void;
 }
 
 
