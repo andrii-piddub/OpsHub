@@ -12,7 +12,7 @@ export function useWorkItems(retryCount: number = 0) {
     const [draftStatuses, setDraftStatuses] = useState<
         Record<number, WorkItemStatus>
     >({})
-    const [deletingItemId, setdeletingItemId] = useState<number | null>(null)
+    const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
     const handleStatusChange = (itemId: number, status: WorkItemStatus) => {
         setDraftStatuses((previous) => ({
             ...previous,
