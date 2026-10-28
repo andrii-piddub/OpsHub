@@ -53,6 +53,7 @@ export function useWorkItems(retryCount: number = 0) {
     }
     async function handleDeleteWorkItem(id:number){
         try {
+            setItemsError('');
             setDeletingItemId(id);
             await deleteWorkItem(id)
             setWorkItems((previousItems)=>{
