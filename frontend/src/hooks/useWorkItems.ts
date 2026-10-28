@@ -50,8 +50,9 @@ export function useWorkItems(retryCount: number = 0) {
         }
 
     }
-    async function handleDeleteWorkitem(id:number){
+    async function handleDeleteWorkItem(id:number){
         await deleteWorkItem(id)
+        setWorkItems(workItems.filter((item)=>{item !==id}))
     }
 
     useEffect(() => {
@@ -107,6 +108,6 @@ export function useWorkItems(retryCount: number = 0) {
         workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
         setItemsError, creatingItem, setCreatingItem, createError, setCreateError,
         savingItemId, setSavingItemId, draftStatuses, setDraftStatuses, handleStatusChange, handleSaveStatus,
-        createWorkItem, handleDeleteWorkitem
+        createWorkItem, handleDeleteWorkItem
     }
 }
