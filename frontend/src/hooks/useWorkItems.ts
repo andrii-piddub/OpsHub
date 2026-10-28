@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { WorkItem } from '../api/workitems.ts';
-import { getWorkItems, patchWorkitems, postWorkItems } from '../api/workitems.ts'
+import { getWorkItems, patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus } from '../api/workitems'
 export function useWorkItems(retryCount: number = 0) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
