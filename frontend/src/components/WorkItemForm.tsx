@@ -7,7 +7,11 @@ type WorkItemFormProps = {
 
 function WorkItemForm({title, description, onTitleChange, onDescriptionChange}:WorkItemFormProps){
   return (<>
+  <label
+  htmlFor="title"
+  >Title</label>
   <input
+  id="title"
   type="text"
   value={title} 
   onChange={(event)=>{
