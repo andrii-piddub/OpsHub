@@ -32,6 +32,8 @@ function WorkItemsTable(props: WorkItemsTableProps) {
           <th scope="col">Current status</th>
           <th scope="col">Change status</th>
           <th scope="col">Action</th>
+          <th scope="col">Delete</th>
+
         </tr>
       </thead>
 
@@ -67,6 +69,13 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                 disabled={props.savingItemId !== null}
               >
                 {props.savingItemId === item.id ? 'Saving' : 'Save'}
+              </button>
+            </td>
+            <td>
+              <button
+              onClick={()=>props.onDeleteWorkItem(item.id)}
+              >
+                Delete
               </button>
             </td>
           </tr>
