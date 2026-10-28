@@ -7,17 +7,18 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 
-
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def health_check(request):
-    return Response({
-        "status": "ok",
-        "service": "OpsHub API",
-    })
+    return Response(
+        {
+            "status": "ok",
+            "service": "OpsHub API",
+        }
+    )
 
 
-@api_view(["GET","POST"])
+@api_view(["GET", "POST"])
 @permission_classes([AllowAny])
 def work_item(request):
     if request.method == "GET":
@@ -39,7 +40,9 @@ class ItemPartialUpdateView(APIView):
         try:
             item = WorkItem.objects.get(id=item_id)
         except WorkItem.DoesNotExist:
-            return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         serializer = PatchWorkitemSerializer(item, data=request.data, partial=True)
         if serializer.is_valid():
@@ -48,11 +51,13 @@ class ItemPartialUpdateView(APIView):
             return Response(serializer_full.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request, item_id):
         try:
             item = WorkItem.objects.get(id=item_id)
         except WorkItem.DoesNotExist:
-            return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND
+            )
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-  

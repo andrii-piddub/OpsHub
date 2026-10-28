@@ -1,7 +1,9 @@
 from django.test import TestCase
 from .models import WorkItem
 
+
 # Create your tests here.
-class WorkItemDeleteTests(TestCase):
+class WorkItemDeleteTests(TestCase): 
     def test_delete_existing_work_item(self):
         new_Item = WorkItem.objects.create(title="new2", description="new description")
+        response = new_Item.self.client.delete(path="/api/v1/workitem/f{new_Item.id}/")
