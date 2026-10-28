@@ -13,8 +13,8 @@ type WorkItemsTableProps = {
   savingItemId: number | null;
   onStatusChange(itemId: number, status: WorkItemStatus): void;
   onSaveStatus(ID: number): void;
-  onDeleteWorkItem(id:number):void;
-  deletingItemId:number | null;
+  onDeleteWorkItem(id: number): void;
+  deletingItemId: number | null;
 }
 
 
@@ -74,10 +74,11 @@ function WorkItemsTable(props: WorkItemsTableProps) {
             </td>
             <td>
               <button
-              onClick={()=>props.onDeleteWorkItem(item.id)}
-              disabled={props.deletingItemId!==null}
+                onClick={() => props.onDeleteWorkItem(item.id)}
+                disabled={props.deletingItemId !== null}
               >
-                Delete
+                {props.deletingItemId === item.id ? 'Deleting' : 'Delete'}
+
               </button>
             </td>
           </tr>
