@@ -75,6 +75,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
             <td>
               <button
               onClick={()=>props.onDeleteWorkItem(item.id)}
+              disabled={props.deletingItemId!==null}
               >
                 Delete
               </button>
