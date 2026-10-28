@@ -50,6 +50,9 @@ export function useWorkItems(retryCount: number = 0) {
         }
 
     }
+    async function handleDeleteWorkitem(id:number){
+        await deleteWorkItem(id)
+    }
 
     useEffect(() => {
         const controller = new AbortController()
@@ -103,6 +106,7 @@ export function useWorkItems(retryCount: number = 0) {
     return {
         workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
         setItemsError, creatingItem, setCreatingItem, createError, setCreateError,
-        savingItemId, setSavingItemId, draftStatuses, setDraftStatuses, handleStatusChange, handleSaveStatus, createWorkItem
+        savingItemId, setSavingItemId, draftStatuses, setDraftStatuses, handleStatusChange, handleSaveStatus,
+        createWorkItem, handleDeleteWorkitem
     }
 }
