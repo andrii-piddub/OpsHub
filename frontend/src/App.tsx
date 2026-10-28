@@ -17,7 +17,8 @@ function App() {
   const [retryCount, setRetryCount] = useState(0)
   const {workItems, itemsLoading, itemsError,
      creatingItem, createError, savingItemId,  
-     draftStatuses, handleStatusChange, handleSaveStatus, createWorkItem, handleDeleteWorkItem } = useWorkItems(retryCount)
+     draftStatuses, handleStatusChange, handleSaveStatus, createWorkItem, 
+     handleDeleteWorkItem, deletingItemId } = useWorkItems(retryCount)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
 
