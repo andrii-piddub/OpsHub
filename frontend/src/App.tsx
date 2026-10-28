@@ -72,7 +72,7 @@ function App() {
 // #region handleSubmit
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    await createWorkItem(title,description)
+    const success = await createWorkItem(title,description)
     
   }
 
