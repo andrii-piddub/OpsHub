@@ -60,4 +60,7 @@ export async function deleteWorkItem(
 ): Promise<void> {
   const url = `/api/v1/workitem/${id}/`
   const response = await fetch(url,{method:'DELETE'} )
+  if (!response.ok) {
+    throw new Error(`Request failed: ${response.status}`)
+  }
 }
