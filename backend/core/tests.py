@@ -12,3 +12,6 @@ class WorkItemDeleteTests(TestCase):
     def test_delete_nonexistent_work_item(self):
         response = self.client.delete(path="/api/v1/workitem/9999999/")
         self.assertEqual(response.status_code,404)
+
+class WorkItemCreateTests(TestCase):
+    pass
