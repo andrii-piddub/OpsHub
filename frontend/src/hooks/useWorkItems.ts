@@ -53,7 +53,8 @@ export function useWorkItems(retryCount: number = 0) {
     async function handleDeleteWorkItem(id:number){
         await deleteWorkItem(id)
         setWorkItems((previousItems)=>{
-            previousItems.filter((item)=>item.id!==id)})
+             return previousItems.filter((item)=>item.id!==id)})
+        }
     
 
     useEffect(() => {
