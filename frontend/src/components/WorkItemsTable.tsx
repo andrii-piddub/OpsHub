@@ -76,9 +76,9 @@ function WorkItemsTable(props: WorkItemsTableProps) {
               <button
                 type="button"
                 onClick={() => props.onDeleteWorkItem(item.id)}
-                disabled={props.deletingItemId !== null}
+                disabled={props.deletingItemId !== null || props.savingItemId !== null}
               >
-                {props.deletingItemId === item.id ? 'Deleting' : 'Delete'}
+                {props.deletingItemId === item.id? 'Deleting' : 'Delete'}
 
               </button>
             </td>
