@@ -6,4 +6,4 @@ from .models import WorkItem
 class WorkItemDeleteTests(TestCase): 
     def test_delete_existing_work_item(self):
         new_Item = WorkItem.objects.create(title="new2", description="new description")
-        response = new_Item.self.client.delete(path="/api/v1/workitem/f{new_Item.id}/")
+        response = new_Item.client.delete(path=f"/api/v1/workitem/{new_Item.id}/")
