@@ -73,6 +73,10 @@ function App() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const success = await createWorkItem(title,description)
+    if (success === true ){
+      setTitle('');
+      setDescription('');
+    }
     
   }
 
