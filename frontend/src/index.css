@@ -116,3 +116,9 @@ code {
   max-width: 420px;
   margin: 32px auto;
 }
+
+.workitem-form input, .workitem-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+}
