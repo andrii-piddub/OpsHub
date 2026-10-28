@@ -54,7 +54,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                     event.target.value as WorkItemStatus,
                   )
                 }
-                disabled={props.savingItemId === item.id}
+                disabled={props.savingItemId === item.id || props.deletingItemId !== null}
               >
                 {statuses.map((status) => (
                   <option key={status.value} value={status.value}>
