@@ -16,3 +16,4 @@ class WorkItemDeleteTests(TestCase):
 class WorkItemCreateTests(TestCase):
     def test_create_work_item(self):
         response = self.client.post(data={"title":"Test item","description":"Test description"}, path='/api/v1/workitem/')
+        self.assertEqual(response.status_code,201)
