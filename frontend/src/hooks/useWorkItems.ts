@@ -53,6 +53,7 @@ export function useWorkItems(retryCount: number = 0) {
     }
     async function handleDeleteWorkItem(id:number){
         try {
+            setDeletingItemId(id);
             await deleteWorkItem(id)
             setWorkItems((previousItems)=>{
             return previousItems.filter((item)=>item.id!==id)})
@@ -60,6 +61,8 @@ export function useWorkItems(retryCount: number = 0) {
             setItemsError(
                 error instanceof Error ? error.message : 'Failed to delete item',
             )
+        } finally {
+            setDeletingItemId(null)
         }
         }
     
