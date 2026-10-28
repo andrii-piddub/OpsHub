@@ -54,3 +54,9 @@ export async function patchWorkitems(
 
   return (await response.json()) as WorkItem
 }
+
+export async function deleteWorkItem(
+  id: number,
+): Promise<void> {
+
+}
