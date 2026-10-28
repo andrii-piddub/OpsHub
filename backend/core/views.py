@@ -51,7 +51,9 @@ class ItemPartialUpdateView(APIView):
     def delete(self, request, item_id):
         try:
             item = WorkItem.objects.get(id=item_id)
-            item.delete()
         except WorkItem.DoesNotExist:
             return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
+        if item:
+            item.delete()
+            return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
