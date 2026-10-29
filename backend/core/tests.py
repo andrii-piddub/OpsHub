@@ -17,3 +17,13 @@ class WorkItemCreateTests(TestCase):
     def test_create_work_item(self):
         response = self.client.post(data={"title":"Test item","description":"Test description"}, path='/api/v1/workitem/')
         self.assertEqual(response.status_code,201)
+        self.assertEqual(WorkItem.objects.count(),1)
+        created_Item = WorkItem.objects.get()
+        self.assertEqual(created_Item.title,"Test item")
+        self.assertEqual(created_Item.description,"Test description")
+    def test_create_work_item_without_title(self):
+        response = self.client.post(data={"description":"Test description"}, path='/api/v1/workitem/')
+        self.assertEqual(response.status_code,400)
+        self.assertEqual(WorkItem.objects.count(),0)
+
+        
