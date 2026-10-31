@@ -48,5 +48,24 @@ class WorkItemUpdateTests(TestCase):
         created_item.refresh_from_db()
         self.assertEqual(created_item.status,'OP')
 
+class WorkItemGetTests(TestCase):
+    def test_get_work_item(self):
+        response = self.client.get("/api/v1/workitem/")
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.json()),0)
+    def test_get_two_work_items(self):
+        response_one = self.client.post(data={'title':'First test','description':'New description','status':'OP'},path='/api/v1/workitem/')
+        self.assertEqual(response_one.status_code,201)
+        response_two = self.client.post(data={'title':'Second test','description':'New description','status':'OP'},path='/api/v1/workitem/')
+        self.assertEqual(response_two.status_code,201)
+        response = self.client.get("/api/v1/workitem/")
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.json()),2)
+        list_of_titles = [ i['title']for i in response.json() if 'title' in i]
+        self.assertIn('First test',list_of_titles)
+        self.assertIn('Second test',list_of_titles)
+
+
+
 
 
