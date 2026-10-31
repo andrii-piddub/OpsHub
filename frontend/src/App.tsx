@@ -11,6 +11,7 @@ import WorkItemForm from './components/WorkItemForm.tsx'
 
 
 function App() {
+  const [topSelector, setTopSelector]=useState('All')
   const [health, setHealth] = useState<HealthResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -18,10 +19,9 @@ function App() {
   const {workItems, itemsLoading, itemsError,
      creatingItem, createError, savingItemId,  
      draftStatuses, handleStatusChange, handleSaveStatus, createWorkItem, 
-     handleDeleteWorkItem, deletingItemId } = useWorkItems(retryCount)
+     handleDeleteWorkItem, deletingItemId } = useWorkItems(retryCount, topSelector)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [topSelector, setTopSelector]=useState('All')
 
 
 

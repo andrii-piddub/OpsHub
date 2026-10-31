@@ -1,4 +1,3 @@
-import {topSelector} from '../src/App'
 export type WorkItemStatus = 'OP' | 'IP' | 'DN'
 export type WorkItem = {
   id: number;
@@ -8,8 +7,15 @@ export type WorkItem = {
   created_at: string
 }
 
-export async function getWorkItems(signal: AbortSignal): Promise<WorkItem[]> {
-  const url = '/api/v1/workitem/'
+export async function getWorkItems(signal: AbortSignal,topSelector:string): Promise<WorkItem[]> {
+  let url = '/api/v1/workitem/'
+  if (topSelector==='All') 
+    {
+    url = '/api/v1/workitem/'
+  } else if (topSelector==='IP'||topSelector==='OP'||topSelector==='DN'){
+    url = `/api/v1/workitem/?status=${topSelector}`
+  }
+  
   const response = await fetch(url, { signal })
  if (!response.ok) {
     throw new Error(`Request failed: ${response.status}`)

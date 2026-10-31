@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems, patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus } from '../api/workitems'
-export function useWorkItems(retryCount: number = 0) {
+export function useWorkItems(retryCount: number = 0, topSelector:string) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
     const [itemsError, setItemsError] = useState('')
@@ -75,7 +75,7 @@ export function useWorkItems(retryCount: number = 0) {
             setItemsError('');
             setWorkItems([]);
             try {
-                const data = await getWorkItems(controller.signal)
+                const data = await getWorkItems(controller.signal, topSelector)
                 setWorkItems(data)
             } catch (error) {
                 if (controller.signal.aborted) return
