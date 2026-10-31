@@ -6,7 +6,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     // const []
     const [itemsLoading, setItemsLoading] = useState(true)
-    const [updatedSelected, setUpdatedSelected]= useState(true)
+
     const [itemsError, setItemsError] = useState('')
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
@@ -31,14 +31,14 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
 
         try {
             const updatedItem = await patchWorkitems(itemId, selectedStatus)
-            if(updatedItem.status === topSelector || topSelector==='All'){
+
                 setWorkItems((previousItems) =>
-                    previousItems.map((item) =>
+                    (previousItems.map((item) =>
                         item.id === updatedItem.id ? updatedItem : item,
-                    ),
+                    )).filter(element=>element.status===topSelector||topSelector==='All')
                 )               
 
-            }
+
                 setDraftStatuses((previous) => {
                     const remaining = { ...previous }
     
@@ -52,9 +52,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             )
         } finally {
             setSavingItemId(null);
-            if (selectedStatus!==topSelector){
-                setUpdatedSelected(!updatedSelected)
-            }
+
         }
 
     }
@@ -102,7 +100,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         return (() => {
             controller.abort()
         })
-    }, [retryCount,topSelector, updatedSelected])
+    }, [retryCount,topSelector])
 
     async function createWorkItem(title: string, description: string) {
         setCreatingItem(true);
