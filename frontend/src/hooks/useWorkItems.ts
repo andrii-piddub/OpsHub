@@ -6,6 +6,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     // const []
     const [itemsLoading, setItemsLoading] = useState(true)
+    const [updatedSelected, setUpdatedSelected]= useState(true)
     const [itemsError, setItemsError] = useState('')
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
@@ -49,6 +50,9 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             )
         } finally {
             setSavingItemId(null);
+            if (selectedStatus!==topSelector){
+                setUpdatedSelected(!updatedSelected)
+            }
         }
 
     }
@@ -96,7 +100,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         return (() => {
             controller.abort()
         })
-    }, [retryCount,topSelector, savingItemId, creatingItem])
+    }, [retryCount,topSelector, updatedSelected])
 
     async function createWorkItem(title: string, description: string) {
         setCreatingItem(true);
@@ -114,6 +118,9 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             )
         } finally {
             setCreatingItem(false)
+            if (topSelector==='DN'|| topSelector==='IP'){
+                setUpdatedSelected(!updatedSelected)
+            }
         }
     }
 
