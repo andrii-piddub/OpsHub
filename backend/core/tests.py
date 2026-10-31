@@ -26,6 +26,17 @@ class WorkItemCreateTests(TestCase):
         response = self.client.post(data={"description":"Test description"}, path='/api/v1/workitem/')
         self.assertEqual(response.status_code,400)
         self.assertEqual(WorkItem.objects.count(),0)
+    def test_create_work_item_wrong_status(self):
+        response = self.client.post(data={'title':'Third title', 'status':'XX'},path='/api/v1/workitem/')
+        self.assertEqual(response.status_code,400)
+        response_get=self.client.get("/api/v1/workitem/")
+        self.assertEqual(len(response_get.json()),0)
+    def test_create_work_item_only_with_title(self):
+        response = self.client.post(data={'title':'Interesting info'}, path='/api/v1/workitem/')
+        self.assertEqual(response.status_code,201)
+        response_get=WorkItem.objects.get()
+        self.assertEqual(response_get.description,'')
+
 
 class WorkItemUpdateTests(TestCase):
     def test_update_work_item(self):
@@ -65,17 +76,7 @@ class WorkItemGetTests(TestCase):
         self.assertIn('First test',list_of_titles)
         self.assertIn('Second test',list_of_titles)
 
-class WorkItemCreateTests(TestCase):
-    def test_create_work_item_wrong_status(self):
-        response = self.client.post(data={'status':'XX'},path='/api/v1/workitem/')
-        self.assertEqual(response.status_code,400)
-        response_get=self.client.get("/api/v1/workitem/")
-        self.assertEqual(len(response_get.json()),0)
-    def test_create_work_item_only_with_title(self):
-        response = self.client.post(data={'title':'Interesting info'}, path='/api/v1/workitem/')
-        self.assertEqual(response.status_code,201)
-        response_get=self.client.get("/api/v1/workitem/")
-        self.assertEqual(response_get.json()[0]['description'],'')
+
 
 
 
