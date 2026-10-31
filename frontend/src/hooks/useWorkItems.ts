@@ -31,22 +31,21 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
 
         try {
             const updatedItem = await patchWorkitems(itemId, selectedStatus)
+            if(updatedItem.status === topSelector || topSelector==='All'){
+                setWorkItems((previousItems) =>
+                    previousItems.map((item) =>
+                        item.id === updatedItem.id ? updatedItem : item,
+                    ),
+                )               
 
-            setWorkItems((previousItems) =>
-                previousItems.map((item) =>
-                    item.id === updatedItem.id ? updatedItem : item,
-                ),
-            )
-            if (updatedItem.status===topSelector || topSelector==='All')
-            {
-                
+            }
                 setDraftStatuses((previous) => {
                     const remaining = { ...previous }
     
                     delete remaining[itemId]
                     return remaining
                 })
-            }
+
         } catch (error) {
             setItemsError(
                 error instanceof Error ? error.message : 'Failed to update status',
