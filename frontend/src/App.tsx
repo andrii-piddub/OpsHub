@@ -21,6 +21,7 @@ function App() {
      handleDeleteWorkItem, deletingItemId } = useWorkItems(retryCount)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [topSelector, setTopSelector]=useState('All')
 
 
 
@@ -134,7 +135,20 @@ function App() {
 
 
 
+<label htmlFor="workitems">
+  Choose Work Item
+</label>
+<select id="workitems"
+  value={topSelector}
+  onChange={(event)=>{
+    setTopSelector(event.target.value)
+  }}>
+  <option value="All">All</option>
+  <option value="OP">Open</option>
+  <option value="IP">In Progress</option>
+  <option value="DN">Done</option>
 
+</select>
       <div>
 <WorkItemsTable workItems={workItems} draftStatuses={draftStatuses} savingItemId={savingItemId} 
 onStatusChange={handleStatusChange} onSaveStatus={handleSaveStatus} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId}/>
