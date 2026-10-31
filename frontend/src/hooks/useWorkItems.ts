@@ -95,7 +95,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:string) {
         return (() => {
             controller.abort()
         })
-    }, [retryCount])
+    }, [retryCount,topSelector])
 
     async function createWorkItem(title: string, description: string) {
         setCreatingItem(true);
