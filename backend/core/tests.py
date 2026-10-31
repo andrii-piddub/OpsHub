@@ -36,6 +36,22 @@ class WorkItemCreateTests(TestCase):
         self.assertEqual(response.status_code,201)
         response_get=WorkItem.objects.get()
         self.assertEqual(response_get.description,'')
+    def test_create_work_item_without_status(self):
+        response = self.client.post(data={'title':'Fourth  title'},path='/api/v1/workitem/')
+        self.assertEqual(response.status_code,201)
+        response_get=WorkItem.objects.get()
+        self.assertEqual(response_get.status,'OP')
+    def test_create_work_item_with_empty_title(self):
+        response = self.client.post(data={'title':''},path='/api/v1/workitem/')
+        self.assertEqual(response.status_code,400)
+        error_message = response.json()
+        self.assertEqual(error_message['title'],['This field may not be blank.'])
+        self.assertEqual(WorkItem.objects.count(),0)
+    def test_create_long_title(self):
+        response = self.client.post(data={'title':'?]x.!?22A=dVy?M7QwYxFLa@06e2+*{2==,K@_qD}ngPtCm;YL@r=]BG6rhztJx0qk?#%XCdH,Xx=@{+!c?wP?,:yj:gR1vDzw:!ETDp*faS7)AG+Fq!!)J),71;L/*idBwDvZbD]Hp-{z&}aA66=;/pda)*%2p%b2D[?#PJ$0SU-]NnZiLF}6$qvw.6jjg+j3/,%h1+k'},
+        path='/api/v1/workitem/')
+        self.assertEqual(response.status_code,400)
+        self.assertEqual(WorkItem.objects.count(),0)
 
 
 class WorkItemUpdateTests(TestCase):
