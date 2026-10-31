@@ -7,7 +7,7 @@ export type WorkItem = {
   created_at: string
 }
 
-export async function getWorkItems(signal: AbortSignal,topSelector:string): Promise<WorkItem[]> {
+export async function getWorkItems(signal: AbortSignal,topSelector:'All'| WorkItemStatus): Promise<WorkItem[]> {
   let url = '/api/v1/workitem/'
   if (topSelector==='All') 
     {

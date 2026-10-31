@@ -5,13 +5,14 @@ import type { HealthResponse } from './api/health'
 import {useWorkItems} from './hooks/useWorkItems.ts'
 import WorkItemsTable from './components/WorkItemsTable.tsx'
 import WorkItemForm from './components/WorkItemForm.tsx'
+import type { WorkItemStatus } from './api/workitems'
 
 
 
 
 
 function App() {
-  const [topSelector, setTopSelector]=useState('All')
+  const [topSelector, setTopSelector]=useState<'All' | WorkItemStatus>('All')
   const [health, setHealth] = useState<HealthResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
