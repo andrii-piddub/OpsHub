@@ -24,7 +24,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
     async function handleSaveStatus(itemId: number) {
         const selectedStatus = draftStatuses[itemId]
 
-        if (!selectedStatus) return
+        if (!selectedStatus ) return
 
         setItemsError('')
         setSavingItemId(itemId);
@@ -37,13 +37,16 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
                     item.id === updatedItem.id ? updatedItem : item,
                 ),
             )
-
-            setDraftStatuses((previous) => {
-                const remaining = { ...previous }
-
-                delete remaining[itemId]
-                return remaining
-            })
+            if (updatedItem.status===topSelector || topSelector==='All')
+            {
+                
+                setDraftStatuses((previous) => {
+                    const remaining = { ...previous }
+    
+                    delete remaining[itemId]
+                    return remaining
+                })
+            }
         } catch (error) {
             setItemsError(
                 error instanceof Error ? error.message : 'Failed to update status',
@@ -107,7 +110,9 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         setCreateError('')
         try {
             const newItem = await postWorkItems(title, description)
-            setWorkItems((previousItems) => [...previousItems, newItem])
+            if (newItem.status ===topSelector || topSelector==='All'){
+                setWorkItems((previousItems) => [...previousItems, newItem])
+            }
             return true
 
         } catch (error) {
@@ -118,9 +123,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             )
         } finally {
             setCreatingItem(false)
-            if (topSelector==='DN'|| topSelector==='IP'){
-                setUpdatedSelected(!updatedSelected)
-            }
+
         }
     }
 
