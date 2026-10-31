@@ -18,13 +18,10 @@ type WorkItemsTableProps = {
 }
 
 
-
-
-
-
 function WorkItemsTable(props: WorkItemsTableProps) {
   return (<>
-    <table>
+    <div className="table-wrap">
+    <table className="work-table">
       <thead>
         <tr>
           <th scope="col">ID</th>
@@ -44,7 +41,11 @@ function WorkItemsTable(props: WorkItemsTableProps) {
             <td>{item.id}</td>
             <td>{item.title}</td>
             <td>{item.description}</td>
-            <td>{item.status}</td>
+            <td>
+              <span className={`badge badge-${item.status}`}>
+                {statuses.find((s) => s.value === item.status)?.label ?? item.status}
+              </span>
+            </td>
             <td>
               <select
                 value={props.draftStatuses[item.id] ?? item.status}
@@ -66,6 +67,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
             <td>
               <button
                 type="button"
+                className="btn btn-save"
                 onClick={() => props.onSaveStatus(item.id)}
                 disabled={props.savingItemId !== null || props.deletingItemId !== null}
               >
@@ -75,6 +77,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
             <td>
               <button
                 type="button"
+                className="btn btn-delete"
                 onClick={() => props.onDeleteWorkItem(item.id)}
                 disabled={props.deletingItemId !== null || props.savingItemId !== null}
               >
@@ -86,6 +89,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
         ))}
       </tbody>
     </table>
+    </div>
   </>)
 }
 export default WorkItemsTable

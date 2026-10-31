@@ -4,6 +4,7 @@ import { getWorkItems, patchWorkitems, postWorkItems, deleteWorkItem } from '../
 import type { WorkItemStatus } from '../api/workitems'
 export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemStatus) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
+    // const []
     const [itemsLoading, setItemsLoading] = useState(true)
     const [itemsError, setItemsError] = useState('')
     const [creatingItem, setCreatingItem] = useState(false)
@@ -95,7 +96,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         return (() => {
             controller.abort()
         })
-    }, [retryCount,topSelector])
+    }, [retryCount,topSelector, savingItemId, creatingItem])
 
     async function createWorkItem(title: string, description: string) {
         setCreatingItem(true);
