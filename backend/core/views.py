@@ -23,6 +23,11 @@ def health_check(request):
 def work_item(request):
     if request.method == "GET":
         work_item_list = WorkItem.objects.all()
+        status_item = request.query_params.get('status')
+        if status_item not in WorkItem.different_status and status_item is not None:
+            return Response({'status':[f'{status_item} is not valid. Choose one from {WorkItem.different_status}']}, status=status.HTTP_400_BAD_REQUEST)
+        elif status_item:
+            work_item_list = work_item_list.filter(status=status_item)
         serializer = WorkItemSerializer(work_item_list, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -30,7 +35,7 @@ def work_item(request):
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
 
 class ItemPartialUpdateView(APIView):

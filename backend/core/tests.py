@@ -91,6 +91,41 @@ class WorkItemGetTests(TestCase):
         list_of_titles = [ i['title']for i in response.json() if 'title' in i]
         self.assertIn('First test',list_of_titles)
         self.assertIn('Second test',list_of_titles)
+    def test_get_filtered_status_OP(self):
+        response_one = self.client.post(data={'title':'First test','status':'OP'},path='/api/v1/workitem/')
+        self.assertEqual(response_one.status_code,201)
+        response_second = self.client.post(data={'title':'Second test','status':'OP'},path='/api/v1/workitem/')
+        self.assertEqual(response_second.status_code,201)
+        response_third = self.client.post(data={'title':'Third test','status':'DN'},path='/api/v1/workitem/')
+        self.assertEqual(response_third.status_code,201)
+        response = self.client.get(path="/api/v1/workitem/",data={'status':'OP'})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.json()),2)
+        titles = [item['title']for item in response.json()]
+        self.assertCountEqual(titles,['First test', 'Second test'])
+        statuses = [item['status']for item in response.json()]
+        self.assertCountEqual(statuses,['OP','OP'])
+    def test_get_filtered_status_DN(self):
+        response_one = self.client.post(data={'title':'First test','status':'DN'},path='/api/v1/workitem/')
+        self.assertEqual(response_one.status_code,201)
+        response_second = self.client.post(data={'title':'Second test','status':'DN'},path='/api/v1/workitem/')
+        self.assertEqual(response_second.status_code,201)
+        response_third = self.client.post(data={'title':'Third test','status':'IP'},path='/api/v1/workitem/')
+        self.assertEqual(response_third.status_code,201)
+        response = self.client.get(path="/api/v1/workitem/",data={'status':'DN'})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.json()),2)
+        titles = [item['title']for item in response.json()]
+        self.assertCountEqual(titles,['First test', 'Second test'])
+        statuses = [item['status']for item in response.json()]
+        self.assertCountEqual(statuses,['DN','DN'])
+    def test_get_filtered_status_wrong(self):
+        response = self.client.get(path="/api/v1/workitem/",data={'status':'XX'})
+        self.assertEqual(response.status_code,400)
+
+
+
+
 
 
 
