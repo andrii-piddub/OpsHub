@@ -142,7 +142,7 @@ function App() {
 <select id="workitems"
   value={topSelector}
   onChange={(event)=>{
-    setTopSelector(event.target.value)
+    setTopSelector(event.target.value as 'All' | WorkItemStatus)
   }}>
   <option value="All">All</option>
   <option value="OP">Open</option>
