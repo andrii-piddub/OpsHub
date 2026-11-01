@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import type { FormEvent } from 'react'
 import { getHealth } from './api/health'
 import type { HealthResponse } from './api/health'
-import {useWorkItems} from './hooks/useWorkItems.ts'
+import { useWorkItems } from './hooks/useWorkItems.ts'
 import WorkItemsTable from './components/WorkItemsTable.tsx'
 import WorkItemForm from './components/WorkItemForm.tsx'
 import type { WorkItemStatus } from './api/workitems'
@@ -12,15 +12,16 @@ import type { WorkItemStatus } from './api/workitems'
 
 
 function App() {
-  const [topSelector, setTopSelector]=useState<'All' | WorkItemStatus>('All')
+  const [topSelector, setTopSelector] = useState<'All' | WorkItemStatus>('All')
   const [health, setHealth] = useState<HealthResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
-  const {workItems, itemsLoading, itemsError,
-     creatingItem, createError, savingItemId,  
-     draftStatuses, handleStatusChange, handleSaveStatus, createWorkItem, 
-     handleDeleteWorkItem, deletingItemId } = useWorkItems(retryCount, topSelector)
+  const [searchValue, setSearchValue] = useState('')
+  const { workItems, itemsLoading, itemsError,
+    creatingItem, createError, savingItemId,
+    draftStatuses, handleStatusChange, handleSaveStatus, createWorkItem,
+    handleDeleteWorkItem, deletingItemId } = useWorkItems(retryCount, topSelector, searchValue)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
 
@@ -72,15 +73,15 @@ function App() {
 
 
 
-// #region handleSubmit
+  // #region handleSubmit
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const success = await createWorkItem(title,description)
-    if (success === true ){
+    const success = await createWorkItem(title, description)
+    if (success === true) {
       setTitle('');
       setDescription('');
     }
-    
+
   }
 
 
@@ -136,23 +137,33 @@ function App() {
 
 
 
-<label htmlFor="workitems">
-  Choose Work Item
-</label>
-<select id="workitems"
-  value={topSelector}
-  onChange={(event)=>{
-    setTopSelector(event.target.value as 'All' | WorkItemStatus)
-  }}>
-  <option value="All">All</option>
-  <option value="OP">Open</option>
-  <option value="IP">In Progress</option>
-  <option value="DN">Done</option>
+      <label htmlFor="workitems">
+        Choose Work Item
+      </label>
+      <select id="workitems"
+        value={topSelector}
+        onChange={(event) => {
+          setTopSelector(event.target.value as 'All' | WorkItemStatus)
+        }}>
+        <option value="All">All</option>
+        <option value="OP">Open</option>
+        <option value="IP">In Progress</option>
+        <option value="DN">Done</option>
 
-</select>
+      </select>
+
+      <input
+        className='search-button'
+        placeholder='Search'
+        value={searchValue}
+        onChange={(event)=>{
+          setSearchValue(event.target.value)
+        }}
+      />
+
       <div>
-<WorkItemsTable workItems={workItems} draftStatuses={draftStatuses} savingItemId={savingItemId} 
-onStatusChange={handleStatusChange} onSaveStatus={handleSaveStatus} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId}/>
+        <WorkItemsTable workItems={workItems} draftStatuses={draftStatuses} savingItemId={savingItemId}
+          onStatusChange={handleStatusChange} onSaveStatus={handleSaveStatus} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} />
 
 
 
@@ -170,15 +181,15 @@ onStatusChange={handleStatusChange} onSaveStatus={handleSaveStatus} onDeleteWork
         <p>There are no Work Items yet</p>
       )}
 
-      <form 
-      className="workitem-form"
-      onSubmit={handleSubmit}>
-       <WorkItemForm 
-       title={title}
-       description={description} 
-       onTitleChange={setTitle}
-       onDescriptionChange={setDescription}
-       />
+      <form
+        className="workitem-form"
+        onSubmit={handleSubmit}>
+        <WorkItemForm
+          title={title}
+          description={description}
+          onTitleChange={setTitle}
+          onDescriptionChange={setDescription}
+        />
 
         <button type="submit" disabled={creatingItem}>
           {creatingItem ? 'Creating' : 'Submit'}

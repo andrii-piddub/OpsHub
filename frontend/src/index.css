@@ -202,3 +202,8 @@ button:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ---------- accessibility ---------- */
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+
+.search-button{
+  margin-top: 20px;
+}

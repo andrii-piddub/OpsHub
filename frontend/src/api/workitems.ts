@@ -7,37 +7,41 @@ export type WorkItem = {
   created_at: string
 }
 
-export async function getWorkItems(signal: AbortSignal,topSelector:'All'| WorkItemStatus): Promise<WorkItem[]> {
+export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, searchValue: string): Promise<WorkItem[]> {
   let url = '/api/v1/workitem/'
-  if (topSelector==='All') 
-    {
+  if (topSelector === 'All') {
     url = '/api/v1/workitem/'
-  } else if (topSelector==='IP'||topSelector==='OP'||topSelector==='DN'){
+  } else if (topSelector === 'IP' || topSelector === 'OP' || topSelector === 'DN') {
     url = `/api/v1/workitem/?status=${topSelector}`
   }
-  
+  if (searchValue &&(topSelector === 'IP' || topSelector === 'OP' || topSelector === 'DN')){
+  url = `/api/v1/workitem/?status=${topSelector}&search=${searchValue}`
+  } else if (searchValue) {
+    url = `/api/v1/workitem/?search=${searchValue}`
+  }
+
   const response = await fetch(url, { signal })
- if (!response.ok) {
+  if (!response.ok) {
     throw new Error(`Request failed: ${response.status}`)
-  } 
+  }
   return (await response.json()) as WorkItem[]
 }
 
-export async function postWorkItems(title:string, description:string) {
+export async function postWorkItems(title: string, description: string) {
   const response = await fetch(
-    '/api/v1/workitem/',   
+    '/api/v1/workitem/',
     {
-      method: 'POST',                           
+      method: 'POST',
       headers: {
-        'Content-Type': 'application/json',      
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ title: title, description: description}),  
+      body: JSON.stringify({ title: title, description: description }),
     },
   )
-   if (!response.ok) {
+  if (!response.ok) {
     throw new Error(`Request failed: ${response.status}`)
   }
-    return (await response.json()) as WorkItem
+  return (await response.json()) as WorkItem
 }
 
 export async function patchWorkitems(
@@ -66,7 +70,7 @@ export async function deleteWorkItem(
   id: number,
 ): Promise<void> {
   const url = `/api/v1/workitem/${id}/`
-  const response = await fetch(url,{method:'DELETE'} )
+  const response = await fetch(url, { method: 'DELETE' })
   if (!response.ok) {
     throw new Error(`Request failed: ${response.status}`)
   }

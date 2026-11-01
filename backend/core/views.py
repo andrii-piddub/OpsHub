@@ -5,7 +5,7 @@ from .models import WorkItem
 from .serializers import WorkItemSerializer, PatchWorkitemSerializer
 from rest_framework import status
 from rest_framework.views import APIView
-from django.db.models import Q
+
 
 
 @api_view(["GET"])
