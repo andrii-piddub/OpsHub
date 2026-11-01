@@ -8,17 +8,15 @@ export type WorkItem = {
 }
 
 export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, searchValue: string): Promise<WorkItem[]> {
-  let url = '/api/v1/workitem/'
-  if (topSelector === 'All') {
-    url = '/api/v1/workitem/'
-  } else if (topSelector === 'IP' || topSelector === 'OP' || topSelector === 'DN') {
-    url = `/api/v1/workitem/?status=${topSelector}`
+  let url = new URL('/api/v1/workitem/', window.location.origin)
+  const params = new URLSearchParams(url.search)
+  if (topSelector && topSelector!='All'){
+    params.append('status',topSelector)
   }
-  if (searchValue &&(topSelector === 'IP' || topSelector === 'OP' || topSelector === 'DN')){
-  url = `/api/v1/workitem/?status=${topSelector}&search=${searchValue}`
-  } else if (searchValue) {
-    url = `/api/v1/workitem/?search=${searchValue}`
+  if (searchValue){
+    params.append('search',searchValue)
   }
+  url.search=params.toString()
 
   const response = await fetch(url, { signal })
   if (!response.ok) {
