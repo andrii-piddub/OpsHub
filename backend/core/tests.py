@@ -76,52 +76,75 @@ class WorkItemUpdateTests(TestCase):
         self.assertEqual(created_item.status,'OP')
 
 class WorkItemGetTests(TestCase):
+    def setUp(self):
+        WorkItem.objects.create(title='First case', status='IP')
+        WorkItem.objects.create(title='Second case', status='DN')
+        WorkItem.objects.create(title='Third case',status='OP')
     def test_get_work_item(self):
         response = self.client.get("/api/v1/workitem/")
         self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.json()),0)
+        self.assertEqual(len(response.json()),3)
     def test_get_two_work_items(self):
-        response_one = self.client.post(data={'title':'First test','description':'New description','status':'OP'},path='/api/v1/workitem/')
-        self.assertEqual(response_one.status_code,201)
-        response_two = self.client.post(data={'title':'Second test','description':'New description','status':'OP'},path='/api/v1/workitem/')
-        self.assertEqual(response_two.status_code,201)
         response = self.client.get("/api/v1/workitem/")
         self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.json()),2)
+        self.assertEqual(len(response.json()),3)
         list_of_titles = [ i['title']for i in response.json() if 'title' in i]
-        self.assertIn('First test',list_of_titles)
-        self.assertIn('Second test',list_of_titles)
+        self.assertIn('First case',list_of_titles)
+        self.assertIn('Second case',list_of_titles)
     def test_get_filtered_status_OP(self):
-        response_one = self.client.post(data={'title':'First test','status':'OP'},path='/api/v1/workitem/')
-        self.assertEqual(response_one.status_code,201)
-        response_second = self.client.post(data={'title':'Second test','status':'OP'},path='/api/v1/workitem/')
-        self.assertEqual(response_second.status_code,201)
-        response_third = self.client.post(data={'title':'Third test','status':'DN'},path='/api/v1/workitem/')
-        self.assertEqual(response_third.status_code,201)
-        response = self.client.get(path="/api/v1/workitem/",data={'status':'OP'})
+        WorkItem.objects.create(title='Fourth case', status='OP')
+        response = self.client.get(path="/api/v1/workitem/", data={'status':'OP'})
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.json()),2)
         titles = [item['title']for item in response.json()]
-        self.assertCountEqual(titles,['First test', 'Second test'])
+        self.assertCountEqual(titles,['Third case','Fourth case'])
         statuses = [item['status']for item in response.json()]
         self.assertCountEqual(statuses,['OP','OP'])
     def test_get_filtered_status_DN(self):
-        response_one = self.client.post(data={'title':'First test','status':'DN'},path='/api/v1/workitem/')
-        self.assertEqual(response_one.status_code,201)
-        response_second = self.client.post(data={'title':'Second test','status':'DN'},path='/api/v1/workitem/')
-        self.assertEqual(response_second.status_code,201)
-        response_third = self.client.post(data={'title':'Third test','status':'IP'},path='/api/v1/workitem/')
-        self.assertEqual(response_third.status_code,201)
+        response_fourth = self.client.post(data={'title':'Fourth case','status':'DN'},path='/api/v1/workitem/')
+        self.assertEqual(response_fourth.status_code,201)
         response = self.client.get(path="/api/v1/workitem/",data={'status':'DN'})
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.json()),2)
         titles = [item['title']for item in response.json()]
-        self.assertCountEqual(titles,['First test', 'Second test'])
+        self.assertCountEqual(titles,['Second case', 'Fourth case'])
         statuses = [item['status']for item in response.json()]
         self.assertCountEqual(statuses,['DN','DN'])
     def test_get_filtered_status_wrong(self):
         response = self.client.get(path="/api/v1/workitem/",data={'status':'XX'})
         self.assertEqual(response.status_code,400)
+    def test_get_by_search(self):
+        response=self.client.get(path="/api/v1/workitem/",query_params={'search':'First'})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.json()),1)
+        self.assertEqual(response.json()[0]['title'],'First case')
+    def test_get_by_search_insensitive(self):
+        response=self.client.get(path="/api/v1/workitem/",query_params={'search':'FIRST'})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.json()),1)
+        self.assertEqual(response.json()[0]['title'],'First case')
+    def test_get_by_search_and_filter(self):
+        WorkItem.objects.create(title='Fourth case',status='OP')
+        response=self.client.get(path="/api/v1/workitem/", query_params={'search':'Fourth','status':'OP'})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.json()),1)
+        self.assertEqual(response.json()[0]['title'],'Fourth case')
+    def test_get_by_empty_search(self):
+        response=self.client.get(path="/api/v1/workitem/", query_params={'search':''})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.json()),3)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

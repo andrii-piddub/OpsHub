@@ -5,6 +5,7 @@ from .models import WorkItem
 from .serializers import WorkItemSerializer, PatchWorkitemSerializer
 from rest_framework import status
 from rest_framework.views import APIView
+from django.db.models import Q
 
 
 @api_view(["GET"])
@@ -22,13 +23,16 @@ def health_check(request):
 @permission_classes([AllowAny])
 def work_item(request):
     if request.method == "GET":
-        work_item_list = WorkItem.objects.all()
+        query_set = WorkItem.objects.all()
         status_item = request.query_params.get('status')
         if status_item not in WorkItem.different_status and status_item is not None:
             return Response({'status':[f'{status_item} is not valid. Choose one from {WorkItem.different_status}']}, status=status.HTTP_400_BAD_REQUEST)
         elif status_item:
-            work_item_list = work_item_list.filter(status=status_item)
-        serializer = WorkItemSerializer(work_item_list, many=True)
+            query_set = query_set.filter(status=status_item)
+        search = request.query_params.get('search',"").strip()
+        if search:
+            query_set = query_set.filter(Q(title__icontains=search) | Q(description__icontains=search))
+        serializer = WorkItemSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     serializer = WorkItemSerializer(data=request.data)
