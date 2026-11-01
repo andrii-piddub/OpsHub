@@ -31,7 +31,7 @@ def work_item(request):
             query_set = query_set.filter(status=status_item)
         search = request.query_params.get('search',"").strip()
         if search:
-            query_set = query_set.filter(Q(title__icontains=search) | Q(description__icontains=search))
+            query_set = query_set.filter(title__icontains=search)
         serializer = WorkItemSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

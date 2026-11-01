@@ -81,13 +81,15 @@ class WorkItemGetTests(TestCase):
         WorkItem.objects.create(title='Second case', status='DN')
         WorkItem.objects.create(title='Third case',status='OP')
     def test_get_work_item(self):
+        WorkItem.objects.all().delete()
         response = self.client.get("/api/v1/workitem/")
         self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.json()),3)
+        self.assertEqual(len(response.json()),0)
     def test_get_two_work_items(self):
+        WorkItem.objects.filter(status='OP').delete()
         response = self.client.get("/api/v1/workitem/")
         self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.json()),3)
+        self.assertEqual(len(response.json()),2)
         list_of_titles = [ i['title']for i in response.json() if 'title' in i]
         self.assertIn('First case',list_of_titles)
         self.assertIn('Second case',list_of_titles)
@@ -125,6 +127,7 @@ class WorkItemGetTests(TestCase):
         self.assertEqual(response.json()[0]['title'],'First case')
     def test_get_by_search_and_filter(self):
         WorkItem.objects.create(title='Fourth case',status='OP')
+        WorkItem.objects.create(title='Fourth case new',status='DN')
         response=self.client.get(path="/api/v1/workitem/", query_params={'search':'Fourth','status':'OP'})
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.json()),1)
