@@ -99,7 +99,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         return (() => {
             controller.abort()
         })
-    }, [retryCount,topSelector,searchValue])
+    }, [retryCount,topSelector,searchValue, orderingType])
 
     async function createWorkItem(title: string, description: string) {
         setCreatingItem(true);
@@ -107,7 +107,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         try {
             const newItem = await postWorkItems(title, description)
             if ((newItem.status ===topSelector || topSelector==='All') && (searchValue==="" || newItem.title.toLowerCase().includes(searchValue.toLowerCase()))){
-                setWorkItems((previousItems) => [...previousItems, newItem])
+                setWorkItems((previousItems) =>(orderingType==='-created_at'?[newItem, ...previousItems ]: [...previousItems, newItem]))
             }
             return true
 

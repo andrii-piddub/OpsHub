@@ -17,7 +17,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
-  const [orderingType, setOrderingType]=useState('')
+  const [orderingType, setOrderingType]=useState('-created_at')
   const [searchValue, setSearchValue] = useState('')
   const { workItems, itemsLoading, itemsError,
     creatingItem, createError, savingItemId,
