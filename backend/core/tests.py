@@ -1,7 +1,8 @@
 from django.test import TestCase
 from .models import WorkItem
 import json
-
+from datetime import timedelta
+from django.utils import timezone
 
 # Create your tests here.
 class WorkItemDeleteTests(TestCase): 
@@ -80,6 +81,11 @@ class WorkItemGetTests(TestCase):
         WorkItem.objects.create(title='First case', status='IP')
         WorkItem.objects.create(title='Second case', status='DN')
         WorkItem.objects.create(title='Third case',status='OP')
+
+        now = timezone.now()
+        WorkItem.objects.filter(pk=36).update(created_at=now)
+        WorkItem.objects.filter(pk=37).update(created_at=now - timedelta(days=2))
+        WorkItem.objects.filter(pk=38).update(created_at=now - timedelta(days=1))
     def test_get_work_item(self):
         WorkItem.objects.all().delete()
         response = self.client.get("/api/v1/workitem/")
@@ -136,6 +142,31 @@ class WorkItemGetTests(TestCase):
         response=self.client.get(path="/api/v1/workitem/", query_params={'search':''})
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.json()),3)
+    def test_ordering_ascending_get(self):
+        response=self.client.get(path="/api/v1/workitem/", query_params={'ordering':'created_at'})
+        self.assertEqual(response.status_code,200)
+        dates=[i['created_at']for i in response.json()]
+        self.assertEqual(dates,sorted(dates,reverse=False))
+    def test_ordering_descending_get(self):
+        response=self.client.get(path='/api/v1/workitem/', query_params={'ordering':'-created_at'})
+        self.assertEqual(response.status_code,200)
+        dates=[i['created_at']for i in response.json()]
+        self.assertEqual(dates,sorted(dates,reverse=True))
+    def test_ordering_default_get(self):
+        response=self.client.get(path='/api/v1/workitem/')
+        self.assertEqual(response.status_code,200)
+        dates=[i['created_at']for i in response.json()]
+        self.assertEqual(dates,sorted(dates,reverse=True))
+    def test_ordering_wrong_value(self):
+        response=self.client.get(path='/api/v1/workitem/', query_params={'ordering':'wrong'})
+        self.assertEqual(response.status_code,400)
+
+
+
+
+
+
+
 
 
 

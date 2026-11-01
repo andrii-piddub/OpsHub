@@ -17,11 +17,12 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
+  const [orderingType, setOrderingType]=useState('')
   const [searchValue, setSearchValue] = useState('')
   const { workItems, itemsLoading, itemsError,
     creatingItem, createError, savingItemId,
     draftStatuses, handleStatusChange, handleSaveStatus, createWorkItem,
-    handleDeleteWorkItem, deletingItemId } = useWorkItems(retryCount, topSelector, searchValue)
+    handleDeleteWorkItem, deletingItemId } = useWorkItems(retryCount, topSelector, searchValue, orderingType)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue]=useState('')
@@ -137,10 +138,7 @@ function App() {
           <p>Статус: {health.status}</p>
         </div>
       )}
-
-
-
-
+    <p></p>
 
 
 
@@ -171,6 +169,16 @@ function App() {
           
         }
       />
+      <select
+      id='ordering'
+      value={orderingType}
+      onChange={(event)=>{
+        setOrderingType(event.target.value)
+      }}>
+        <option value='-created_at'>Newest first</option>
+        <option value='created_at'>Oldest first</option>
+      </select>
+      
 
       <div>
         <WorkItemsTable workItems={workItems} draftStatuses={draftStatuses} savingItemId={savingItemId}

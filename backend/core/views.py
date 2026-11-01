@@ -23,7 +23,7 @@ def health_check(request):
 @permission_classes([AllowAny])
 def work_item(request):
     if request.method == "GET":
-        query_set = WorkItem.objects.all()
+        query_set = WorkItem.objects.all().order_by('-created_at')
         status_item = request.query_params.get('status')
         if status_item not in WorkItem.different_status and status_item is not None:
             return Response({'status':[f'{status_item} is not valid. Choose one from {WorkItem.different_status}']}, status=status.HTTP_400_BAD_REQUEST)
@@ -32,6 +32,13 @@ def work_item(request):
         search = request.query_params.get('search',"").strip()
         if search:
             query_set = query_set.filter(title__icontains=search)
+        ordering = request.query_params.get('ordering')
+        if ordering=='created_at':
+            query_set = query_set.order_by('created_at')
+        elif ordering=='-created_at':
+            query_set = query_set.order_by('-created_at')
+        elif ordering is not None and ordering not in ['created_at','-created_at']:
+            return Response({'Wrong Ordering'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = WorkItemSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
