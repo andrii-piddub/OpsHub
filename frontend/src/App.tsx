@@ -151,8 +151,9 @@ function App() {
         <option value="DN">Done</option>
 
       </select>
-
+      <label htmlFor='search'>Search</label>
       <input
+        id='search'
         className='search-button'
         placeholder='Search'
         value={searchValue}
