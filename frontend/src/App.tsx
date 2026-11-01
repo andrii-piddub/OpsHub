@@ -24,7 +24,15 @@ function App() {
     handleDeleteWorkItem, deletingItemId } = useWorkItems(retryCount, topSelector, searchValue)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [inputValue, setInputValue]=useState('')
+  
 
+  useEffect(()=>{
+    const timeId = setTimeout(()=>{
+    setSearchValue(inputValue)
+  },300)
+  return ()=>clearTimeout(timeId)
+  },[inputValue])
 
 
 
@@ -156,10 +164,12 @@ function App() {
         id='search'
         className='search-button'
         placeholder='Search'
-        value={searchValue}
+        value={inputValue}
         onChange={(event)=>{
-          setSearchValue(event.target.value)
-        }}
+          setInputValue(event.target.value)
+          }
+          
+        }
       />
 
       <div>
