@@ -6,8 +6,8 @@ export type WorkItem = {
   status: WorkItemStatus
   created_at: string
 }
-
-export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: string): Promise<WorkItem[]> {
+import type { WorkItemOrdering } from "../App";
+export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering): Promise<WorkItem[]> {
   let url = new URL('/api/v1/workitem/', window.location.origin)
   const params = new URLSearchParams(url.search)
   if (topSelector && topSelector!='All'){

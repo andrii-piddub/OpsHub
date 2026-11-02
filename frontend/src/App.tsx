@@ -8,7 +8,7 @@ import WorkItemForm from './components/WorkItemForm.tsx'
 import type { WorkItemStatus } from './api/workitems'
 
 
-
+export type WorkItemOrdering = 'created_at' | '-created_at' 
 
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
-  const [orderingType, setOrderingType]=useState('-created_at')
+  const [orderingType, setOrderingType]=useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
   const { workItems, itemsLoading, itemsError,
     creatingItem, createError, savingItemId,
@@ -173,7 +173,7 @@ function App() {
       id='ordering'
       value={orderingType}
       onChange={(event)=>{
-        setOrderingType(event.target.value)
+        setOrderingType(event.target.value as WorkItemOrdering)
       }}>
         <option value='-created_at'>Newest first</option>
         <option value='created_at'>Oldest first</option>

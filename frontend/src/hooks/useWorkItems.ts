@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems, patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus } from '../api/workitems'
-export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemStatus, searchValue:string, orderingType:string) {
+import type { WorkItemOrdering } from "../App.tsx";
+export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemStatus, searchValue:string, orderingType:WorkItemOrdering) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
     

@@ -38,7 +38,7 @@ def work_item(request):
         elif ordering=='-created_at':
             query_set = query_set.order_by('-created_at')
         elif ordering is not None and ordering not in ['created_at','-created_at']:
-            return Response({'Wrong Ordering'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'ordering':f'Wrong ordering atribute - {ordering}'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = WorkItemSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

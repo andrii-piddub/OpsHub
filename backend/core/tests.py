@@ -78,14 +78,14 @@ class WorkItemUpdateTests(TestCase):
 
 class WorkItemGetTests(TestCase):
     def setUp(self):
-        WorkItem.objects.create(title='First case', status='IP')
-        WorkItem.objects.create(title='Second case', status='DN')
-        WorkItem.objects.create(title='Third case',status='OP')
+        first_item = WorkItem.objects.create(title='First case', status='IP')
+        second_item = WorkItem.objects.create(title='Second case', status='DN')
+        third_item = WorkItem.objects.create(title='Third case',status='OP')
 
         now = timezone.now()
-        WorkItem.objects.filter(pk=36).update(created_at=now)
-        WorkItem.objects.filter(pk=37).update(created_at=now - timedelta(days=2))
-        WorkItem.objects.filter(pk=38).update(created_at=now - timedelta(days=1))
+        WorkItem.objects.filter(pk=third_item.pk).update(created_at=now)
+        WorkItem.objects.filter(pk=second_item.pk).update(created_at=now - timedelta(days=2))
+        WorkItem.objects.filter(pk=first_item.pk).update(created_at=now - timedelta(days=1))
     def test_get_work_item(self):
         WorkItem.objects.all().delete()
         response = self.client.get("/api/v1/workitem/")
