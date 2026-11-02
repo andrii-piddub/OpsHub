@@ -63,6 +63,8 @@ export async function postWorkItems(title: string, description: string) {
 export async function patchWorkitems(
   id: number,
   status: WorkItemStatus,
+  title:string,
+  description:string
 ): Promise<WorkItem> {
   const response = await fetch(
     `/api/v1/workitem/${id}/`,
@@ -71,7 +73,7 @@ export async function patchWorkitems(
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({title:title, status:status, description:description }),
     },
   )
 

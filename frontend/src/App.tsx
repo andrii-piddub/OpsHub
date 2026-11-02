@@ -6,12 +6,11 @@ import { useWorkItems } from './hooks/useWorkItems.ts'
 import WorkItemsTable from './components/WorkItemsTable.tsx'
 import WorkItemForm from './components/WorkItemForm.tsx'
 import type { WorkItemStatus, WorkItemOrdering } from './api/workitems'
-
-
-
-
+import type { Draft } from './components/WorkItemsTable.tsx'
 
 function App() {
+
+  // ===== STATE =====
   const [topSelector, setTopSelector] = useState<'All' | WorkItemStatus>('All')
   const [health, setHealth] = useState<HealthResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -22,13 +21,14 @@ function App() {
   const [searchValue, setSearchValue] = useState('')
   const { workItems, itemsLoading, itemsError,
     creatingItem, createError, savingItemId,
-    draftStatuses, handleStatusChange, handleSaveStatus, createWorkItem,
+    draft, handleStatusChange, handleSaveStatus, createWorkItem,
     handleDeleteWorkItem, deletingItemId, paginationInfo } = useWorkItems(retryCount, topSelector, searchValue, orderingType, page, setPage)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
 
 
+  // ===== useEffect: search debounce =====
   useEffect(() => {
     const timeId = setTimeout(() => {
       setSearchValue(inputValue)
@@ -38,12 +38,7 @@ function App() {
   }, [inputValue])
 
 
-
-
-
-
-
-
+  // ===== useEffect: health check =====
   useEffect(() => {
     const controller = new AbortController()
 
@@ -76,15 +71,7 @@ function App() {
   }, [retryCount])
 
 
-
-
-
-
-
-
-
-
-  // #region handleSubmit
+  // ===== handleSubmit =====
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const success = await createWorkItem(title, description)
@@ -96,27 +83,12 @@ function App() {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // ===== RENDER =====
   return (
     <main>
       <h1>OpsHub</h1>
 
+      {/* ===== Health check ===== */}
       <button
         type="button"
         onClick={() => setRetryCount((previous) => previous + 1)}
@@ -124,12 +96,6 @@ function App() {
       >
         {loading || itemsLoading ? 'Checking' : 'Checking again'}
       </button>
-
-
-
-
-
-
 
       {loading && <p>Checking connection with server</p>}
       {error && <p role="alert">Error: {error}</p>}
@@ -143,8 +109,7 @@ function App() {
       <p></p>
 
 
-
-
+      {/* ===== Filters: status, search, ordering ===== */}
       <label htmlFor="workitems">
         Choose Work Item
       </label>
@@ -184,11 +149,14 @@ function App() {
       </select>
 
 
+      {/* ===== Work items table ===== */}
       <div>
-        <WorkItemsTable workItems={workItems} draftStatuses={draftStatuses} savingItemId={savingItemId}
+        <WorkItemsTable workItems={workItems} draft={draft} savingItemId={savingItemId}
           onStatusChange={handleStatusChange} onSaveStatus={handleSaveStatus} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} />
       </div>
 
+
+      {/* ===== Pagination ===== */}
       <div className="pagination">
         <button className="pagination__btn"
         onClick={()=>{
@@ -206,6 +174,7 @@ function App() {
       <p></p>
 
 
+      {/* ===== Loading / error / empty messages ===== */}
       {itemsLoading && <p>Loading work items</p>}
       {itemsError && <p role="alert">Error: {itemsError}</p>}
 
@@ -213,6 +182,8 @@ function App() {
         <p>There are no Work Items yet</p>
       )}
 
+
+      {/* ===== Create form ===== */}
       <form
         className="workitem-form"
         onSubmit={handleSubmit}>

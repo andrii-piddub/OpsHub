@@ -3,10 +3,12 @@ import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems, patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus } from '../api/workitems'
 import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
-
+import type { Draft } from "../components/WorkItemsTable.tsx";
 
 
 export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page: number, setPage: (page: number) => void) {
+
+    // ===== STATE =====
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
     const [refreshKey, setRefreshKey] = useState(0)
@@ -15,16 +17,21 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
-    const [draftStatuses, setDraftStatuses] = useState<
-        Record<number, WorkItemStatus>
-    >({})
+    const [draft, setDraft] = useState<Draft | null>(null)
+
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
+
+
+    // ===== handleStatusChange =====
     const handleStatusChange = (itemId: number, status: WorkItemStatus) => {
         setDraftStatuses((previous) => ({
             ...previous,
             [itemId]: status,
         }))
     }
+
+
+    // ===== handleSaveStatus =====
     async function handleSaveStatus(itemId: number) {
         const selectedStatus = draftStatuses[itemId]
 
@@ -62,6 +69,9 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
         }
 
     }
+
+
+    // ===== handleDeleteWorkItem =====
     async function handleDeleteWorkItem(id: number) {
         try {
             setItemsError('');
@@ -82,6 +92,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
     }
 
 
+    // ===== useEffect: load work items =====
     useEffect(() => {
         const controller = new AbortController()
         async function checkWorkItem() {
@@ -115,6 +126,8 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
         })
     }, [retryCount, topSelector, searchValue, orderingType, page, refreshKey])
 
+
+    // ===== createWorkItem =====
     async function createWorkItem(title: string, description: string) {
         setCreatingItem(true);
         setCreateError('')
@@ -137,10 +150,11 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
     }
 
 
+    // ===== RETURN =====
     return {
         workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
         setItemsError, creatingItem, setCreatingItem, createError, setCreateError,
-        savingItemId, setSavingItemId, draftStatuses, setDraftStatuses, handleStatusChange, handleSaveStatus,
+        savingItemId, setSavingItemId, draft, setDraft, handleStatusChange, handleSaveStatus,
         createWorkItem, handleDeleteWorkItem, deletingItemId, paginationInfo
     }
 }
