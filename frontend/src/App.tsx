@@ -32,6 +32,7 @@ function App() {
   useEffect(() => {
     const timeId = setTimeout(() => {
       setSearchValue(inputValue)
+      setPage(1)
     }, 300)
     return () => clearTimeout(timeId)
   }, [inputValue])
@@ -151,6 +152,7 @@ function App() {
         value={topSelector}
         onChange={(event) => {
           setTopSelector(event.target.value as 'All' | WorkItemStatus)
+          setPage(1)
         }}>
         <option value="All">All</option>
         <option value="OP">Open</option>
@@ -175,6 +177,7 @@ function App() {
         value={orderingType}
         onChange={(event) => {
           setOrderingType(event.target.value as WorkItemOrdering)
+          setPage(1)
         }}>
         <option value='-created_at'>Newest first</option>
         <option value='created_at'>Oldest first</option>

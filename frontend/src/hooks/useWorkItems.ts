@@ -66,9 +66,11 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             setItemsError('');
             setDeletingItemId(id);
             await deleteWorkItem(id)
-            setWorkItems((previousItems)=>{
-            return previousItems.filter((item)=>item.id!==id)})
-            setRefreshKey(refreshKey+1)
+            if (page>1 && workItems.length===1){
+                setPage(page-1)
+            }
+
+            setRefreshKey(prev=>prev+1)
         } catch (error) {
             setItemsError(
                 error instanceof Error ? error.message : 'Failed to delete item',
@@ -86,7 +88,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             setItemsError('');
             setWorkItems([]);
             try {
-                const data = await getWorkItems(controller.signal, topSelector, searchValue, orderingType, page, setPage)
+                const data = await getWorkItems(controller.signal, topSelector, searchValue, orderingType, page)
                 setWorkItems(data.results)
                 setPaginationInfo({count:data.count, num_pages:data.num_pages, current_page:data.current_page, 
                     next:data.next, previous:data.previous })
