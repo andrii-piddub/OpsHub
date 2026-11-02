@@ -19,14 +19,16 @@ export type WorkItemsResponse = {
 export type PaginationInfo = Omit<WorkItemsResponse, 'results'>
 
 export type WorkItemOrdering = 'created_at' | '-created_at' 
-export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page:number): Promise<WorkItemsResponse> {
+export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page:number, setPage:(page:number)=>void): Promise<WorkItemsResponse> {
   let url = new URL('/api/v1/workitem/', window.location.origin)
   const params = new URLSearchParams(url.search)
   if (topSelector && topSelector!='All'){
     params.append('status',topSelector)
+    setPage(1)
   }
   if (searchValue){
     params.append('search',searchValue)
+    setPage(1)
   }
   if (orderingType){
     params.append('ordering',orderingType)

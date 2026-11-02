@@ -9,6 +9,7 @@ import type { WorkItemOrdering, PaginationInfo  } from "../api/workitems.ts";
 export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemStatus, searchValue:string, orderingType:WorkItemOrdering, page:number, setPage:(page:number)=>void) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
+    const [refreshKey, setRefreshKey] = useState(0)
     const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({'count':1, 'num_pages':1,'current_page':1,'next':null, 'previous':null})
     const [itemsError, setItemsError] = useState('')
     const [creatingItem, setCreatingItem] = useState(false)
@@ -39,7 +40,8 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
                     (previousItems.map((item) =>
                         item.id === updatedItem.id ? updatedItem : item,
                     )).filter(element=>element.status===topSelector||topSelector==='All')
-                )               
+                )
+                setRefreshKey(refreshKey+1)               
 
 
                 setDraftStatuses((previous) => {
@@ -66,6 +68,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             await deleteWorkItem(id)
             setWorkItems((previousItems)=>{
             return previousItems.filter((item)=>item.id!==id)})
+            setRefreshKey(refreshKey+1)
         } catch (error) {
             setItemsError(
                 error instanceof Error ? error.message : 'Failed to delete item',
@@ -83,7 +86,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             setItemsError('');
             setWorkItems([]);
             try {
-                const data = await getWorkItems(controller.signal, topSelector, searchValue, orderingType, page)
+                const data = await getWorkItems(controller.signal, topSelector, searchValue, orderingType, page, setPage)
                 setWorkItems(data.results)
                 setPaginationInfo({count:data.count, num_pages:data.num_pages, current_page:data.current_page, 
                     next:data.next, previous:data.previous })
@@ -105,7 +108,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         return (() => {
             controller.abort()
         })
-    }, [retryCount,topSelector,searchValue, orderingType, page])
+    }, [retryCount,topSelector,searchValue, orderingType, page, refreshKey])
 
     async function createWorkItem(title: string, description: string) {
         setCreatingItem(true);
@@ -115,9 +118,9 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             if ((newItem.status ===topSelector || topSelector==='All') && (searchValue==="" || newItem.title.toLowerCase().includes(searchValue.toLowerCase()))){
                 setWorkItems((previousItems) =>(orderingType==='-created_at'?[newItem, ...previousItems ]: [...previousItems, newItem]))
                 setPage(1)
+                setRefreshKey(refreshKey+1)
             }
             return true
-
         } catch (error) {
             setCreateError(
                 error instanceof Error

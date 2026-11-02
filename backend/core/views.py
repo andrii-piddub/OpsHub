@@ -44,8 +44,10 @@ def work_item(request):
         page_number = request.query_params.get('page',1)
         try:
             page=paginator.page(page_number)
-        except (PageNotAnInteger, EmptyPage):
-            return Response ({'Pagination':f'Wrong page {page_number}'}, status=status.HTTP_400_BAD_REQUEST)
+        except (PageNotAnInteger):
+            return Response ({'Pagination':f'Wrong page - {page_number}'}, status=status.HTTP_400_BAD_REQUEST)
+        except EmptyPage:
+            return Response({f'There is no page with number {page_number}'}, status=status.HTTP_404_NOT_FOUND)
         serializer = WorkItemSerializer(page, many=True)
         return Response({
             'results':serializer.data,
