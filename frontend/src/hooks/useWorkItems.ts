@@ -17,7 +17,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
-    const [draft, setDraft] = useState<Draft | null>(null)
+    const [draft, setDraft] = useState<Draft |null>(null)
 
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
 

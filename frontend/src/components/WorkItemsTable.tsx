@@ -9,13 +9,11 @@ const statuses: { value: WorkItemStatus; label: string }[] = [
 
 type WorkItemsTableProps = {
   workItems: WorkItem[];
-  draftStatuses: Record<number, WorkItemStatus>;
   savingItemId: number | null;
-  onStatusChange(itemId: number, status: WorkItemStatus): void;
   onSaveStatus(ID: number): void;
   onDeleteWorkItem(id: number): void;
   deletingItemId: number | null;
-  draft:Draft;
+  draft:Draft |null;
 }
 export type Draft = {
   id:number;
@@ -76,7 +74,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
               </td>
               <td>
                 <select
-                  value={props.draftStatuses[item.id] ?? item.status}
+                  value={props.draft?.id===item.id? props.draft.status: item.status}
                   onChange={(event) =>
                     props.onStatusChange(
                       item.id,
