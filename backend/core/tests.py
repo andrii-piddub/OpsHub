@@ -181,6 +181,9 @@ class WorkItemGetTests(TestCase):
     def test_pagination_wrong_page(self):
         response=self.client.get(path="/api/v1/workitem/", query_params={'page':'abc'})
         self.assertEqual(response.status_code,400)
+    def test_pagination_empty_page(self):
+        response=self.client.get(path="/api/v1/workitem/", query_params={'page':9999})
+        self.assertEqual(response.status_code,404)
     def test_pagination_without_page(self):
         for i in range(20):
             WorkItem.objects.create(title=f'{i} case+', status='IP')

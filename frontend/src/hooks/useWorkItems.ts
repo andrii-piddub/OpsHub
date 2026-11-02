@@ -2,15 +2,15 @@ import { useState, useEffect } from "react";
 import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems, patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus } from '../api/workitems'
-import type { WorkItemOrdering, PaginationInfo  } from "../api/workitems.ts";
+import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
 
 
 
-export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemStatus, searchValue:string, orderingType:WorkItemOrdering, page:number, setPage:(page:number)=>void) {
+export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page: number, setPage: (page: number) => void) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
     const [refreshKey, setRefreshKey] = useState(0)
-    const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({'count':1, 'num_pages':1,'current_page':1,'next':null, 'previous':null})
+    const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({ 'count': 1, 'num_pages': 1, 'current_page': 1, 'next': null, 'previous': null })
     const [itemsError, setItemsError] = useState('')
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
@@ -28,7 +28,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
     async function handleSaveStatus(itemId: number) {
         const selectedStatus = draftStatuses[itemId]
 
-        if (!selectedStatus ) return
+        if (!selectedStatus) return
 
         setItemsError('')
         setSavingItemId(itemId);
@@ -36,20 +36,21 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         try {
             const updatedItem = await patchWorkitems(itemId, selectedStatus)
 
-                setWorkItems((previousItems) =>
-                    (previousItems.map((item) =>
-                        item.id === updatedItem.id ? updatedItem : item,
-                    )).filter(element=>element.status===topSelector||topSelector==='All')
-                )
-                setRefreshKey(refreshKey+1)               
+            const leavesFilter = topSelector !== 'All' && updatedItem.status !== topSelector
+
+            if (leavesFilter && workItems.length === 1 && page > 1) {
+                setPage(page - 1)
+            } else {
+                setRefreshKey(prev => prev + 1)
+            }
 
 
-                setDraftStatuses((previous) => {
-                    const remaining = { ...previous }
-    
-                    delete remaining[itemId]
-                    return remaining
-                })
+            setDraftStatuses((previous) => {
+                const remaining = { ...previous }
+
+                delete remaining[itemId]
+                return remaining
+            })
 
         } catch (error) {
             setItemsError(
@@ -61,16 +62,16 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         }
 
     }
-    async function handleDeleteWorkItem(id:number){
+    async function handleDeleteWorkItem(id: number) {
         try {
             setItemsError('');
             setDeletingItemId(id);
             await deleteWorkItem(id)
-            if (page>1 && workItems.length===1){
-                setPage(page-1)
+            if (page > 1 && workItems.length === 1) {
+                setPage(page - 1)
             }
 
-            setRefreshKey(prev=>prev+1)
+            setRefreshKey(prev => prev + 1)
         } catch (error) {
             setItemsError(
                 error instanceof Error ? error.message : 'Failed to delete item',
@@ -78,8 +79,8 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         } finally {
             setDeletingItemId(null)
         }
-        }
-    
+    }
+
 
     useEffect(() => {
         const controller = new AbortController()
@@ -90,8 +91,10 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             try {
                 const data = await getWorkItems(controller.signal, topSelector, searchValue, orderingType, page)
                 setWorkItems(data.results)
-                setPaginationInfo({count:data.count, num_pages:data.num_pages, current_page:data.current_page, 
-                    next:data.next, previous:data.previous })
+                setPaginationInfo({
+                    count: data.count, num_pages: data.num_pages, current_page: data.current_page,
+                    next: data.next, previous: data.previous
+                })
             } catch (error) {
                 if (controller.signal.aborted) return
 
@@ -110,17 +113,17 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         return (() => {
             controller.abort()
         })
-    }, [retryCount,topSelector,searchValue, orderingType, page, refreshKey])
+    }, [retryCount, topSelector, searchValue, orderingType, page, refreshKey])
 
     async function createWorkItem(title: string, description: string) {
         setCreatingItem(true);
         setCreateError('')
         try {
             const newItem = await postWorkItems(title, description)
-            if ((newItem.status ===topSelector || topSelector==='All') && (searchValue==="" || newItem.title.toLowerCase().includes(searchValue.toLowerCase()))){
-                setWorkItems((previousItems) =>(orderingType==='-created_at'?[newItem, ...previousItems ]: [...previousItems, newItem]))
+            if ((newItem.status === topSelector || topSelector === 'All') && (searchValue === "" || newItem.title.toLowerCase().includes(searchValue.toLowerCase()))) {
+                setWorkItems((previousItems) => (orderingType === '-created_at' ? [newItem, ...previousItems] : [...previousItems, newItem]))
                 setPage(1)
-                setRefreshKey(refreshKey+1)
+                setRefreshKey(prev => prev + 1)
             }
             return true
         } catch (error) {
