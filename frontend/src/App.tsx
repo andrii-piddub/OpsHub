@@ -23,7 +23,7 @@ function App() {
   const { workItems, itemsLoading, itemsError,
     creatingItem, createError, savingItemId,
     draftStatuses, handleStatusChange, handleSaveStatus, createWorkItem,
-    handleDeleteWorkItem, deletingItemId, paginationInfo } = useWorkItems(retryCount, topSelector, searchValue, orderingType, page)
+    handleDeleteWorkItem, deletingItemId, paginationInfo } = useWorkItems(retryCount, topSelector, searchValue, orderingType, page, setPage)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')

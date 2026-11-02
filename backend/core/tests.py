@@ -31,7 +31,7 @@ class WorkItemCreateTests(TestCase):
         response = self.client.post(data={'title':'Third title', 'status':'XX'},path='/api/v1/workitem/')
         self.assertEqual(response.status_code,400)
         response_get=self.client.get("/api/v1/workitem/")
-        self.assertEqual(len(response_get.json()),0)
+        self.assertEqual(len(response_get.json()['results']),0)
     def test_create_work_item_only_with_title(self):
         response = self.client.post(data={'title':'Interesting info'}, path='/api/v1/workitem/')
         self.assertEqual(response.status_code,201)
@@ -90,33 +90,33 @@ class WorkItemGetTests(TestCase):
         WorkItem.objects.all().delete()
         response = self.client.get("/api/v1/workitem/")
         self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.json()),0)
+        self.assertEqual(len(response.json()['results']),0)
     def test_get_two_work_items(self):
         WorkItem.objects.filter(status='OP').delete()
         response = self.client.get("/api/v1/workitem/")
         self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.json()),2)
-        list_of_titles = [ i['title']for i in response.json() if 'title' in i]
+        self.assertEqual(len(response.json()['results']),2)
+        list_of_titles = [ i['title']for i in response.json()['results'] if 'title' in i]
         self.assertIn('First case',list_of_titles)
         self.assertIn('Second case',list_of_titles)
     def test_get_filtered_status_OP(self):
         WorkItem.objects.create(title='Fourth case', status='OP')
         response = self.client.get(path="/api/v1/workitem/", data={'status':'OP'})
         self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.json()),2)
-        titles = [item['title']for item in response.json()]
+        self.assertEqual(len(response.json()['results']),2)
+        titles = [item['title']for item in response.json()['results']]
         self.assertCountEqual(titles,['Third case','Fourth case'])
-        statuses = [item['status']for item in response.json()]
+        statuses = [item['status']for item in response.json()['results']]
         self.assertCountEqual(statuses,['OP','OP'])
     def test_get_filtered_status_DN(self):
         response_fourth = self.client.post(data={'title':'Fourth case','status':'DN'},path='/api/v1/workitem/')
         self.assertEqual(response_fourth.status_code,201)
         response = self.client.get(path="/api/v1/workitem/",data={'status':'DN'})
         self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.json()),2)
-        titles = [item['title']for item in response.json()]
+        self.assertEqual(len(response.json()['results']),2)
+        titles = [item['title']for item in response.json()['results']]
         self.assertCountEqual(titles,['Second case', 'Fourth case'])
-        statuses = [item['status']for item in response.json()]
+        statuses = [item['status']for item in response.json()['results']]
         self.assertCountEqual(statuses,['DN','DN'])
     def test_get_filtered_status_wrong(self):
         response = self.client.get(path="/api/v1/workitem/",data={'status':'XX'})
@@ -124,42 +124,82 @@ class WorkItemGetTests(TestCase):
     def test_get_by_search(self):
         response=self.client.get(path="/api/v1/workitem/",query_params={'search':'First'})
         self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.json()),1)
-        self.assertEqual(response.json()[0]['title'],'First case')
+        self.assertEqual(len(response.json()['results']),1)
+        self.assertEqual(response.json()['results'][0]['title'],'First case')
     def test_get_by_search_insensitive(self):
         response=self.client.get(path="/api/v1/workitem/",query_params={'search':'FIRST'})
         self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.json()),1)
-        self.assertEqual(response.json()[0]['title'],'First case')
+        self.assertEqual(len(response.json()['results']),1)
+        self.assertEqual(response.json()['results'][0]['title'],'First case')
     def test_get_by_search_and_filter(self):
         WorkItem.objects.create(title='Fourth case',status='OP')
         WorkItem.objects.create(title='Fourth case new',status='DN')
         response=self.client.get(path="/api/v1/workitem/", query_params={'search':'Fourth','status':'OP'})
         self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.json()),1)
-        self.assertEqual(response.json()[0]['title'],'Fourth case')
+        self.assertEqual(len(response.json()['results']),1)
+        self.assertEqual(response.json()['results'][0]['title'],'Fourth case')
     def test_get_by_empty_search(self):
         response=self.client.get(path="/api/v1/workitem/", query_params={'search':''})
         self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.json()),3)
+        self.assertEqual(len(response.json()['results']),3)
     def test_ordering_ascending_get(self):
         response=self.client.get(path="/api/v1/workitem/", query_params={'ordering':'created_at'})
         self.assertEqual(response.status_code,200)
-        dates=[i['created_at']for i in response.json()]
+        dates=[i['created_at']for i in response.json()['results']]
         self.assertEqual(dates,sorted(dates,reverse=False))
     def test_ordering_descending_get(self):
         response=self.client.get(path='/api/v1/workitem/', query_params={'ordering':'-created_at'})
         self.assertEqual(response.status_code,200)
-        dates=[i['created_at']for i in response.json()]
+        dates=[i['created_at']for i in response.json()['results']]
         self.assertEqual(dates,sorted(dates,reverse=True))
     def test_ordering_default_get(self):
         response=self.client.get(path='/api/v1/workitem/')
         self.assertEqual(response.status_code,200)
-        dates=[i['created_at']for i in response.json()]
+        dates=[i['created_at']for i in response.json()['results']]
         self.assertEqual(dates,sorted(dates,reverse=True))
     def test_ordering_wrong_value(self):
         response=self.client.get(path='/api/v1/workitem/', query_params={'ordering':'wrong'})
         self.assertEqual(response.status_code,400)
+    def test_pagination_first_page(self):
+        for i in range(20):
+            WorkItem.objects.create(title=f'{i} case+', status='IP')
+        response=self.client.get(path="/api/v1/workitem/", query_params={'page':1})
+        self.assertEqual(response.json()['count'],WorkItem.objects.all().count())
+        self.assertEqual(len(response.json()['results']),10)
+        self.assertEqual(response.json()['num_pages'],3)
+        self.assertEqual(response.json()['current_page'],1)
+        self.assertEqual(response.json()['next'],2)
+        self.assertEqual(response.json()['previous'],None)
+    def test_pagination_last_page(self):
+        for i in range(20):
+            WorkItem.objects.create(title=f'{i} case+', status='IP')
+        response=self.client.get(path="/api/v1/workitem/", query_params={'page':3})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.json()['results']),3)
+        self.assertEqual(response.json()['next'],None)
+        self.assertEqual(response.json()['previous'],2)
+    def test_pagination_wrong_page(self):
+        response=self.client.get(path="/api/v1/workitem/", query_params={'page':'abc'})
+        self.assertEqual(response.status_code,400)
+    def test_pagination_without_page(self):
+        for i in range(20):
+            WorkItem.objects.create(title=f'{i} case+', status='IP')
+        response=self.client.get(path="/api/v1/workitem/")
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.json()['results']),10)
+
+
+        
+
+
+
+
+
+
+
+
+
+
 
 
 

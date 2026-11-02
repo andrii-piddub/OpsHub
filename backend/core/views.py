@@ -5,7 +5,7 @@ from .models import WorkItem
 from .serializers import WorkItemSerializer, PatchWorkitemSerializer
 from rest_framework import status
 from rest_framework.views import APIView
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 
@@ -41,8 +41,11 @@ def work_item(request):
         elif ordering is not None and ordering not in ['created_at','-created_at']:
             return Response({'ordering':f'Wrong ordering atribute - {ordering}'}, status=status.HTTP_400_BAD_REQUEST)
         paginator = Paginator(query_set,10)
-        page_number = request.query_params.get('page')
-        page=paginator.get_page(page_number)
+        page_number = request.query_params.get('page',1)
+        try:
+            page=paginator.page(page_number)
+        except (PageNotAnInteger, EmptyPage):
+            return Response ({'Pagination':f'Wrong page {page_number}'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = WorkItemSerializer(page, many=True)
         return Response({
             'results':serializer.data,

@@ -6,7 +6,7 @@ import type { WorkItemOrdering, PaginationInfo  } from "../api/workitems.ts";
 
 
 
-export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemStatus, searchValue:string, orderingType:WorkItemOrdering, page:number) {
+export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemStatus, searchValue:string, orderingType:WorkItemOrdering, page:number, setPage:(page:number)=>void) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
     const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({'count':1, 'num_pages':1,'current_page':1,'next':null, 'previous':null})
@@ -85,7 +85,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             try {
                 const data = await getWorkItems(controller.signal, topSelector, searchValue, orderingType, page)
                 setWorkItems(data.results)
-                setPaginationInfo({count:data.count, num_pages:data.num_pages, current_page:data.num_pages, 
+                setPaginationInfo({count:data.count, num_pages:data.num_pages, current_page:data.current_page, 
                     next:data.next, previous:data.previous })
             } catch (error) {
                 if (controller.signal.aborted) return
@@ -114,6 +114,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             const newItem = await postWorkItems(title, description)
             if ((newItem.status ===topSelector || topSelector==='All') && (searchValue==="" || newItem.title.toLowerCase().includes(searchValue.toLowerCase()))){
                 setWorkItems((previousItems) =>(orderingType==='-created_at'?[newItem, ...previousItems ]: [...previousItems, newItem]))
+                setPage(1)
             }
             return true
 
