@@ -5,10 +5,10 @@ import type { HealthResponse } from './api/health'
 import { useWorkItems } from './hooks/useWorkItems.ts'
 import WorkItemsTable from './components/WorkItemsTable.tsx'
 import WorkItemForm from './components/WorkItemForm.tsx'
-import type { WorkItemStatus } from './api/workitems'
+import type { WorkItemStatus, WorkItemOrdering } from './api/workitems'
 
 
-export type WorkItemOrdering = 'created_at' | '-created_at' 
+
 
 
 function App() {
@@ -17,23 +17,24 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
-  const [orderingType, setOrderingType]=useState<WorkItemOrdering>('-created_at')
+  const [page, setPage] = useState(1)
+  const [orderingType, setOrderingType] = useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
   const { workItems, itemsLoading, itemsError,
     creatingItem, createError, savingItemId,
     draftStatuses, handleStatusChange, handleSaveStatus, createWorkItem,
-    handleDeleteWorkItem, deletingItemId } = useWorkItems(retryCount, topSelector, searchValue, orderingType)
+    handleDeleteWorkItem, deletingItemId, paginationInfo } = useWorkItems(retryCount, topSelector, searchValue, orderingType, page)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [inputValue, setInputValue]=useState('')
-  
+  const [inputValue, setInputValue] = useState('')
 
-  useEffect(()=>{
-    const timeId = setTimeout(()=>{
-    setSearchValue(inputValue)
-  },300)
-  return ()=>clearTimeout(timeId)
-  },[inputValue])
+
+  useEffect(() => {
+    const timeId = setTimeout(() => {
+      setSearchValue(inputValue)
+    }, 300)
+    return () => clearTimeout(timeId)
+  }, [inputValue])
 
 
 
@@ -138,7 +139,7 @@ function App() {
           <p>Статус: {health.status}</p>
         </div>
       )}
-    <p></p>
+      <p></p>
 
 
 
@@ -163,38 +164,47 @@ function App() {
         className='search-button'
         placeholder='Search'
         value={inputValue}
-        onChange={(event)=>{
+        onChange={(event) => {
           setInputValue(event.target.value)
-          }
-          
+        }
+
         }
       />
       <select
-      id='ordering'
-      value={orderingType}
-      onChange={(event)=>{
-        setOrderingType(event.target.value as WorkItemOrdering)
-      }}>
+        id='ordering'
+        value={orderingType}
+        onChange={(event) => {
+          setOrderingType(event.target.value as WorkItemOrdering)
+        }}>
         <option value='-created_at'>Newest first</option>
         <option value='created_at'>Oldest first</option>
       </select>
-      
+
 
       <div>
         <WorkItemsTable workItems={workItems} draftStatuses={draftStatuses} savingItemId={savingItemId}
           onStatusChange={handleStatusChange} onSaveStatus={handleSaveStatus} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} />
-
-
-
-
-
-
-
-
-
-        {itemsLoading && <p>Loading work items</p>}
-        {itemsError && <p role="alert">Error: {itemsError}</p>}
       </div>
+
+      <div className="pagination">
+        <button className="pagination__btn"
+        onClick={()=>{
+          setPage(page-1)}
+        }
+        disabled={paginationInfo.previous===null}
+        >Previous</button>
+        <p className="pagination__info">Page {paginationInfo.current_page} of {paginationInfo.num_pages}</p>
+        <button className="pagination__btn"
+        onClick={()=>{
+          setPage(page+1)
+        }}
+        disabled={paginationInfo.next===null}>Next</button>
+      </div>
+      <p></p>
+
+
+      {itemsLoading && <p>Loading work items</p>}
+      {itemsError && <p role="alert">Error: {itemsError}</p>}
 
       {workItems.length === 0 && !itemsLoading && !itemsError && (
         <p>There are no Work Items yet</p>
@@ -216,6 +226,7 @@ function App() {
       </form>
 
       {createError && <p role="alert">Error: {createError}</p>}
+
     </main>
   )
 }

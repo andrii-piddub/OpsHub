@@ -207,3 +207,32 @@ button:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; }
 .search-button{
   margin-top: 20px;
 }
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.pagination__info {
+  margin: 0;
+}
+
+.pagination__btn {
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.pagination__btn:hover:not(:disabled) {
+  background: #f0f0f0;
+}
+
+.pagination__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -6,8 +6,20 @@ export type WorkItem = {
   status: WorkItemStatus
   created_at: string
 }
-import type { WorkItemOrdering } from "../App";
-export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering): Promise<WorkItem[]> {
+
+export type WorkItemsResponse = {
+  results:WorkItem[];
+  count:number;
+  num_pages:number;
+  current_page:number;
+  next:number | null;
+  previous: number | null;
+
+}
+export type PaginationInfo = Omit<WorkItemsResponse, 'results'>
+
+export type WorkItemOrdering = 'created_at' | '-created_at' 
+export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page:number): Promise<WorkItemsResponse> {
   let url = new URL('/api/v1/workitem/', window.location.origin)
   const params = new URLSearchParams(url.search)
   if (topSelector && topSelector!='All'){
@@ -19,13 +31,16 @@ export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | Wor
   if (orderingType){
     params.append('ordering',orderingType)
   }
+  if (page){
+    params.append('page',String(page))  
+  }
   url.search=params.toString()
 
   const response = await fetch(url, { signal })
   if (!response.ok) {
     throw new Error(`Request failed: ${response.status}`)
   }
-  return (await response.json()) as WorkItem[]
+  return (await response.json() ) as WorkItemsResponse
 }
 
 export async function postWorkItems(title: string, description: string) {

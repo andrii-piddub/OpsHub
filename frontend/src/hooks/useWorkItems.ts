@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems, patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus } from '../api/workitems'
-import type { WorkItemOrdering } from "../App.tsx";
-export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemStatus, searchValue:string, orderingType:WorkItemOrdering) {
+import type { WorkItemOrdering, PaginationInfo  } from "../api/workitems.ts";
+
+
+
+export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemStatus, searchValue:string, orderingType:WorkItemOrdering, page:number) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [itemsLoading, setItemsLoading] = useState(true)
-    
+    const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({'count':1, 'num_pages':1,'current_page':1,'next':null, 'previous':null})
     const [itemsError, setItemsError] = useState('')
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
@@ -80,8 +83,10 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
             setItemsError('');
             setWorkItems([]);
             try {
-                const data = await getWorkItems(controller.signal, topSelector, searchValue, orderingType)
-                setWorkItems(data)
+                const data = await getWorkItems(controller.signal, topSelector, searchValue, orderingType, page)
+                setWorkItems(data.results)
+                setPaginationInfo({count:data.count, num_pages:data.num_pages, current_page:data.num_pages, 
+                    next:data.next, previous:data.previous })
             } catch (error) {
                 if (controller.signal.aborted) return
 
@@ -100,7 +105,7 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         return (() => {
             controller.abort()
         })
-    }, [retryCount,topSelector,searchValue, orderingType])
+    }, [retryCount,topSelector,searchValue, orderingType, page])
 
     async function createWorkItem(title: string, description: string) {
         setCreatingItem(true);
@@ -129,6 +134,6 @@ export function useWorkItems(retryCount: number = 0, topSelector:'All'|WorkItemS
         workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
         setItemsError, creatingItem, setCreatingItem, createError, setCreateError,
         savingItemId, setSavingItemId, draftStatuses, setDraftStatuses, handleStatusChange, handleSaveStatus,
-        createWorkItem, handleDeleteWorkItem, deletingItemId
+        createWorkItem, handleDeleteWorkItem, deletingItemId, paginationInfo
     }
 }
