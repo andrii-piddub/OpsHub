@@ -33,8 +33,8 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
 
         try {
             const updatedItem = await patchWorkitems(itemId, draftStatus, draftTitle, draftDescription)
-
-            const leavesFilter = topSelector !== 'All' && updatedItem.status !== topSelector
+            setEditingItemId(null)
+            const leavesFilter = topSelector !== 'All' && updatedItem.status !== topSelector && !updatedItem.title.includes(searchValue)
 
             if (leavesFilter && workItems.length === 1 && page > 1) {
                 setPage(page - 1)
@@ -48,8 +48,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
                 error instanceof Error ? error.message : 'Failed to update status',
             )
         } finally {
-            setSavingItemId(null);
-
+            setSavingItemId(null)
         }
 
     }
@@ -118,7 +117,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
         try {
             const newItem = await postWorkItems(title, description)
             if ((newItem.status === topSelector || topSelector === 'All') && (searchValue === "" || newItem.title.toLowerCase().includes(searchValue.toLowerCase()))) {
-            setRefreshKey(prev => prev + 1)
+                setRefreshKey(prev => prev + 1)
             }
             return true
         } catch (error) {
@@ -138,7 +137,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
     return {
         workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
         setItemsError, creatingItem, setCreatingItem, createError, setCreateError,
-        savingItemId, setSavingItemId,  handleSaveAction,
+        savingItemId, setSavingItemId, handleSaveAction,
         createWorkItem, handleDeleteWorkItem, deletingItemId, paginationInfo, editingItemId, setEditingItemId, draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus, setDraftStatus
     }
 }

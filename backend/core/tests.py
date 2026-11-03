@@ -75,6 +75,49 @@ class WorkItemUpdateTests(TestCase):
         self.assertEqual(patch_response.status_code,400)
         created_item.refresh_from_db()
         self.assertEqual(created_item.status,'OP')
+    def test_update_title_description_status(self):
+        created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
+        patch_data={'title':'Second case','description':'New','status':'IP'}
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")        
+        self.assertEqual(patch_response.status_code,200)
+        created_item.refresh_from_db()
+
+        self.assertEqual(patch_response.json()['title'],created_item.title)
+        self.assertEqual(patch_response.json()['description'],created_item.description)
+        self.assertEqual(patch_response.json()['status'],created_item.status)
+
+        self.assertEqual(patch_data['title'],created_item.title)
+        self.assertEqual(patch_data['description'],created_item.description)
+        self.assertEqual(patch_data['status'],created_item.status)
+
+    def test_update_partial(self):
+        created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
+        patch_data={'description':'New'}
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")        
+        self.assertEqual(patch_response.status_code,200)
+        created_item.refresh_from_db()   
+        self.assertEqual(patch_data['description'],created_item.description)
+
+        self.assertEqual(patch_response.json()['title'],created_item.title)
+        self.assertEqual(patch_response.json()['description'],created_item.description)
+        self.assertEqual(patch_response.json()['status'],created_item.status)
+    def test_update_empty_title(self):
+        created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
+        patch_data={'title':''}
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")        
+        created_item.refresh_from_db()   
+        self.assertEqual(patch_response.status_code,400)
+    def test_long_title(self):
+        created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
+        patch_data={'title':f'{'x'*201}'}
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")        
+        created_item.refresh_from_db()   
+        self.assertEqual(patch_response.status_code,400)
+    
+
+  
+
+
 
 class WorkItemGetTests(TestCase):
     def setUp(self):

@@ -53,18 +53,21 @@ function WorkItemsTable(props: WorkItemsTableProps) {
               <td>{props.editingItemId === item.id ? <textarea
                 className="edit-field"
                 rows={3}
-                maxLength={500}
+                maxLength={200}
                 aria-label="Description"
                 value={props.draftTitle}
+                disabled={props.savingItemId === item.id || props.deletingItemId !== null}
                 onChange={(event) => {
                   props.setDraftTitle(event.target.value)
-                }} /> : item.title}</td>
+                }} /> : item.title}
+              </td>
 
               <td>{props.editingItemId === item.id ? <textarea
                 className="edit-field"
                 rows={3}
-                maxLength={500}
+                maxLength={200}
                 aria-label="Description"
+                disabled={props.savingItemId === item.id || props.deletingItemId !== null}
                 value={props.draftDescription}
                 onChange={(event) => {
                   props.setDraftDescription(event.target.value)
@@ -72,10 +75,11 @@ function WorkItemsTable(props: WorkItemsTableProps) {
 
               <td>{props.editingItemId === item.id ? <select
                 value={props.draftStatus}
+                disabled={props.savingItemId === item.id || props.deletingItemId !== null}
                 onChange={(event) =>
                   props.setDraftStatus(event.target.value as WorkItemStatus)
                 }
-                disabled={props.savingItemId === item.id || props.deletingItemId !== null}
+
               >
                 {statuses.map((status) => (
                   <option key={status.value} value={status.value}>
@@ -106,7 +110,8 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                   <button
                     className="btn"
                     hidden={props.editingItemId !== item.id}
-                    onClick={() => { props.onSaveAction(item.id); props.setEditingItemId(null) }}>
+                    onClick={() => { props.onSaveAction(item.id) }}
+                    disabled={props.savingItemId !== null || props.deletingItemId !== null}>
                     {props.savingItemId === item.id ? 'Saving' : 'Save'}
                   </button>
 
@@ -114,6 +119,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                   <button
                     className="btn"
                     hidden={props.editingItemId !== item.id}
+                    disabled={props.savingItemId === item.id || props.deletingItemId !== null}
                     onClick={() => { props.setEditingItemId(null) }}>
                     Cancel
                   </button>
@@ -130,7 +136,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                 onClick={() =>{ props.onSaveAction(item.id)
                 }
                 }
-                disabled={props.savingItemId !== null || props.deletingItemId !== null}
+                
                 // hidden = {editing===true}
               >
                 {props.savingItemId === item.id ? 'Saving' : 'Save'}
