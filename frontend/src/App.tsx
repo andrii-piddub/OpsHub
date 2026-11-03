@@ -21,8 +21,9 @@ function App() {
   const [searchValue, setSearchValue] = useState('')
   const { workItems, itemsLoading, itemsError,
     creatingItem, createError, savingItemId,
-    draft, handleStatusChange, handleSaveStatus, createWorkItem,
-    handleDeleteWorkItem, deletingItemId, paginationInfo } = useWorkItems(retryCount, topSelector, searchValue, orderingType, page, setPage)
+    draft, handleSaveStatus, createWorkItem,
+    handleDeleteWorkItem, deletingItemId, paginationInfo, editingItemId, setEditingItemId,
+    draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus,setDraftStatus } = useWorkItems(retryCount, topSelector, searchValue, orderingType, page, setPage)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -152,7 +153,9 @@ function App() {
       {/* ===== Work items table ===== */}
       <div>
         <WorkItemsTable workItems={workItems} draft={draft} savingItemId={savingItemId}
-          onStatusChange={handleStatusChange} onSaveStatus={handleSaveStatus} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} />
+           onSaveStatus={handleSaveStatus} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} editingItemId={editingItemId}
+           setEditingItemId={setEditingItemId} draftTitle={draftTitle}  setDraftTitle={setDraftTitle} draftDescription={draftDescription} setDraftDescription={setDraftDescription}
+           draftStatus={draftStatus} setDraftStatus={setDraftStatus}/>
       </div>
 
 
