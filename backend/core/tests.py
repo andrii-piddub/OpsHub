@@ -61,7 +61,7 @@ class WorkItemCreateTests(TestCase):
         response = self.client.post(data={'title':'New Case','description':'New description','status':'OP','priority':'HI'}, path='/api/v1/workitem/')
         self.assertEqual(response.status_code,201)
         self.assertEqual(response.json()['priority'],'HI')
-    def test_create_workitem_with_priority_HI(self):
+    def test_create_workitem_with_priority_XX(self):
         response = self.client.post(data={'title':'New Case','description':'New description','status':'OP','priority':'XX'}, path='/api/v1/workitem/')
         self.assertEqual(response.status_code,400)
 

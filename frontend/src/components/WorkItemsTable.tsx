@@ -153,12 +153,14 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       type="button"
                       className="btn btn-save"
                       hidden={isEditing}
+                      disabled={props.editingItemId!==null || isBusy}
                       onClick={() => {
                         props.setEditingItemId(item.id)
                         props.setDraftTitle(item.title)
                         props.setDraftDescription(item.description)
                         props.setDraftStatus(item.status)
                         props.setDraftPriority(item.priority)
+
                       }}
                     >
                       Edit
@@ -179,7 +181,8 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       className="btn"
                       hidden={!isEditing}
                       disabled={fieldsDisabled}
-                      onClick={() => props.setEditingItemId(null)}
+                      onClick={() => {props.setEditingItemId(null)}}
+                      
                     >
                       Cancel
                     </button>

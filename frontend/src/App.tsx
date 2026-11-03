@@ -153,7 +153,8 @@ function App() {
         <WorkItemsTable workItems={workItems} savingItemId={savingItemId}
            onSaveAction={handleSaveAction} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} editingItemId={editingItemId}
            setEditingItemId={setEditingItemId} draftTitle={draftTitle}  setDraftTitle={setDraftTitle} draftDescription={draftDescription} setDraftDescription={setDraftDescription}
-           draftStatus={draftStatus} setDraftStatus={setDraftStatus} draftPriority={draftPriority} setDraftPriority={setDraftPriority}/>
+           draftStatus={draftStatus} setDraftStatus={setDraftStatus} draftPriority={draftPriority} setDraftPriority={setDraftPriority}
+           />
       </div>
 
 
