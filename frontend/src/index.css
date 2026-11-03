@@ -122,6 +122,8 @@ main > div:has(table) { flex: 1 0 100%; }
 
 .work-table {
   width: 100%;
+  min-width: 900px;          /* на вузьких екранах працює скрол у .table-wrap */
+  table-layout: fixed;       /* ширини стовпчиків задає <colgroup>, а не вміст */
   border-collapse: collapse;
   text-align: left;
 }
@@ -137,11 +139,13 @@ main > div:has(table) { flex: 1 0 100%; }
   padding: 14px;
   vertical-align: top;
   border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;   /* довгий текст переноситься, а не розтягує стовпчик */
 }
 .work-table tbody tr:last-child td { border-bottom: 0; }
 .work-table td:nth-child(1) { color: var(--muted); font-variant-numeric: tabular-nums; }
-.work-table td:nth-child(2) { font-weight: 600; min-width: 160px; }
-.work-table td:nth-child(3) { color: var(--muted); min-width: 220px; max-width: 360px; }
+.work-table td:nth-child(2) { font-weight: 600; }
+.work-table td:nth-child(3) { color: var(--muted); }
+.work-table select { width: 100%; }
 
 .badge {
   display: inline-block;
@@ -154,6 +158,14 @@ main > div:has(table) { flex: 1 0 100%; }
 .badge-OP { color: var(--open-fg); background: var(--open-bg); }
 .badge-IP { color: var(--prog-fg); background: var(--prog-bg); }
 .badge-DN { color: var(--done-fg); background: var(--done-bg); }
+
+/* priority badges (окремі класи, щоб не плутати зі статусами) */
+.badge-priority-LO { color: var(--done-fg); background: var(--done-bg); }
+.badge-priority-ME { color: var(--open-fg); background: var(--open-bg); }
+.badge-priority-HI {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+}
 
 .btn {
   padding: 6px 12px;
@@ -171,6 +183,26 @@ main > div:has(table) { flex: 1 0 100%; }
 .btn-delete:hover:not(:disabled) { border-color: var(--danger); }
 
 button:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.edit-field {
+  width: 100%;
+  min-width: 0;              /* було 180px: саме воно розпирало стовпчик */
+  min-height: 40px;
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.edit-field:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
 
 /* ---------- create form ---------- */
 .workitem-form {
@@ -203,11 +235,12 @@ button:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; }
 /* ---------- accessibility ---------- */
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-
-.search-button{
+/* ---------- search ---------- */
+.search-button {
   margin-top: 20px;
 }
 
+/* ---------- pagination ---------- */
 .pagination {
   display: flex;
   align-items: center;
@@ -222,36 +255,18 @@ button:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .pagination__btn {
   padding: 6px 14px;
-  border: 1px solid #ccc;
+  color: var(--ink);
+  border: 1px solid var(--line);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
   cursor: pointer;
 }
 
 .pagination__btn:hover:not(:disabled) {
-  background: #f0f0f0;
+  border-color: var(--accent);
 }
 
 .pagination__btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.row-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: nowrap;
-}
-.edit-field {
-  width: 100%;
-  min-width: 180px;
-  min-height: 40px;
-  resize: vertical;
-  line-height: 1.4;
-}
-
-.edit-field:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-  border-color: var(--accent);
 }

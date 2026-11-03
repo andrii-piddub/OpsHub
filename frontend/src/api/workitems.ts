@@ -1,8 +1,10 @@
 export type WorkItemStatus = 'OP' | 'IP' | 'DN'
+export type WorkItemPriority = 'LO'|'ME'|'HI'
 export type WorkItem = {
   id: number;
   title: string;
   description: string;
+  priority:WorkItemPriority;
   status: WorkItemStatus
   created_at: string
 }
@@ -64,7 +66,8 @@ export async function patchWorkitems(
   id: number,
   status: WorkItemStatus,
   title:string,
-  description:string
+  description:string,
+  priority:WorkItemPriority,
 ): Promise<WorkItem> {
   const response = await fetch(
     `/api/v1/workitem/${id}/`,
@@ -73,7 +76,7 @@ export async function patchWorkitems(
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({title:title, status:status, description:description }),
+      body: JSON.stringify({title:title, status:status, description:description, priority:priority }),
     },
   )
 

@@ -53,6 +53,17 @@ class WorkItemCreateTests(TestCase):
         path='/api/v1/workitem/')
         self.assertEqual(response.status_code,400)
         self.assertEqual(WorkItem.objects.count(),0)
+    def test_create_workitem_without_priority(self):
+        response = self.client.post(data={'title':'New Case','description':'New description','status':'OP'}, path='/api/v1/workitem/')
+        self.assertEqual(response.status_code,201)
+        self.assertEqual(response.json()['priority'],'ME')
+    def test_create_workitem_with_priority_HI(self):
+        response = self.client.post(data={'title':'New Case','description':'New description','status':'OP','priority':'HI'}, path='/api/v1/workitem/')
+        self.assertEqual(response.status_code,201)
+        self.assertEqual(response.json()['priority'],'HI')
+    def test_create_workitem_with_priority_HI(self):
+        response = self.client.post(data={'title':'New Case','description':'New description','status':'OP','priority':'XX'}, path='/api/v1/workitem/')
+        self.assertEqual(response.status_code,400)
 
 
 class WorkItemUpdateTests(TestCase):
@@ -121,6 +132,29 @@ class WorkItemUpdateTests(TestCase):
         created_item.refresh_from_db()   
         self.assertEqual(patch_response.status_code,400)
         self.assertEqual(created_item.title,'First case')
+    def test_update_priority(self):
+        created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
+        patch_data={'priority':'HI'}
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")  
+        self.assertEqual(patch_response.status_code,200)
+        created_item.refresh_from_db()   
+        self.assertEqual(patch_response.json()['priority'],created_item.priority)
+        self.assertEqual(patch_data['priority'],created_item.priority)
+    def test_update__wrong_priority(self):
+        created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
+        patch_data={'priority':'XX'}
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")  
+        self.assertEqual(patch_response.status_code,400)
+        created_item.refresh_from_db()   
+        self.assertEqual(created_item.priority,'ME')
+
+
+
+
+
+        
+
+
 
     
 

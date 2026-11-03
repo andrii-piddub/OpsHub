@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems, patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
-import type { WorkItemStatus } from '../api/workitems'
+import type { WorkItemStatus, WorkItemPriority } from '../api/workitems'
 import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
 
 
@@ -20,7 +20,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
     const [draftTitle, setDraftTitle] = useState('')
     const [draftDescription, setDraftDescription] = useState("")
     const [draftStatus, setDraftStatus] = useState<WorkItemStatus>('OP')
-
+    const [draftPriority, setDraftPriority] = useState<WorkItemPriority>('ME')
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
 
 
@@ -32,9 +32,9 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
         setSavingItemId(itemId);
 
         try {
-            const updatedItem = await patchWorkitems(itemId, draftStatus, draftTitle, draftDescription)
+            const updatedItem = await patchWorkitems(itemId, draftStatus, draftTitle, draftDescription, draftPriority)
             setEditingItemId(null)
-            const leavesFilter = (topSelector !== 'All' && updatedItem.status !== topSelector) || !updatedItem.title.toLowerCase().includes(searchValue)
+            const leavesFilter = (topSelector !== 'All' && updatedItem.status !== topSelector) || !updatedItem.title.toLowerCase().includes(searchValue.toLowerCase())
 
             if (leavesFilter && workItems.length === 1 && page > 1) {
                 setPage(page - 1)
@@ -138,6 +138,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
         workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
         setItemsError, creatingItem, setCreatingItem, createError, setCreateError,
         savingItemId, setSavingItemId, handleSaveAction,
-        createWorkItem, handleDeleteWorkItem, deletingItemId, paginationInfo, editingItemId, setEditingItemId, draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus, setDraftStatus
+        createWorkItem, handleDeleteWorkItem, deletingItemId, paginationInfo, editingItemId, setEditingItemId, draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus, setDraftStatus,
+        draftPriority, setDraftPriority
     }
 }
