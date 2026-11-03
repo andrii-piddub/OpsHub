@@ -6,7 +6,6 @@ import { useWorkItems } from './hooks/useWorkItems.ts'
 import WorkItemsTable from './components/WorkItemsTable.tsx'
 import WorkItemForm from './components/WorkItemForm.tsx'
 import type { WorkItemStatus, WorkItemOrdering } from './api/workitems'
-import type { Draft } from './components/WorkItemsTable.tsx'
 
 function App() {
 
@@ -20,8 +19,7 @@ function App() {
   const [orderingType, setOrderingType] = useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
   const { workItems, itemsLoading, itemsError,
-    creatingItem, createError, savingItemId,
-    draft, handleSaveStatus, createWorkItem,
+    creatingItem, createError, savingItemId, handleSaveAction, createWorkItem,
     handleDeleteWorkItem, deletingItemId, paginationInfo, editingItemId, setEditingItemId,
     draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus,setDraftStatus } = useWorkItems(retryCount, topSelector, searchValue, orderingType, page, setPage)
   const [title, setTitle] = useState('')
@@ -152,8 +150,8 @@ function App() {
 
       {/* ===== Work items table ===== */}
       <div>
-        <WorkItemsTable workItems={workItems} draft={draft} savingItemId={savingItemId}
-           onSaveStatus={handleSaveStatus} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} editingItemId={editingItemId}
+        <WorkItemsTable workItems={workItems} savingItemId={savingItemId}
+           onSaveAction={handleSaveAction} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} editingItemId={editingItemId}
            setEditingItemId={setEditingItemId} draftTitle={draftTitle}  setDraftTitle={setDraftTitle} draftDescription={draftDescription} setDraftDescription={setDraftDescription}
            draftStatus={draftStatus} setDraftStatus={setDraftStatus}/>
       </div>

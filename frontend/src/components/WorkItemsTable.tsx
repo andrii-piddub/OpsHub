@@ -1,6 +1,5 @@
 import type { WorkItem } from '../api/workitems.ts';
 import type { WorkItemStatus } from '../api/workitems.ts'
-import { useState } from 'react';
 const statuses: { value: WorkItemStatus; label: string }[] = [
   { value: 'OP', label: 'Open' },
   { value: 'IP', label: 'In Progress' },
@@ -10,31 +9,24 @@ const statuses: { value: WorkItemStatus; label: string }[] = [
 type WorkItemsTableProps = {
   workItems: WorkItem[];
   savingItemId: number | null;
-  onEditChange(id: number): void;
-  onSaveStatus(id: number): void;
+  onSaveAction(id: number): void;
   onDeleteWorkItem(id: number): void;
   deletingItemId: number | null;
-  draft: Draft | null;
-  editingItemId:number | null;
-  setEditingItemId:(id:number|null)=>void;
-  draftTitle:string;
-  setDraftTitle:(value:string)=>void;
-  draftDescription:string;
-  setDraftDescription:(value:string)=>void;
-  draftStatus:WorkItemStatus;
-  setDraftStatus:(value:WorkItemStatus | null)=>void;
+  editingItemId: number | null;
+  setEditingItemId: (id: number | null) => void;
+  draftTitle: string;
+  setDraftTitle: (value: string) => void;
+  draftDescription: string;
+  setDraftDescription: (value: string) => void;
+  draftStatus: WorkItemStatus;
+  setDraftStatus: (value: WorkItemStatus) => void;
 }
-export type Draft = {
-  id: number;
-  title: string;
-  description: string;
-  status: WorkItemStatus;
-}
+
 
 
 function WorkItemsTable(props: WorkItemsTableProps) {
 
-    console.log(props.editingItemId)
+  console.log(props.editingItemId)
   console.log(props.draftTitle)
   console.log(props.draftDescription)
   console.log(props.draftStatus)
@@ -57,6 +49,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
           {props.workItems.map((item) => (
             <tr key={item.id}>
               <td>{item.id}</td>
+
               <td>{props.editingItemId === item.id ? <textarea
                 className="edit-field"
                 rows={3}
@@ -66,6 +59,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                 onChange={(event) => {
                   props.setDraftTitle(event.target.value)
                 }} /> : item.title}</td>
+
               <td>{props.editingItemId === item.id ? <textarea
                 className="edit-field"
                 rows={3}
@@ -75,7 +69,6 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                 onChange={(event) => {
                   props.setDraftDescription(event.target.value)
                 }} /> : item.description}</td>
-
 
               <td>{props.editingItemId === item.id ? <select
                 value={props.draftStatus}
@@ -93,6 +86,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                 {statuses.find((s) => s.value === item.status)?.label ?? item.status}
               </span>}
               </td>
+
               <td>
                 <div
                   className="row-actions">
@@ -103,6 +97,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       props.setEditingItemId(item.id)
                       props.setDraftTitle(item.title)
                       props.setDraftDescription(item.description)
+                      props.setDraftStatus(item.status)
                     }}>
                     Edit
                   </button>
@@ -111,8 +106,8 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                   <button
                     className="btn"
                     hidden={props.editingItemId !== item.id}
-                    onClick={() => { props.setEditingItemId(null) }}>
-                    Save
+                    onClick={() => { props.onSaveAction(item.id); props.setEditingItemId(null) }}>
+                    {props.savingItemId === item.id ? 'Saving' : 'Save'}
                   </button>
 
 
@@ -132,7 +127,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                 type="button"
                 className="btn btn-save"
                 // onClick={()=>{setEditing(false)}}
-                onClick={() =>{ props.onSaveStatus(item.id)
+                onClick={() =>{ props.onSaveAction(item.id)
                 }
                 }
                 disabled={props.savingItemId !== null || props.deletingItemId !== null}
@@ -162,7 +157,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
         </tbody>
       </table>
     </div>
-    
+
   </>)
 
 

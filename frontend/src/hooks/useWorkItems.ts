@@ -3,7 +3,6 @@ import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems, patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus } from '../api/workitems'
 import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
-import type { Draft } from "../components/WorkItemsTable.tsx";
 
 
 export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page: number, setPage: (page: number) => void) {
@@ -17,34 +16,18 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
-    const [draft, setDraft] = useState<Draft |null>(null)
     const [editingItemId, setEditingItemId] = useState<number | null>(null)
     const [draftTitle, setDraftTitle] = useState('')
     const [draftDescription, setDraftDescription] = useState("")
-    const [draftStatus, setDraftStatus] = useState<WorkItemStatus |null >(null)
+    const [draftStatus, setDraftStatus] = useState<WorkItemStatus>('OP')
 
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
 
 
-    // ===== handleStatusChange =====
-    // const handleStatusChange = (itemId: number, draft: Draft) => {
-    //     setDraft((previous) => ({
-    //         ...previous,
-    //         [itemId]:{title:itemId.title,
-    //                     description:itemId.description,
-    //                     status:itemId.status,
-    //                 } ,
-    //     }))
-    // }
-    // console.log(typeof(handleStatusChange))
 
-
-    // ===== handleSaveStatus =====
-    async function handleSaveStatus(itemId: number) {
+    // ===== handleSaveAction =====
+    async function handleSaveAction(itemId: number) {
         if (!editingItemId) return
-        if (draftStatus === null){
-            setDraftStatus('OP')
-        }
         setItemsError('')
         setSavingItemId(itemId);
 
@@ -155,7 +138,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
     return {
         workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
         setItemsError, creatingItem, setCreatingItem, createError, setCreateError,
-        savingItemId, setSavingItemId, draft, setDraft, handleSaveStatus,
+        savingItemId, setSavingItemId,  handleSaveAction,
         createWorkItem, handleDeleteWorkItem, deletingItemId, paginationInfo, editingItemId, setEditingItemId, draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus, setDraftStatus
     }
 }
