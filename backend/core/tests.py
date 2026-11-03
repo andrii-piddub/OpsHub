@@ -92,6 +92,8 @@ class WorkItemUpdateTests(TestCase):
 
     def test_update_partial(self):
         created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
+        original_title = created_item.title
+        original_status = created_item.status
         patch_data={'description':'New'}
         patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")        
         self.assertEqual(patch_response.status_code,200)
@@ -101,18 +103,25 @@ class WorkItemUpdateTests(TestCase):
         self.assertEqual(patch_response.json()['title'],created_item.title)
         self.assertEqual(patch_response.json()['description'],created_item.description)
         self.assertEqual(patch_response.json()['status'],created_item.status)
+
+        self.assertEqual(patch_response.json()['title'],original_title)
+        self.assertEqual(patch_response.json()['status'],original_status)
+
     def test_update_empty_title(self):
         created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
         patch_data={'title':''}
         patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")        
         created_item.refresh_from_db()   
         self.assertEqual(patch_response.status_code,400)
+        self.assertEqual(created_item.title,'First case')
     def test_long_title(self):
         created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
         patch_data={'title':f'{'x'*201}'}
         patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")        
         created_item.refresh_from_db()   
         self.assertEqual(patch_response.status_code,400)
+        self.assertEqual(created_item.title,'First case')
+
     
 
   

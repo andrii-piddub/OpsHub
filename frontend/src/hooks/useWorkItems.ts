@@ -34,7 +34,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
         try {
             const updatedItem = await patchWorkitems(itemId, draftStatus, draftTitle, draftDescription)
             setEditingItemId(null)
-            const leavesFilter = topSelector !== 'All' && updatedItem.status !== topSelector && !updatedItem.title.includes(searchValue)
+            const leavesFilter = (topSelector !== 'All' && updatedItem.status !== topSelector) || !updatedItem.title.includes(searchValue)
 
             if (leavesFilter && workItems.length === 1 && page > 1) {
                 setPage(page - 1)

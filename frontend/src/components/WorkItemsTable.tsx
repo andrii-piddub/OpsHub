@@ -54,7 +54,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                 className="edit-field"
                 rows={3}
                 maxLength={200}
-                aria-label="Description"
+                aria-label="Title"
                 value={props.draftTitle}
                 disabled={props.savingItemId === item.id || props.deletingItemId !== null}
                 onChange={(event) => {
