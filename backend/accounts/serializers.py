@@ -10,11 +10,12 @@ class UserSerializer(serializers.ModelSerializer):
     fields = ['username','password']
     extra_kwargs ={'password':{'write_only':True}}
     
-  def validate_password(self,value):
+  def validate(self, attrs):
+    user = User(username=attrs.get('username'))
     try:
-      validate_password(value)
+      validate_password(attrs.get('password'), user=user)
     except ValidationError as e:
-      raise serializers.ValidationError(e.messages)
-    return value
+      raise serializers.ValidationError({'password': e.messages})
+    return attrs
   def create(self,validated_data):
     return User.objects.create_user(**validated_data)
