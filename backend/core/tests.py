@@ -6,6 +6,9 @@ from django.utils import timezone
 
 # Create your tests here.
 class WorkItemDeleteTests(TestCase): 
+    def setUp(self):
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
     def test_delete_existing_work_item(self):
         new_Item = WorkItem.objects.create(title="new2", description="new description")
         response = self.client.delete(path=f"/api/v1/workitem/{new_Item.id}/")
@@ -16,6 +19,9 @@ class WorkItemDeleteTests(TestCase):
         self.assertEqual(response.status_code,404)
 
 class WorkItemCreateTests(TestCase):
+    def setUp(self):
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
     def test_create_work_item(self):
         response = self.client.post(data={"title":"Test item","description":"Test description"}, path='/api/v1/workitem/')
         self.assertEqual(response.status_code,201)
@@ -67,6 +73,9 @@ class WorkItemCreateTests(TestCase):
 
 
 class WorkItemUpdateTests(TestCase):
+    def setUp(self):
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
     def test_update_work_item(self):
         response = self.client.post(data={'title':'Test item','description':'New description','status':'OP'},path='/api/v1/workitem/')
         self.assertEqual(response.status_code,201)
@@ -164,6 +173,8 @@ class WorkItemUpdateTests(TestCase):
 
 class WorkItemGetTests(TestCase):
     def setUp(self):
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
         first_item = WorkItem.objects.create(title='First case', status='IP')
         second_item = WorkItem.objects.create(title='Second case', status='DN')
         third_item = WorkItem.objects.create(title='Third case',status='OP')
@@ -278,8 +289,26 @@ class WorkItemGetTests(TestCase):
         self.assertEqual(len(response.json()['results']),10)
 
 
-        
-
+class WorkItemAuthorizedTests(TestCase):
+    def setUp(self):
+        first_item = WorkItem.objects.create(title='First case', status='IP')
+    def test_anonymous_get_item(self):
+        response = self.client.get(path="/api/v1/workitem/",data={'title':'First case'})
+        self.assertEqual(response.status_code,403)
+    def test_anonymous_post_item(self):
+        response = self.client.post(path="/api/v1/workitem/",data={'title':'Second case','description':'Description','status':'IP'})
+        self.assertEqual(response.status_code,403)
+    def test_authorized_get_item(self):
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        response = self.client.get(path="/api/v1/workitem/",data={'title':'First case'})
+        self.assertEqual(response.status_code,200)
+    def test_authorized_post_item(self):
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        second_item = self.client.post(path="/api/v1/workitem/",data={'title':'Second case','description':'description','status':'IP'})
+        self.assertEqual(second_item.status_code,201)
+        self.assertEqual(WorkItem.objects.filter(title='Second case').count(),1)
 
 
 

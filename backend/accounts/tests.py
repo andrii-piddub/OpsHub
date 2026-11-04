@@ -71,7 +71,6 @@ class LogoutTests(TestCase):
         self.assertEqual(response_two.status_code,200)
         self.assertNotIn("_auth_user_id", self.client.session)
     def test_logout_not_authorised_user(self):
-        user = User.objects.create_user(username='Andre',password='Five23oaks!')
         response_two = self.client.post(path="/api/v1/auth/logout/")
         self.assertEqual(response_two.status_code,403)
     def test_logout_then_login(self):
