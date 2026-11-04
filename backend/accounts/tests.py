@@ -12,7 +12,6 @@ class RegistrationTests(TestCase):
         self.assertEqual(len(responde.json()),1)
         self.assertEqual(responde.json()['username'],'Andre')
         self.assertNotIn('password',responde.json())
-
         user=User.objects.get(username='Andre')
         self.assertNotEqual(user.password,'newAndre123!')
         self.assertTrue(user.check_password('newAndre123!'))
@@ -41,5 +40,29 @@ class RegistrationTests(TestCase):
 
 
 
+class LoginTests(TestCase):
+    def test_login_success(self):
+        user = User.objects.create_user(username='Andre',password='Five23oaks!')
+        response = self.client.post(data={'username':'Andre','password':'Five23oaks!'},path="/api/v1/auth/login/")
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(self.client.session["_auth_user_id"], str(user.pk))
+    def test_wrong_password(self):
+        user = User.objects.create_user(username='Andre',password='Five23oaks!')
+        response = self.client.post(data={'username':'Andre','password':'Five23oaks2!'},path="/api/v1/auth/login/")
+        self.assertEqual(response.status_code,400)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_wrong_username(self):
+        user = User.objects.create_user(username='Andre',password='Five23oaks!')
+        response = self.client.post(data={'username':'Andrey','password':'Five23oaks!'},path="/api/v1/auth/login/")
+        self.assertEqual(response.status_code,400)
+        self.assertNotIn("_auth_user_id", self.client.session)
+    def test_missed_credentials(self):
+        user = User.objects.create_user(username='Andre',password='Five23oaks!')
+        response = self.client.post(data={'password':'Five23oaks!'},path="/api/v1/auth/login/")
+        self.assertEqual(response.status_code,400)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+        
 
 
