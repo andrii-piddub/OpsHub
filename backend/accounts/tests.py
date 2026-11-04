@@ -51,7 +51,6 @@ class LoginTests(TestCase):
         response = self.client.post(data={'username':'Andre','password':'Five23oaks2!'},path="/api/v1/auth/login/")
         self.assertEqual(response.status_code,400)
         self.assertNotIn("_auth_user_id", self.client.session)
-
     def test_wrong_username(self):
         user = User.objects.create_user(username='Andre',password='Five23oaks!')
         response = self.client.post(data={'username':'Andrey','password':'Five23oaks!'},path="/api/v1/auth/login/")
@@ -63,6 +62,28 @@ class LoginTests(TestCase):
         self.assertEqual(response.status_code,400)
         self.assertNotIn("_auth_user_id", self.client.session)
 
-        
+class LogoutTests(TestCase):
+    def test_logout_authorised_user(self):
+        user = User.objects.create_user(username='Andre',password='Five23oaks!')
+        response_one = self.client.post(data={'username':'Andre','password':'Five23oaks!'},path="/api/v1/auth/login/")
+        self.assertEqual(response_one.status_code,200)
+        response_two = self.client.post(path="/api/v1/auth/logout/")
+        self.assertEqual(response_two.status_code,200)
+        self.assertNotIn("_auth_user_id", self.client.session)
+    def test_logout_not_authorised_user(self):
+        user = User.objects.create_user(username='Andre',password='Five23oaks!')
+        response_two = self.client.post(path="/api/v1/auth/logout/")
+        self.assertEqual(response_two.status_code,403)
+    def test_logout_then_login(self):
+        user = User.objects.create_user(username='Andre',password='Five23oaks!')
+        response_one = self.client.post(data={'username':'Andre','password':'Five23oaks!'},path="/api/v1/auth/login/")
+        self.assertEqual(response_one.status_code,200)
+        response_two = self.client.post(path="/api/v1/auth/logout/")
+        self.assertEqual(response_two.status_code,200)
+        self.assertNotIn("_auth_user_id", self.client.session)
+        response_three = self.client.post(data={'username':'Andre','password':'Five23oaks!'},path="/api/v1/auth/login/")
+        self.assertEqual(response_three.status_code,200)
+        self.assertEqual(self.client.session["_auth_user_id"], str(user.pk))
+
 
 
