@@ -3,6 +3,7 @@ from .models import WorkItem
 import json
 from datetime import timedelta
 from django.utils import timezone
+from accounts.models import User
 
 # Create your tests here.
 class WorkItemDeleteTests(TestCase): 
@@ -10,10 +11,10 @@ class WorkItemDeleteTests(TestCase):
         self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
         self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
     def test_delete_existing_work_item(self):
-        new_Item = WorkItem.objects.create(title="new2", description="new description")
-        response = self.client.delete(path=f"/api/v1/workitem/{new_Item.id}/")
+        new_Item = self.client.post(data={"title":"new2","description":"new description"}, path='/api/v1/workitem/')
+        response = self.client.delete(path=f"/api/v1/workitem/{new_Item.json()['id']}/")
         self.assertEqual(response.status_code,204)
-        self.assertFalse(WorkItem.objects.filter(id=new_Item.id).exists())
+        self.assertFalse(WorkItem.objects.filter(id=new_Item.json()['id']).exists())
     def test_delete_nonexistent_work_item(self):
         response = self.client.delete(path="/api/v1/workitem/9999999/")
         self.assertEqual(response.status_code,404)
@@ -96,71 +97,115 @@ class WorkItemUpdateTests(TestCase):
         created_item.refresh_from_db()
         self.assertEqual(created_item.status,'OP')
     def test_update_title_description_status(self):
-        created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
-        patch_data={'title':'Second case','description':'New','status':'IP'}
-        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")        
+        created_item = self.client.post(path="/api/v1/workitem/",data={"title":"First case","description":"Some information","status":"OP"})       
+        patch_data={"title":"Second case","description":"New","status":"IP"}
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.json()['id']}/",data=json.dumps(patch_data), content_type="application/json")        
         self.assertEqual(patch_response.status_code,200)
-        created_item.refresh_from_db()
+        item_in_db=WorkItem.objects.get(pk=created_item.json()['id'])
 
-        self.assertEqual(patch_response.json()['title'],created_item.title)
-        self.assertEqual(patch_response.json()['description'],created_item.description)
-        self.assertEqual(patch_response.json()['status'],created_item.status)
+        self.assertEqual(patch_response.json()['title'],item_in_db.title)
+        self.assertEqual(patch_response.json()['description'],item_in_db.description)
+        self.assertEqual(patch_response.json()['status'],item_in_db.status)
 
-        self.assertEqual(patch_data['title'],created_item.title)
-        self.assertEqual(patch_data['description'],created_item.description)
-        self.assertEqual(patch_data['status'],created_item.status)
+        self.assertEqual(patch_data['title'],item_in_db.title)
+        self.assertEqual(patch_data['description'],item_in_db.description)
+        self.assertEqual(patch_data['status'],item_in_db.status)
 
     def test_update_partial(self):
-        created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
-        original_title = created_item.title
-        original_status = created_item.status
+        created_item=self.client.post(path="/api/v1/workitem/",data={"title":"First case", "description":"Some information","status":"OP"})
+        original_title = created_item.json()['title']
+        original_status = created_item.json()['status']
         patch_data={'description':'New'}
-        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")        
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.json()['id']}/",data=json.dumps(patch_data), content_type="application/json")        
+        item_from_db = WorkItem.objects.get(pk=created_item.json()['id'])
         self.assertEqual(patch_response.status_code,200)
-        created_item.refresh_from_db()   
-        self.assertEqual(patch_data['description'],created_item.description)
-
-        self.assertEqual(patch_response.json()['title'],created_item.title)
-        self.assertEqual(patch_response.json()['description'],created_item.description)
-        self.assertEqual(patch_response.json()['status'],created_item.status)
+        self.assertEqual(patch_data['description'],item_from_db.description)
+        self.assertEqual(patch_response.json()['title'],item_from_db.title)
+        self.assertEqual(patch_response.json()['description'],item_from_db.description)
+        self.assertEqual(patch_response.json()['status'],item_from_db.status)
 
         self.assertEqual(patch_response.json()['title'],original_title)
         self.assertEqual(patch_response.json()['status'],original_status)
 
     def test_update_empty_title(self):
-        created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
+        created_item=self.client.post(path="/api/v1/workitem/",data={"title":"First case","description":"Some information","status":"OP"})
         patch_data={'title':''}
-        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")        
-        created_item.refresh_from_db()   
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.json()['id']}/",data=json.dumps(patch_data), content_type="application/json")        
+        item_from_db = WorkItem.objects.get(pk=created_item.json()['id'])
         self.assertEqual(patch_response.status_code,400)
-        self.assertEqual(created_item.title,'First case')
+        self.assertEqual(item_from_db.title,'First case')
     def test_long_title(self):
-        created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
+        created_item=self.client.post(path="/api/v1/workitem/",data={"title":"First case","description":"Some information","status":"OP"})
         patch_data={'title':f'{'x'*201}'}
-        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")        
-        created_item.refresh_from_db()   
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.json()['id']}/",data=json.dumps(patch_data), content_type="application/json")        
         self.assertEqual(patch_response.status_code,400)
-        self.assertEqual(created_item.title,'First case')
+        self.assertEqual(created_item.json()['title'],'First case')
     def test_update_priority(self):
-        created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
+        created_item=self.client.post(path="/api/v1/workitem/",data={"title":"First case","description":"Some information","status":"OP"})
         patch_data={'priority':'HI'}
-        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")  
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.json()['id']}/",data=json.dumps(patch_data), content_type="application/json")  
         self.assertEqual(patch_response.status_code,200)
-        created_item.refresh_from_db()   
-        self.assertEqual(patch_response.json()['priority'],created_item.priority)
-        self.assertEqual(patch_data['priority'],created_item.priority)
+        item = WorkItem.objects.get(title='First case')
+        self.assertEqual(patch_response.json()['priority'],item.priority)
+        self.assertEqual(patch_data['priority'],item.priority)
     def test_update__wrong_priority(self):
-        created_item=WorkItem.objects.create(title="First case", description="Some information", status='OP')
+        created_item=self.client.post(path="/api/v1/workitem/",data={"title":"First case","description":"Some information","status":"OP"})
         patch_data={'priority':'XX'}
-        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps(patch_data), content_type="application/json")  
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.json()['id']}/",data=json.dumps(patch_data), content_type="application/json")  
         self.assertEqual(patch_response.status_code,400)
-        created_item.refresh_from_db()   
-        self.assertEqual(created_item.priority,'ME')
+        self.assertEqual(created_item.json()['priority'],'ME')
 
 
-
-
-
+class WorkItemOwnersTests(TestCase):
+    def test_owner(self):
+        self.client.post(data={'username':'Andre', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Andre', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        response = self.client.post(path="/api/v1/workitem/",data={"title":'Title one',"status":"IP"})
+        self.assertEqual(response.status_code,201)
+        item_in_db = WorkItem.objects.get(pk=response.json()['id'])
+        self.assertEqual(item_in_db.owner.username,'Andre') 
+    def test_two_owners(self):
+        self.client.post(data={'username':'Andre', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Peter', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Peter', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        response = self.client.post(path="/api/v1/workitem/",data={"title":'Title one',"status":"IP"})
+        self.assertEqual(response.status_code,201)
+        self.client.post(path='/api/v1/auth/logout/')
+        self.client.post(data={'username':'Andre', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        response_get = self.client.get(path="/api/v1/workitem/")
+        self.assertEqual(len(response_get.json()['results']),0)
+    def test_two_owners_patch_another_item(self):
+        self.client.post(data={'username':'Andre', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Peter', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Peter', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        response = self.client.post(path="/api/v1/workitem/",data={"title":'Title one',"status":"IP"})
+        self.assertEqual(response.status_code,201)
+        self.client.post(path='/api/v1/auth/logout/')
+        self.client.post(data={'username':'Andre', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        response_get = self.client.patch(path=f"/api/v1/workitem/{response.json()["id"]}/",data={"title":'Newone'}, content_type="application/json")
+        self.assertEqual(response_get.status_code,404)
+        item_in_db = WorkItem.objects.get(pk=response.json()['id'])
+        self.assertNotEqual(item_in_db.title,"Newone")    
+    def test_two_owners_delete_another_item(self):
+        self.client.post(data={'username':'Andre', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Peter', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Peter', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        response = self.client.post(path="/api/v1/workitem/",data={"title":'Title one',"status":"IP"})
+        self.assertEqual(response.status_code,201)
+        self.client.post(path='/api/v1/auth/logout/')
+        self.client.post(data={'username':'Andre', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        response_get = self.client.delete(path=f"/api/v1/workitem/{response.json()["id"]}/", content_type="application/json")
+        self.assertEqual(response_get.status_code,404)
+        item_in_db = WorkItem.objects.get(pk=response.json()['id'])
+    def test_post_item_different_owner(self):
+        user_one=self.client.post(data={'username':'Andre', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        user_two=self.client.post(data={'username':'Peter', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Andre', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        user_two_id=User.objects.get(username='Peter').id
+        response=self.client.post(path='/api/v1/workitem/',data={"title":'NewOne',"description":"some text","status":"IP","owner":f"{user_two_id}"})
+        self.assertEqual(response.status_code,201)
+        item_in_db = WorkItem.objects.get(pk=response.json()['id'])
+        self.assertEqual(item_in_db.owner.username,'Andre')
         
 
 
@@ -175,14 +220,15 @@ class WorkItemGetTests(TestCase):
     def setUp(self):
         self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
         self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
-        first_item = WorkItem.objects.create(title='First case', status='IP')
-        second_item = WorkItem.objects.create(title='Second case', status='DN')
-        third_item = WorkItem.objects.create(title='Third case',status='OP')
-
+        first_item = self.client.post(path='/api/v1/workitem/', data={"title":"First case","status":"IP"})
+        second_item = self.client.post(path='/api/v1/workitem/', data={"title":"Second case","status":"DN"})
+        third_item = self.client.post(path='/api/v1/workitem/', data={"title":"Third case","status":"OP"})
+       
         now = timezone.now()
-        WorkItem.objects.filter(pk=third_item.pk).update(created_at=now)
-        WorkItem.objects.filter(pk=second_item.pk).update(created_at=now - timedelta(days=2))
-        WorkItem.objects.filter(pk=first_item.pk).update(created_at=now - timedelta(days=1))
+        print()
+        WorkItem.objects.filter(pk=third_item.json()['id']).update(created_at=now)
+        WorkItem.objects.filter(pk=second_item.json()['id']).update(created_at=now - timedelta(days=2))
+        WorkItem.objects.filter(pk=first_item.json()['id']).update(created_at=now - timedelta(days=1))
     def test_get_work_item(self):
         WorkItem.objects.all().delete()
         response = self.client.get("/api/v1/workitem/")
@@ -197,7 +243,7 @@ class WorkItemGetTests(TestCase):
         self.assertIn('First case',list_of_titles)
         self.assertIn('Second case',list_of_titles)
     def test_get_filtered_status_OP(self):
-        WorkItem.objects.create(title='Fourth case', status='OP')
+        self.client.post(path="/api/v1/workitem/",data={"title":"Fourth case", "status":"OP"})
         response = self.client.get(path="/api/v1/workitem/", data={'status':'OP'})
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.json()['results']),2)
@@ -229,8 +275,8 @@ class WorkItemGetTests(TestCase):
         self.assertEqual(len(response.json()['results']),1)
         self.assertEqual(response.json()['results'][0]['title'],'First case')
     def test_get_by_search_and_filter(self):
-        WorkItem.objects.create(title='Fourth case',status='OP')
-        WorkItem.objects.create(title='Fourth case new',status='DN')
+        self.client.post(path="/api/v1/workitem/",data={"title":"Fourth case","status":"OP"})
+        self.client.post(path="/api/v1/workitem/",data={"title":"Fourth case new","status":"DN"})
         response=self.client.get(path="/api/v1/workitem/", query_params={'search':'Fourth','status':'OP'})
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.json()['results']),1)
@@ -259,7 +305,7 @@ class WorkItemGetTests(TestCase):
         self.assertEqual(response.status_code,400)
     def test_pagination_first_page(self):
         for i in range(20):
-            WorkItem.objects.create(title=f'{i} case+', status='IP')
+            self.client.post(path="/api/v1/workitem/",data={"title":f"{i} case+","status":"IP"})
         response=self.client.get(path="/api/v1/workitem/", query_params={'page':1})
         self.assertEqual(response.json()['count'],WorkItem.objects.all().count())
         self.assertEqual(len(response.json()['results']),10)
@@ -269,7 +315,7 @@ class WorkItemGetTests(TestCase):
         self.assertEqual(response.json()['previous'],None)
     def test_pagination_last_page(self):
         for i in range(20):
-            WorkItem.objects.create(title=f'{i} case+', status='IP')
+            self.client.post(path="/api/v1/workitem/",data={"title":f"{i} case+","status":"IP"})
         response=self.client.get(path="/api/v1/workitem/", query_params={'page':3})
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.json()['results']),3)
@@ -283,7 +329,7 @@ class WorkItemGetTests(TestCase):
         self.assertEqual(response.status_code,404)
     def test_pagination_without_page(self):
         for i in range(20):
-            WorkItem.objects.create(title=f'{i} case+', status='IP')
+            self.client.post(path="/api/v1/workitem/",data={"title":f"{i} case+","status":"IP"})
         response=self.client.get(path="/api/v1/workitem/")
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.json()['results']),10)
@@ -291,11 +337,15 @@ class WorkItemGetTests(TestCase):
 
 class WorkItemAuthorizedTests(TestCase):
     def setUp(self):
-        first_item = WorkItem.objects.create(title='First case', status='IP')
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')
+        self.client.post(data={'username':'Andrii', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        first_item = self.client.post(path="/api/v1/workitem/", data={"title":"First case","status":"IP"})
     def test_anonymous_get_item(self):
+        self.client.post(path='/api/v1/auth/logout/')
         response = self.client.get(path="/api/v1/workitem/",data={'title':'First case'})
         self.assertEqual(response.status_code,403)
     def test_anonymous_post_item(self):
+        self.client.post(path='/api/v1/auth/logout/')
         response = self.client.post(path="/api/v1/workitem/",data={'title':'Second case','description':'Description','status':'IP'})
         self.assertEqual(response.status_code,403)
     def test_authorized_get_item(self):
