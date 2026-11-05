@@ -6,6 +6,7 @@ from .serializers import WorkItemSerializer, PatchWorkitemSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from accounts.models import User
 
 
 
@@ -24,7 +25,7 @@ def health_check(request):
 @permission_classes([IsAuthenticated])
 def work_item(request):
     if request.method == "GET":
-        query_set = WorkItem.objects.all().order_by('-created_at')
+        query_set = WorkItem.objects.filter(owner=request.user).order_by('-created_at')
         status_item = request.query_params.get('status')
         if status_item not in WorkItem.different_status and status_item is not None:
             return Response({'status':[f'{status_item} is not valid. Choose one from {WorkItem.different_status}']}, status=status.HTTP_400_BAD_REQUEST)
@@ -60,7 +61,7 @@ def work_item(request):
 
     serializer = WorkItemSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
+        serializer.save(owner=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
@@ -70,7 +71,7 @@ class ItemPartialUpdateView(APIView):
 
     def patch(self, request, item_id):
         try:
-            item = WorkItem.objects.get(id=item_id)
+            item = WorkItem.objects.filter(owner=request.user).get(id=item_id) 
         except WorkItem.DoesNotExist:
             return Response(
                 {"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND
@@ -86,7 +87,7 @@ class ItemPartialUpdateView(APIView):
 
     def delete(self, request, item_id):
         try:
-            item = WorkItem.objects.get(id=item_id)
+            item = WorkItem.objects.filter(owner=request.user).get(id=item_id) 
         except WorkItem.DoesNotExist:
             return Response(
                 {"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND

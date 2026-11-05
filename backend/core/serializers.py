@@ -5,8 +5,8 @@ from .models import WorkItem
 class WorkItemSerializer(serializers.ModelSerializer):
   class Meta:
     model = WorkItem
-    fields = ['id', 'title', 'description', 'status', 'priority', 'created_at']
-    
+    fields = ['id', 'title', 'description', 'status', 'priority', 'created_at', 'owner']
+    read_only_fields = ['owner']
     
 class PatchWorkitemSerializer(serializers.ModelSerializer):
   class Meta:
