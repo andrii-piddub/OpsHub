@@ -4,11 +4,21 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import authenticate, login, logout
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def auth_me(request):
+    return Response({'id':request.user.id,'username':request.user.username},status=status.HTTP_200_OK)
 
-
+@ensure_csrf_cookie
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def auth_csrf(request):
+    return Response(status=status.HTTP_200_OK)
 
 @api_view(["POST"])
+@csrf_protect
 @permission_classes([AllowAny])
 def register(request):
     serializer = UserSerializer(data=request.data)
@@ -18,8 +28,8 @@ def register(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
 
-
 @api_view(["POST"])
+@csrf_protect
 @permission_classes([AllowAny])
 def login_app(request):
     username = request.data.get("username")

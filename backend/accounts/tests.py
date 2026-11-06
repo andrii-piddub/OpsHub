@@ -2,6 +2,7 @@ from django.test import TestCase
 from .models import User
 import json
 from .serializers import UserSerializer 
+from rest_framework.test import APIClient
 
 
 # Create your tests here.
@@ -85,4 +86,39 @@ class LogoutTests(TestCase):
         self.assertEqual(self.client.session["_auth_user_id"], str(user.pk))
 
 
+class CSRFTests(TestCase):
+    def test_authorized_me(self):
+        response_post=self.client.post(data={'username':'Andre','password':'newAndre123!'}, path="/api/v1/auth/register/")
+        self.assertEqual(response_post.status_code,201)
+        response_one = self.client.post(data={'username':'Andre','password':'newAndre123!'},path="/api/v1/auth/login/")
+        self.assertEqual(response_one.status_code,200)
+        response_two = self.client.get(path="/api/v1/auth/me/")
+        self.assertEqual(response_two.status_code,200)
+        user=User.objects.get(username='Andre')
+        self.assertEqual(response_two.json()['username'],user.username)
+        self.assertEqual(response_two.json()['id'],user.id)
+    def test_anonimus_me(self):
+        response_two = self.client.get(path="/api/v1/auth/me/")
+        self.assertEqual(response_two.status_code,403)
+    def test_authorized_get_csrf(self):
+        response_csrf = self.client.get(path="/api/v1/auth/csrf/")
+        self.assertEqual(response_csrf.status_code,200)
+        self.assertIn('csrftoken',response_csrf.cookies)
+        self.assertTrue(response_csrf.cookies['csrftoken'].value)
+    def test_login_without_csrf_token(self):
+        client = APIClient(enforce_csrf_checks=True)
+        user = User.objects.create_user(username='Andre', password='newAndre123!')
+        response_one = client.post(data={'username':user.username,'password':'newAndre123!'},path="/api/v1/auth/login/")
+        self.assertEqual(response_one.status_code,403)
+    def test_login_with_csrf_token(self):
+        client = APIClient(enforce_csrf_checks=True)
+        user = User.objects.create_user(username='Andre', password='newAndre123!')
+        response_csrf = client.get(path="/api/v1/auth/csrf/")
+        self.assertEqual(response_csrf.status_code, 200)
+        csrf_token = client.cookies['csrftoken']
+        response_login=client.post(path="/api/v1/auth/login/", data={"username":"Andre","password":"newAndre123!"},format="json",HTTP_X_CSRFTOKEN=csrf_token.value)
+        self.assertEqual(response_login.status_code,200)
+        self.assertIn("sessionid",client.cookies)
+        self.assertEqual(client.session['_auth_user_id'],str(user.id))
 
+        
