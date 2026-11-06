@@ -30,8 +30,7 @@ function WorkItemPage({ user,getUser }: { user: User | null, getUser:(user: User
   const [inputValue, setInputValue] = useState('')
   const [logouting,setLogouting]=useState(false)
 
-  async function logoutRequest(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+  async function logoutRequest() {
     setError('')
     try{
       setLogouting(true)
@@ -112,7 +111,7 @@ function WorkItemPage({ user,getUser }: { user: User | null, getUser:(user: User
         <button
           className="logout-button"
           type="button"
-          onClick={()=>{logoutRequest}}
+          onClick={()=>{logoutRequest()}}
           disabled={logouting}
         >Logout</button>
       </header>
