@@ -3,12 +3,13 @@ import { useState, useEffect } from "react"
 import LoginForm from './components/LoginForm'
 import type {User} from './api/auth.ts'
 import {authMe} from './api/auth.ts'
-
+import RegisterForm from "./components/RegisterForm.tsx"
 
 function App(){
   const [user, setUser]=useState<User |null>(null)
   const [authLoading,setAuthLoading]=useState(true)
   const [authError, setAuthError]=useState('')
+  const [createAccount, setCreateAccount]=useState(false)
   
   useEffect(() => {
     let active = true
@@ -58,8 +59,8 @@ function App(){
     </div>
   )}
   {!authLoading && user && <WorkItemPage user={user} getUser={setUser}/>}
-  {!authLoading && !user && <div className="auth-screen"><LoginForm getUser={setUser} /></div>}
-  
+  {!authLoading && !user && <div className="auth-screen"><LoginForm getUser={setUser} createAccount={createAccount} setCreateAccount={setCreateAccount}/></div>}
+  {!authLoading && !user && createAccount && <RegisterForm />}
 
   </>)
 }

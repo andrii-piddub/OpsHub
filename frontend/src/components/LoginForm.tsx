@@ -3,7 +3,14 @@ import {  useState } from 'react'
 import type { FormEvent } from 'react'
 import type {User} from '../api/auth.ts'
 
-function LoginForm({getUser}:{getUser:(user: User) => void}) {
+type LoginFormProps={
+    getUser:(user: User) => void;
+    createAccount:boolean;
+    setCreateAccount:(value:boolean)=>void;
+
+}
+
+function LoginForm(props:LoginFormProps) {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [requesting, setRequesting] = useState(false)
@@ -16,7 +23,7 @@ function LoginForm({getUser}:{getUser:(user: User) => void}) {
             await getCsrf();
             await login(username, password);
             const response = await authMe();
-            getUser(response)
+            props.getUser(response)
           
         } catch (error) {
             setError(
@@ -68,6 +75,15 @@ function LoginForm({getUser}:{getUser:(user: User) => void}) {
                 <button className="auth-submit" type="submit" disabled={requesting}>Login</button>
                 {requesting && <p>Checking connection with server</p>}
                 {error && <p role="alert">Error: {error}</p>}
+                <button
+                className="auth-submit"
+                type="button"
+                onClick={()=>{
+                    props.setCreateAccount(true)
+                }}
+                >
+                    Create account
+                </button>
             </div>
         </form>
     </section>)
