@@ -105,6 +105,30 @@ main {
 }
 
 /* ---------- header ---------- */
+.workspace-header {
+  flex: 1 0 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.workspace-header h1 { flex: initial; margin: 0; }
+.logout-button {
+  flex-shrink: 0;
+  padding: 9px 18px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 600 .875rem var(--body);
+  cursor: pointer;
+  transition: border-color .15s, background-color .15s;
+}
+.logout-button:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+}
+
 h1 {
   flex: 1 0 100%;
   margin: 0 0 4px;

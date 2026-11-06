@@ -41,3 +41,16 @@ export async function authMe(): Promise<User> {
     return (await response.json() as User)
 }
 
+
+export async function logout(): Promise<void> {
+    const response = await fetch('/api/v1/auth/logout/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken() ?? '',
+        }
+    })
+    if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`)
+    }
+}

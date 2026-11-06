@@ -7,8 +7,10 @@ import WorkItemsTable from '../components/WorkItemsTable.tsx'
 import WorkItemForm from '../components/WorkItemForm.tsx'
 import type { WorkItemStatus, WorkItemOrdering } from '../api/workitems'
 import type { User } from '../api/auth'
+import { logout } from '../api/auth'
 
-function WorkItemPage({user}: {user: User}) {
+
+function WorkItemPage({ user,getUser }: { user: User | null, getUser:(user: User|null) => void}) {
 
   // ===== STATE =====
   const [topSelector, setTopSelector] = useState<'All' | WorkItemStatus>('All')
@@ -22,11 +24,30 @@ function WorkItemPage({user}: {user: User}) {
   const { workItems, itemsLoading, itemsError,
     creatingItem, createError, savingItemId, handleSaveAction, createWorkItem,
     handleDeleteWorkItem, deletingItemId, paginationInfo, editingItemId, setEditingItemId,
-    draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus,setDraftStatus, draftPriority, setDraftPriority } = useWorkItems(retryCount, topSelector, searchValue, orderingType, page, setPage)
+    draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus, setDraftStatus, draftPriority, setDraftPriority } = useWorkItems(retryCount, topSelector, searchValue, orderingType, page, setPage)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
+  const [logouting,setLogouting]=useState(false)
 
+  async function logoutRequest(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError('')
+    try{
+      setLogouting(true)
+      await logout()
+      getUser(null)
+    }catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Did not receive an answer',
+      )
+
+    }finally{
+      setLogouting(false)
+    }
+  }
 
   // ===== useEffect: search debounce =====
   useEffect(() => {
@@ -86,7 +107,16 @@ function WorkItemPage({user}: {user: User}) {
   // ===== RENDER =====
   return (
     <main>
-      <h1>OpsHub</h1><p>{user && `Welcome ${user.username}`}</p>
+      <header className="workspace-header">
+        <h1>OpsHub</h1>
+        <button
+          className="logout-button"
+          type="button"
+          onClick={()=>{logoutRequest}}
+          disabled={logouting}
+        >Logout</button>
+      </header>
+      <p>{user && `Welcome ${user.username}`}</p>
 
       {/* ===== Health check ===== */}
       <button
@@ -152,27 +182,28 @@ function WorkItemPage({user}: {user: User}) {
       {/* ===== Work items table ===== */}
       <div>
         <WorkItemsTable workItems={workItems} savingItemId={savingItemId}
-           onSaveAction={handleSaveAction} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} editingItemId={editingItemId}
-           setEditingItemId={setEditingItemId} draftTitle={draftTitle}  setDraftTitle={setDraftTitle} draftDescription={draftDescription} setDraftDescription={setDraftDescription}
-           draftStatus={draftStatus} setDraftStatus={setDraftStatus} draftPriority={draftPriority} setDraftPriority={setDraftPriority}
-           />
+          onSaveAction={handleSaveAction} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} editingItemId={editingItemId}
+          setEditingItemId={setEditingItemId} draftTitle={draftTitle} setDraftTitle={setDraftTitle} draftDescription={draftDescription} setDraftDescription={setDraftDescription}
+          draftStatus={draftStatus} setDraftStatus={setDraftStatus} draftPriority={draftPriority} setDraftPriority={setDraftPriority}
+        />
       </div>
 
 
       {/* ===== Pagination ===== */}
       <div className="pagination">
         <button className="pagination__btn"
-        onClick={()=>{
-          setPage(page-1)}
-        }
-        disabled={paginationInfo.previous===null}
+          onClick={() => {
+            setPage(page - 1)
+          }
+          }
+          disabled={paginationInfo.previous === null}
         >Previous</button>
         <p className="pagination__info">Page {paginationInfo.current_page} of {paginationInfo.num_pages}</p>
         <button className="pagination__btn"
-        onClick={()=>{
-          setPage(page+1)
-        }}
-        disabled={paginationInfo.next===null}>Next</button>
+          onClick={() => {
+            setPage(page + 1)
+          }}
+          disabled={paginationInfo.next === null}>Next</button>
       </div>
       <p></p>
 

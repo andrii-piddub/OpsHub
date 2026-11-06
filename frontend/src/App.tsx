@@ -57,7 +57,7 @@ function App(){
       </section>
     </div>
   )}
-  {!authLoading && user && <WorkItemPage user={user}/>}
+  {!authLoading && user && <WorkItemPage user={user} getUser={setUser}/>}
   {!authLoading && !user && <div className="auth-screen"><LoginForm getUser={setUser} /></div>}
   
 
