@@ -1,48 +1,48 @@
 export type WorkItemStatus = 'OP' | 'IP' | 'DN'
-export type WorkItemPriority = 'LO'|'ME'|'HI'
+export type WorkItemPriority = 'LO' | 'ME' | 'HI'
 export type WorkItem = {
   id: number;
   title: string;
   description: string;
-  priority:WorkItemPriority;
+  priority: WorkItemPriority;
   status: WorkItemStatus
   created_at: string
 }
 
 export type WorkItemsResponse = {
-  results:WorkItem[];
-  count:number;
-  num_pages:number;
-  current_page:number;
-  next:number | null;
+  results: WorkItem[];
+  count: number;
+  num_pages: number;
+  current_page: number;
+  next: number | null;
   previous: number | null;
 
 }
 export type PaginationInfo = Omit<WorkItemsResponse, 'results'>
 
-export type WorkItemOrdering = 'created_at' | '-created_at' 
-export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page:number): Promise<WorkItemsResponse> {
+export type WorkItemOrdering = 'created_at' | '-created_at'
+export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page: number): Promise<WorkItemsResponse> {
   let url = new URL('/api/v1/workitem/', window.location.origin)
   const params = new URLSearchParams(url.search)
-  if (topSelector && topSelector!='All'){
-    params.append('status',topSelector)
+  if (topSelector && topSelector != 'All') {
+    params.append('status', topSelector)
   }
-  if (searchValue){
-    params.append('search',searchValue)
+  if (searchValue) {
+    params.append('search', searchValue)
   }
-  if (orderingType){
-    params.append('ordering',orderingType)
+  if (orderingType) {
+    params.append('ordering', orderingType)
   }
-  if (page){
-    params.append('page',String(page))  
+  if (page) {
+    params.append('page', String(page))
   }
-  url.search=params.toString()
+  url.search = params.toString()
 
   const response = await fetch(url, { signal })
   if (!response.ok) {
     throw new Error(`Request failed: ${response.status}`)
   }
-  return (await response.json() ) as WorkItemsResponse
+  return (await response.json()) as WorkItemsResponse
 }
 
 export async function postWorkItems(title: string, description: string) {
@@ -52,6 +52,10 @@ export async function postWorkItems(title: string, description: string) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-CSRFToken': document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('csrftoken='))
+          ?.split('=')[1] ?? '',
       },
       body: JSON.stringify({ title: title, description: description }),
     },
@@ -65,9 +69,9 @@ export async function postWorkItems(title: string, description: string) {
 export async function patchWorkitems(
   id: number,
   status: WorkItemStatus,
-  title:string,
-  description:string,
-  priority:WorkItemPriority,
+  title: string,
+  description: string,
+  priority: WorkItemPriority,
 ): Promise<WorkItem> {
   const response = await fetch(
     `/api/v1/workitem/${id}/`,
@@ -75,8 +79,12 @@ export async function patchWorkitems(
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
+        'X-CSRFToken': document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('csrftoken='))
+          ?.split('=')[1] ?? '',
       },
-      body: JSON.stringify({title:title, status:status, description:description, priority:priority }),
+      body: JSON.stringify({ title: title, status: status, description: description, priority: priority }),
     },
   )
 
@@ -91,7 +99,14 @@ export async function deleteWorkItem(
   id: number,
 ): Promise<void> {
   const url = `/api/v1/workitem/${id}/`
-  const response = await fetch(url, { method: 'DELETE' })
+  const response = await fetch(url, {
+    method: 'DELETE', headers: {
+      'X-CSRFToken': document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('csrftoken='))
+        ?.split('=')[1] ?? '',
+    }
+  })
   if (!response.ok) {
     throw new Error(`Request failed: ${response.status}`)
   }
