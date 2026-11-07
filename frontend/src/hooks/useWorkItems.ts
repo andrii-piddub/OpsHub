@@ -3,9 +3,10 @@ import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems, patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus, WorkItemPriority } from '../api/workitems'
 import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
+import { authMe } from "../api/auth.ts";
+import type { User } from "../api/auth.ts";
 
-
-export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page: number, setPage: (page: number) => void) {
+export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page: number, setPage: (page: number) => void, setSessionOver: (value: boolean) => void, getUser: (value: User | null) => void) {
 
     // ===== STATE =====
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
@@ -47,6 +48,18 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
 
 
         } catch (error) {
+            const err = error as { status?: number }
+            if (err.status === 403) {
+                try {
+                    await authMe()
+                } catch (error) {
+                    const err2 = error as { status?: number }
+                    if (err2.status === 403) {
+                        setSessionOver(true)
+                        getUser(null)
+                    }
+                }
+            }
             setItemsError(
                 error instanceof Error ? error.message : 'Failed to update status',
             )
@@ -69,6 +82,19 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
 
             setRefreshKey(prev => prev + 1)
         } catch (error) {
+            const err = error as { status?: number }
+            if (err.status === 403) {
+                try {
+                    await authMe()
+                } catch (error) {
+                    const err2 = error as { status?: number }
+                    if (err2.status === 403) {
+                        setSessionOver(true)
+                        getUser(null)
+                    }
+                }
+            }
+
             setItemsError(
                 error instanceof Error ? error.message : 'Failed to delete item',
             )
@@ -124,6 +150,18 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
             }
             return true
         } catch (error) {
+            const err = error as { status?: number }
+            if (err.status === 403) {
+                try {
+                    await authMe()
+                } catch (error) {
+                    const err2 = error as { status?: number }
+                    if (err2.status === 403) {
+                        setSessionOver(true)
+                        getUser(null)
+                    }
+                }
+            }
             setCreateError(
                 error instanceof Error
                     ? error.message

@@ -396,3 +396,61 @@ button:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; }
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Session notification */
+.session-dialog {
+  width: min(420px, calc(100vw - 40px));
+  max-height: calc(100svh - 40px);
+  padding: 32px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 24%);
+  text-align: center;
+}
+.session-dialog::backdrop {
+  background: rgb(6 20 18 / 55%);
+  backdrop-filter: blur(5px);
+}
+.session-dialog__icon {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 20px;
+  color: var(--accent);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+.session-dialog__brand {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.session-dialog h2 {
+  margin: 8px 0 12px;
+  font-family: var(--display);
+  font-size: 28px;
+  line-height: 1.2;
+}
+.session-dialog #session-description {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.session-dialog__button {
+  width: 100%;
+  margin-top: 28px;
+  padding: 13px 20px;
+  border: 0;
+  border-radius: 10px;
+  font: 600 15px var(--body);
+  color: var(--accent-ink);
+  background: var(--accent);
+  cursor: pointer;
+}
+.session-dialog__button:hover { filter: brightness(1.08); }

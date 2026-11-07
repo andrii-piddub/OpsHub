@@ -61,7 +61,7 @@ export async function postWorkItems(title: string, description: string) {
     },
   )
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`)
+    throw { status: response.status }
   }
   return (await response.json()) as WorkItem
 }
@@ -89,9 +89,9 @@ export async function patchWorkitems(
   )
 
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`)
-  }
+    throw { status: response.status }
 
+  }
   return (await response.json()) as WorkItem
 }
 
@@ -108,6 +108,6 @@ export async function deleteWorkItem(
     }
   })
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`)
+    throw { status: response.status }
   }
 }

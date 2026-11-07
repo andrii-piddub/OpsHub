@@ -10,7 +10,7 @@ import type { User } from '../api/auth'
 import { logout } from '../api/auth'
 
 
-function WorkItemPage({ user,getUser }: { user: User | null, getUser:(user: User|null) => void}) {
+function WorkItemPage({ user,getUser, sessionOver, setSessionOver }: { user: User | null, getUser:(user: User|null) => void, sessionOver:boolean, setSessionOver:(value:boolean)=>void}) {
 
   // ===== STATE =====
   const [topSelector, setTopSelector] = useState<'All' | WorkItemStatus>('All')
@@ -24,7 +24,7 @@ function WorkItemPage({ user,getUser }: { user: User | null, getUser:(user: User
   const { workItems, itemsLoading, itemsError,
     creatingItem, createError, savingItemId, handleSaveAction, createWorkItem,
     handleDeleteWorkItem, deletingItemId, paginationInfo, editingItemId, setEditingItemId,
-    draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus, setDraftStatus, draftPriority, setDraftPriority } = useWorkItems(retryCount, topSelector, searchValue, orderingType, page, setPage)
+    draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus, setDraftStatus, draftPriority, setDraftPriority } = useWorkItems(retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')

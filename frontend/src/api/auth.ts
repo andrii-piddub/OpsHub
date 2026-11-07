@@ -36,7 +36,7 @@ export async function authMe(): Promise<User> {
         credentials: 'same-origin'
     })
     if (!response.ok) {
-        throw new Error(`Request failed: ${response.status}`)
+        throw {status:response.status}
     }
     return (await response.json() as User)
 }
