@@ -1,14 +1,11 @@
 import { register, getCsrf } from '../api/auth'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { useNavigate } from 'react-router'
 
 
-type RegisterFormProps = {
-    setCreateAccount: (value: boolean) => void;
 
-}
-
-function RegisterForm(props: RegisterFormProps) {
+function RegisterForm() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -16,6 +13,7 @@ function RegisterForm(props: RegisterFormProps) {
     const [error, setError] = useState('')
     const [usernameError, setUsernameError] = useState('')
     const [passwordError, setPasswordError] = useState('')
+    const navigate = useNavigate()
     async function RegisterRequest(e: FormEvent<HTMLFormElement>) {
         e.preventDefault()
         setError('')
@@ -29,7 +27,7 @@ function RegisterForm(props: RegisterFormProps) {
             setRequesting(true)
             await getCsrf();
             await register(username, password);
-            props.setCreateAccount(false)
+            navigate('/login')
 
 
         } catch (error) {
@@ -103,9 +101,7 @@ function RegisterForm(props: RegisterFormProps) {
                     <button
                         className="register-back"
                         type="button"
-                        onClick={() => {
-                            props.setCreateAccount(false)
-                        }}
+                        onClick={() => {navigate('/login') }}
                     >
                         Back to login
                     </button>

@@ -2,10 +2,10 @@ import { login, getCsrf, authMe } from '../api/auth'
 import {  useState } from 'react'
 import type { FormEvent } from 'react'
 import type {User} from '../api/auth.ts'
+import { useNavigate } from 'react-router'
 
 type LoginFormProps={
     getUser:(user: User) => void;
-    setCreateAccount:(value:boolean)=>void;
 
 }
 
@@ -14,6 +14,7 @@ function LoginForm(props:LoginFormProps) {
     const [password, setPassword] = useState('')
     const [requesting, setRequesting] = useState(false)
     const [error, setError] = useState('')
+    const navigate=useNavigate()
     async function loginRequest(e: FormEvent<HTMLFormElement>) {
         e.preventDefault()
         setError('')
@@ -23,6 +24,7 @@ function LoginForm(props:LoginFormProps) {
             await login(username, password);
             const response = await authMe();
             props.getUser(response)
+            navigate('/workitem')
           
         } catch (error) {
             setError(
@@ -80,10 +82,8 @@ function LoginForm(props:LoginFormProps) {
                 <button
                 className="login-register"
                 type="button"
-                onClick={()=>{
-                    props.setCreateAccount(true)
-                }}
-                >
+                onClick={()=>{navigate('/register')}}       
+                    >
                     Create account
                 </button>
             </div>
