@@ -5,7 +5,7 @@ import type { WorkItemStatus, WorkItemPriority } from '../api/workitems'
 import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
 import { authMe } from "../api/auth.ts";
 import type { User } from "../api/auth.ts";
-
+import {ApiErrors} from '../api/ApiError.ts'
 export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page: number, setPage: (page: number) => void, setSessionOver: (value: boolean) => void, getUser: (value: User | null) => void) {
 
     // ===== STATE =====
@@ -61,7 +61,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
                 }
             }
             setItemsError(
-                error instanceof Error ? error.message : 'Failed to update status',
+                error instanceof ApiErrors ? error.message : 'Failed to update status',
             )
         } finally {
             setSavingItemId(null)
@@ -93,10 +93,10 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
                         getUser(null)
                     }
                 }
-            }
+            } 
 
             setItemsError(
-                error instanceof Error ? error.message : 'Failed to delete item',
+                error instanceof ApiErrors ? error.message : 'Failed to delete item',
             )
         } finally {
             setDeletingItemId(null)
@@ -122,7 +122,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
                 if (controller.signal.aborted) return
 
                 setItemsError(
-                    error instanceof Error
+                    error instanceof ApiErrors
                         ? error.message
                         : 'Did not receive an answer',
                 )
@@ -163,7 +163,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
                 }
             }
             setCreateError(
-                error instanceof Error
+                error instanceof ApiErrors
                     ? error.message
                     : 'Failed to create WorkItem',
             )

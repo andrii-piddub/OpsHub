@@ -1,3 +1,4 @@
+import {ApiErrors} from './ApiError'
 export type WorkItemStatus = 'OP' | 'IP' | 'DN'
 export type WorkItemPriority = 'LO' | 'ME' | 'HI'
 export type WorkItem = {
@@ -61,7 +62,7 @@ export async function postWorkItems(title: string, description: string) {
     },
   )
   if (!response.ok) {
-    throw { status: response.status }
+    throw new ApiErrors(`Request failed: ${response.status}`,response.status )
   }
   return (await response.json()) as WorkItem
 }
@@ -89,7 +90,7 @@ export async function patchWorkitems(
   )
 
   if (!response.ok) {
-    throw { status: response.status }
+    throw new ApiErrors(`Request failed: ${response.status}`, response.status )
 
   }
   return (await response.json()) as WorkItem
@@ -108,6 +109,6 @@ export async function deleteWorkItem(
     }
   })
   if (!response.ok) {
-    throw { status: response.status }
+    throw new ApiErrors(`Request failed: ${response.status}`, response.status )
   }
 }

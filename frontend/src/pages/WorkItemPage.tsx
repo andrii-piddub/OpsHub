@@ -10,7 +10,7 @@ import type { User } from '../api/auth'
 import { logout } from '../api/auth'
 
 
-function WorkItemPage({ user,getUser, sessionOver, setSessionOver }: { user: User | null, getUser:(user: User|null) => void, sessionOver:boolean, setSessionOver:(value:boolean)=>void}) {
+function WorkItemPage({ user,getUser, setSessionOver }: { user: User | null, getUser:(user: User|null) => void, sessionOver:boolean, setSessionOver:(value:boolean)=>void}) {
 
   // ===== STATE =====
   const [topSelector, setTopSelector] = useState<'All' | WorkItemStatus>('All')
