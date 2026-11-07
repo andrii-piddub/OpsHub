@@ -7,6 +7,7 @@ import RegisterForm from "./components/RegisterForm.tsx"
 import { Route, Routes } from "react-router"
 import {RequireAuth} from "./components/RequireAuth.tsx"
 import { Navigate } from "react-router"
+import {GuestRoute} from './components/GuestRoute.tsx'
 function App() {
   const [user, setUser] = useState<User | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
@@ -75,8 +76,10 @@ function App() {
     </dialog>
 
     <Routes>
+      <Route element={<GuestRoute authLoading={authLoading} user={user}/>}>
         <Route path="/login" element={<LoginForm getUser={setUser} />} />
         <Route path="/register" element={<RegisterForm />} />
+      </Route>
       <Route element={<RequireAuth authLoading={authLoading} user={user} />}>
         <Route path="/workitem" element={<WorkItemPage user={user} getUser={setUser} sessionOver={sessionOver} setSessionOver={setSessionOver}/>} />
         <Route path="/" element={<Navigate to="/workitem" replace />} />

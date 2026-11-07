@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from 'react-router'
 import type { User } from '../api/auth'
 
-type RequireAuthProps = {
+export type RequireAuthProps = {
   authLoading: boolean
   user: User | null
 }
