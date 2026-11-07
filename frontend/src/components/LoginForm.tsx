@@ -5,7 +5,6 @@ import type {User} from '../api/auth.ts'
 
 type LoginFormProps={
     getUser:(user: User) => void;
-    createAccount:boolean;
     setCreateAccount:(value:boolean)=>void;
 
 }

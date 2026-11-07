@@ -4,7 +4,6 @@ import type { FormEvent } from 'react'
 
 
 type RegisterFormProps = {
-    createAccount: boolean;
     setCreateAccount: (value: boolean) => void;
 
 }
