@@ -20,14 +20,14 @@ function RegisterForm(props: RegisterFormProps) {
     async function RegisterRequest(e: FormEvent<HTMLFormElement>) {
         e.preventDefault()
         setError('')
+        setUsernameError("")
+        setPasswordError("")
         try {
             if (password !== confirmPassword) {
-               setError('Passwords do not match')
-               return
+                setError('Passwords do not match')
+                return
             }
             setRequesting(true)
-            setUsernameError("")
-            setPasswordError("")
             await getCsrf();
             await register(username, password);
             props.setCreateAccount(false)
@@ -37,8 +37,10 @@ function RegisterForm(props: RegisterFormProps) {
             const data = (error as { data?: Record<string, string[]> }).data
             setUsernameError(data?.username?.[0] ?? '')
             setPasswordError(data?.password?.[0] ?? '')
+            setError(error instanceof Error ? error.message : '')
         } finally {
             setRequesting(false)
+
         }
     }
 
@@ -94,6 +96,8 @@ function RegisterForm(props: RegisterFormProps) {
                     {requesting && <p className="register-status" role="status">Creating your account…</p>}
                     {error && <p className="register-error" role="alert">Error: {error}</p>}
                     {usernameError && <p role="alert">{usernameError}</p>}
+                    {passwordError && <p role="alert">{passwordError}</p>}
+
                 </div>
                 <div className="register-footer">
                     <p>Already have an account?</p>
