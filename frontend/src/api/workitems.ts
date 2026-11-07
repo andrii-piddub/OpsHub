@@ -41,7 +41,7 @@ export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | Wor
 
   const response = await fetch(url, { signal })
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`)
+    throw new ApiErrors(`Request failed: ${response.status}`,response.status )
   }
   return (await response.json()) as WorkItemsResponse
 }

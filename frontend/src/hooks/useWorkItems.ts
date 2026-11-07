@@ -5,7 +5,7 @@ import type { WorkItemStatus, WorkItemPriority } from '../api/workitems'
 import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
 import { authMe } from "../api/auth.ts";
 import type { User } from "../api/auth.ts";
-import {ApiErrors} from '../api/ApiError.ts'
+import { ApiErrors } from '../api/ApiError.ts'
 export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page: number, setPage: (page: number) => void, setSessionOver: (value: boolean) => void, getUser: (value: User | null) => void) {
 
     // ===== STATE =====
@@ -93,7 +93,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
                         getUser(null)
                     }
                 }
-            } 
+            }
 
             setItemsError(
                 error instanceof ApiErrors ? error.message : 'Failed to delete item',
@@ -120,11 +120,22 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
                 })
             } catch (error) {
                 if (controller.signal.aborted) return
-
+                const err = error as { status?: number }
+                if (err.status === 403) {
+                    try {
+                        await authMe()
+                    } catch (error) {
+                        if (controller.signal.aborted) return
+                        const err2 = error as { status?: number }
+                        if (err2.status === 403) {
+                            setSessionOver(true)
+                            getUser(null)
+                        }
+                    }
+                }
+                if (controller.signal.aborted) return
                 setItemsError(
-                    error instanceof ApiErrors
-                        ? error.message
-                        : 'Did not receive an answer',
+                    error instanceof Error ? error.message : 'Failed to load message',
                 )
             } finally {
                 if (!controller.signal.aborted) {
