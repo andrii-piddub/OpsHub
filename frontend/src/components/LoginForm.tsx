@@ -39,7 +39,7 @@ function LoginForm(props:LoginFormProps) {
 
     }
 
-    return (<section className="auth-card login-card" aria-labelledby="login-heading">
+    return (<div className="auth-screen"><section className="auth-card login-card" aria-labelledby="login-heading">
         <form
             onSubmit={loginRequest}
         >
@@ -88,7 +88,7 @@ function LoginForm(props:LoginFormProps) {
                 </button>
             </div>
         </form>
-    </section>)
+    </section></div>)
 }
 
 export default LoginForm

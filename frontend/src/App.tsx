@@ -15,6 +15,11 @@ function App() {
   const sessionDialog = useRef<HTMLDialogElement>(null)
 
   useEffect(() => {
+    if (sessionOver) sessionDialog.current?.showModal()
+  }, [sessionOver])
+
+
+  useEffect(() => {
     let active = true
     async function checkSession() {
       try {
@@ -36,11 +41,7 @@ function App() {
       active = false
     }
   }, [])
-  useEffect(() => {
-    if (sessionOver) {
-      sessionDialog.current?.showModal()
-    }
-  }, [sessionOver])
+
 
   if (!authLoading && authError) {
     return (
@@ -72,21 +73,15 @@ function App() {
         <button className="session-dialog__button" autoFocus>OK, back to login</button>
       </form>
     </dialog>
-    {authLoading && (
-      <div className="auth-screen">
-        <section className="auth-card auth-loading" role="status" aria-live="polite">
-          <span className="auth-spinner" aria-hidden="true" />
-          <h1>OpsHub</h1>
-          <p>Loading your workspace…</p>
-        </section>
-      </div>
-    )}
+
     <Routes>
         <Route path="/login" element={<LoginForm getUser={setUser} />} />
         <Route path="/register" element={<RegisterForm />} />
       <Route element={<RequireAuth authLoading={authLoading} user={user} />}>
         <Route path="/workitem" element={<WorkItemPage user={user} getUser={setUser} sessionOver={sessionOver} setSessionOver={setSessionOver}/>} />
         <Route path="/" element={<Navigate to="/workitem" replace />} />
+        <Route path="*" element={<Navigate to="/workitem" replace />} />
+
       </Route>
     </Routes>
 
