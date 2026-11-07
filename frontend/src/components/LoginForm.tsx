@@ -38,7 +38,7 @@ function LoginForm(props:LoginFormProps) {
 
     }
 
-    return (<section className="auth-card" aria-labelledby="login-heading">
+    return (<section className="auth-card login-card" aria-labelledby="login-heading">
         <form
             onSubmit={loginRequest}
         >
@@ -72,11 +72,14 @@ function LoginForm(props:LoginFormProps) {
                     autoComplete="current-password"
                     placeholder="Enter your password"
                 />
-                <button className="auth-submit" type="submit" disabled={requesting}>Login</button>
-                {requesting && <p>Checking connection with server</p>}
-                {error && <p role="alert">Error: {error}</p>}
+                <button className="auth-submit" type="submit" disabled={requesting}>Sign in</button>
+                {requesting && <p className="login-status" role="status">Signing in…</p>}
+                {error && <p className="login-error" role="alert">Error: {error}</p>}
+            </div>
+            <div className="login-footer">
+                <p>Don't have an account?</p>
                 <button
-                className="auth-submit"
+                className="login-register"
                 type="button"
                 onClick={()=>{
                     props.setCreateAccount(true)

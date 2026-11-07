@@ -59,8 +59,8 @@ function App(){
     </div>
   )}
   {!authLoading && user && <WorkItemPage user={user} getUser={setUser}/>}
-  {!authLoading && !user && <div className="auth-screen"><LoginForm getUser={setUser} createAccount={createAccount} setCreateAccount={setCreateAccount}/></div>}
-  {!authLoading && !user && createAccount && <RegisterForm />}
+  {!authLoading && !user && !createAccount && <div className="auth-screen"><LoginForm getUser={setUser} createAccount={createAccount} setCreateAccount={setCreateAccount}/></div>}
+  {!authLoading && !user && createAccount && <RegisterForm createAccount={createAccount} setCreateAccount={setCreateAccount}/>}
 
   </>)
 }

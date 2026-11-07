@@ -1,4 +1,4 @@
-export type User = {id:number, username:string}
+export type User = { id: number, username: string }
 
 export async function getCsrf(): Promise<void> {
     let url = new URL('/api/v1/auth/csrf/', window.location.origin)
@@ -33,7 +33,7 @@ export async function login(username: string, password: string): Promise<void> {
 
 export async function authMe(): Promise<User> {
     const response = await fetch('/api/v1/auth/me/', {
-          credentials: 'same-origin'
+        credentials: 'same-origin'
     })
     if (!response.ok) {
         throw new Error(`Request failed: ${response.status}`)
@@ -52,5 +52,21 @@ export async function logout(): Promise<void> {
     })
     if (!response.ok) {
         throw new Error(`Request failed: ${response.status}`)
+    }
+}
+
+export async function register(username: string, password: string): Promise<void> {
+    const response = await fetch('/api/v1/auth/register/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken() ?? '',
+
+        },
+        body: JSON.stringify({ username: username, password: password })
+    })
+    if (!response.ok) {
+        const data = await response.json()
+        throw {status:response.status,data}
     }
 }
