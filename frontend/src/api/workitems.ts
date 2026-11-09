@@ -1,4 +1,5 @@
 import {ApiErrors} from './ApiError'
+import {getCsrfToken} from './auth'
 export type WorkItemStatus = 'OP' | 'IP' | 'DN'
 export type WorkItemPriority = 'LO' | 'ME' | 'HI'
 export type WorkItem = {
@@ -53,10 +54,7 @@ export async function postWorkItems(title: string, description: string) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('csrftoken='))
-          ?.split('=')[1] ?? '',
+        'X-CSRFToken': getCsrfToken()?? ''
       },
       body: JSON.stringify({ title: title, description: description }),
     },
@@ -80,10 +78,7 @@ export async function patchWorkitems(
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('csrftoken='))
-          ?.split('=')[1] ?? '',
+        'X-CSRFToken': getCsrfToken()?? ''
       },
       body: JSON.stringify({ title: title, status: status, description: description, priority: priority }),
     },
@@ -102,10 +97,7 @@ export async function deleteWorkItem(
   const url = `/api/v1/workitem/${id}/`
   const response = await fetch(url, {
     method: 'DELETE', headers: {
-      'X-CSRFToken': document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('csrftoken='))
-        ?.split('=')[1] ?? '',
+      'X-CSRFToken': getCsrfToken()?? ''
     }
   })
   if (!response.ok) {
