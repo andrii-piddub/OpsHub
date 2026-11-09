@@ -28,11 +28,11 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
         error: unknown,
         signal?: AbortSignal,
     ): Promise<void> {
-        if ( !(error instanceof ApiErrors) || error.status !== 403) {
+        if ( error instanceof ApiErrors && error.status === 403) {
             try {
+                if (signal?.aborted) return
                 await authMe()
             } catch (error) {
-                if (signal?.aborted) return
                 const err2 = error as { status?: number }
                 if (err2.status === 403) {
                     setSessionOver(true)
