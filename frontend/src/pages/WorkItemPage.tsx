@@ -26,9 +26,9 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
   const [page, setPage] = useState(1)
   const [orderingType, setOrderingType] = useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
-  const { workItems, itemsLoading, itemsError,
+  const { workItems, itemsError,
     creatingItem, createError, savingItemId, handleSaveAction, createWorkItem,
-    handleDeleteWorkItem, deletingItemId, paginationInfo, draftManager } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser})
+    handleDeleteWorkItem, deletingItemId, workItemListManager, draftManager } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser})
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -125,9 +125,9 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
       <button
         type="button"
         onClick={() => setRetryCount((previous) => previous + 1)}
-        disabled={loading || itemsLoading}
+        disabled={loading || workItemListManager.itemsLoading}
       >
-        {loading || itemsLoading ? 'Checking' : 'Checking again'}
+        {loading || workItemListManager.itemsLoading ? 'Checking' : 'Checking again'}
       </button>
 
       {loading && <p>Checking connection with server</p>}
@@ -198,23 +198,23 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
             setPage(page - 1)
           }
           }
-          disabled={paginationInfo.previous === null}
+          disabled={workItemListManager.paginationInfo.previous === null}
         >Previous</button>
-        <p className="pagination__info">Page {paginationInfo.current_page} of {paginationInfo.num_pages}</p>
+        <p className="pagination__info">Page {workItemListManager.paginationInfo.current_page} of {workItemListManager.paginationInfo.num_pages}</p>
         <button className="pagination__btn"
           onClick={() => {
             setPage(page + 1)
           }}
-          disabled={paginationInfo.next === null}>Next</button>
+          disabled={workItemListManager.paginationInfo.next === null}>Next</button>
       </div>
       <p></p>
 
 
       {/* ===== Loading / error / empty messages ===== */}
-      {itemsLoading && <p>Loading work items</p>}
+      {workItemListManager.itemsLoading && <p>Loading work items</p>}
       {itemsError && <p role="alert">Error: {itemsError}</p>}
 
-      {workItems.length === 0 && !itemsLoading && !itemsError && (
+      {workItems.length === 0 && !workItemListManager.itemsLoading && !itemsError && (
         <p>There are no Work Items yet</p>
       )}
 
