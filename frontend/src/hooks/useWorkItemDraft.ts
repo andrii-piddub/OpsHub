@@ -46,7 +46,7 @@ export function useWorkItemDraft(){
         }
 
         return {
-            draft, setDraft, startEditing, cancelEditing, updateDraft
+            draft, startEditing, cancelEditing, updateDraft
         }
 
 }    

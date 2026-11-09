@@ -6,7 +6,7 @@ import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
 import { authMe } from "../api/auth.ts";
 import type { User } from "../api/auth.ts";
 import { ApiErrors } from '../api/ApiError.ts'
-import {useWorkItemDraft} from './useWorkItemDraft.ts'
+import { useWorkItemDraft } from './useWorkItemDraft.ts'
 
 export type WorkItemsParam = {
     retryCount?: number;
@@ -99,8 +99,10 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
             if (page > 1 && workItems.length === 1) {
                 setPage(page - 1)
             }
-            draftManager.cancelEditing()
-            
+            if (draftManager.draft.draftId === id) {
+                draftManager.cancelEditing()
+            }
+
             setRefreshKey(prev => prev + 1)
         } catch (error) {
             await handleErrors(error)
