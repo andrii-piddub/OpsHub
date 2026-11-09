@@ -172,9 +172,8 @@ export function useWorkItems({retryCount=0,topSelector,searchValue,orderingType,
 
     // ===== RETURN =====
     return {
-        workItems, setWorkItems, itemsLoading, setItemsLoading, itemsError,
-        setItemsError, creatingItem, setCreatingItem, createError, setCreateError,
-        savingItemId, setSavingItemId, handleSaveAction,
+        workItems, itemsLoading, itemsError, creatingItem, createError,
+        savingItemId, handleSaveAction,
         createWorkItem, handleDeleteWorkItem, deletingItemId, paginationInfo, editingItemId, setEditingItemId, draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus, setDraftStatus,
         draftPriority, setDraftPriority
     }
