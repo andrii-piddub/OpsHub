@@ -25,6 +25,7 @@ type WorkItemsTableProps = {
   draft: DraftWorkItem
   setDraft: Dispatch<SetStateAction<DraftWorkItem>>;
   cancelEditing:()=>void
+  updateDraft:(changes: Partial<DraftWorkItem>)=>void
 }
 
 function WorkItemsTable(props: WorkItemsTableProps) {
@@ -73,13 +74,8 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       aria-label="Title"
                       value={props.draft.draftTitle}
                       disabled={fieldsDisabled}
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        props.setDraft((pr) => ({
-                          ...pr,
-                          draftTitle: value,
-                        }));
-                      }}
+                      onChange={(event)=>{
+                        props.updateDraft({draftTitle:event?.target.value})}}
                     />
                   ) : (
                     item.title
@@ -95,13 +91,8 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       aria-label="Description"
                       value={props.draft.draftDescription}
                       disabled={fieldsDisabled}
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        props.setDraft((pr) => ({
-                          ...pr,
-                          draftDescription: value,
-                        }));
-                      }}
+                      onChange={(event)=>{
+                        props.updateDraft({draftDescription:event?.target.value})}}
                     />
                   ) : (
                     item.description
@@ -114,13 +105,8 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       aria-label="Priority"
                       value={props.draft.draftPriority }
                       disabled={fieldsDisabled}
-                      onChange={(event) => {
-                        const value = event.target.value as WorkItemPriority;
-                        props.setDraft((pr) => ({
-                          ...pr,
-                          draftPriority: value,
-                        }));
-                      }}
+                      onChange={(event)=>{
+                        props.updateDraft({draftPriority:event?.target.value as WorkItemPriority})}}
                     >
                       {priorities.map((priority) => (
                         <option key={priority.value} value={priority.value}>
@@ -142,13 +128,8 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       aria-label="Status"
                       value={props.draft.draftStatus}
                       disabled={fieldsDisabled}
-                      onChange={(event) => {
-                        const value = event.target.value as WorkItemStatus;
-                        props.setDraft((pr) => ({
-                          ...pr,
-                          draftStatus: value,
-                        }));
-                      }}
+                      onChange={(event)=>{
+                        props.updateDraft({draftStatus:event?.target.value as WorkItemStatus})}}
                     >
                       {statuses.map((status) => (
                         <option key={status.value} value={status.value}>
