@@ -1,5 +1,7 @@
 import type { WorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus, WorkItemPriority } from '../api/workitems.ts'
+import type { DraftWorkItem } from '../hooks/useWorkItems.ts'
+import type { Dispatch, SetStateAction } from 'react';
 
 const statuses: { value: WorkItemStatus; label: string }[] = [
   { value: 'OP', label: 'Open' },
@@ -19,16 +21,9 @@ type WorkItemsTableProps = {
   onSaveAction(id: number): void
   onDeleteWorkItem(id: number): void
   deletingItemId: number | null
-  editingItemId: number | null
-  setEditingItemId: (id: number | null) => void
-  draftTitle: string
-  setDraftTitle: (value: string) => void
-  draftDescription: string
-  setDraftDescription: (value: string) => void
-  draftStatus: WorkItemStatus
-  setDraftStatus: (value: WorkItemStatus) => void
-  draftPriority: WorkItemPriority
-  setDraftPriority: (value: WorkItemPriority) => void
+  startEditing: (item: WorkItem) => void
+  draft: DraftWorkItem
+  setDraft: Dispatch<SetStateAction<DraftWorkItem>>;
 }
 
 function WorkItemsTable(props: WorkItemsTableProps) {
@@ -59,7 +54,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
 
         <tbody>
           {props.workItems.map((item) => {
-            const isEditing = props.editingItemId === item.id
+            const isEditing = props.draft.draftId === item.id
             const isSaving = props.savingItemId === item.id
             const isBusy = props.savingItemId !== null || props.deletingItemId !== null
             const fieldsDisabled = isSaving || props.deletingItemId !== null
@@ -75,9 +70,15 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       rows={3}
                       maxLength={200}
                       aria-label="Title"
-                      value={props.draftTitle}
+                      value={props.draft.draftTitle}
                       disabled={fieldsDisabled}
-                      onChange={(event) => props.setDraftTitle(event.target.value)}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        props.setDraft((pr) => ({
+                          ...pr,
+                          draftTitle: value,
+                        }));
+                      }}
                     />
                   ) : (
                     item.title
@@ -91,9 +92,15 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       rows={3}
                       maxLength={200}
                       aria-label="Description"
-                      value={props.draftDescription}
+                      value={props.draft.draftDescription}
                       disabled={fieldsDisabled}
-                      onChange={(event) => props.setDraftDescription(event.target.value)}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        props.setDraft((pr) => ({
+                          ...pr,
+                          draftDescription: value,
+                        }));
+                      }}
                     />
                   ) : (
                     item.description
@@ -104,11 +111,15 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                   {isEditing ? (
                     <select
                       aria-label="Priority"
-                      value={props.draftPriority}
+                      value={props.draft.draftPriority }
                       disabled={fieldsDisabled}
-                      onChange={(event) =>
-                        props.setDraftPriority(event.target.value as WorkItemPriority)
-                      }
+                      onChange={(event) => {
+                        const value = event.target.value as WorkItemPriority;
+                        props.setDraft((pr) => ({
+                          ...pr,
+                          draftPriority: value,
+                        }));
+                      }}
                     >
                       {priorities.map((priority) => (
                         <option key={priority.value} value={priority.value}>
@@ -128,11 +139,15 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                   {isEditing ? (
                     <select
                       aria-label="Status"
-                      value={props.draftStatus}
+                      value={props.draft.draftStatus}
                       disabled={fieldsDisabled}
-                      onChange={(event) =>
-                        props.setDraftStatus(event.target.value as WorkItemStatus)
-                      }
+                      onChange={(event) => {
+                        const value = event.target.value as WorkItemStatus;
+                        props.setDraft((pr) => ({
+                          ...pr,
+                          draftStatus: value,
+                        }));
+                      }}
                     >
                       {statuses.map((status) => (
                         <option key={status.value} value={status.value}>
@@ -153,13 +168,9 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       type="button"
                       className="btn btn-save"
                       hidden={isEditing}
-                      disabled={props.editingItemId!==null || isBusy}
+                      disabled={props.draft.draftId !== null || isBusy}
                       onClick={() => {
-                        props.setEditingItemId(item.id)
-                        props.setDraftTitle(item.title)
-                        props.setDraftDescription(item.description)
-                        props.setDraftStatus(item.status)
-                        props.setDraftPriority(item.priority)
+                        props.startEditing(item)
 
                       }}
                     >
@@ -181,8 +192,8 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       className="btn"
                       hidden={!isEditing}
                       disabled={fieldsDisabled}
-                      onClick={() => {props.setEditingItemId(null)}}
-                      
+                      onClick={() => { props.setDraft((pr)=>({...pr, draftId:null})) }}
+
                     >
                       Cancel
                     </button>

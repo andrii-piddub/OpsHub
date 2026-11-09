@@ -28,8 +28,7 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
   const [searchValue, setSearchValue] = useState('')
   const { workItems, itemsLoading, itemsError,
     creatingItem, createError, savingItemId, handleSaveAction, createWorkItem,
-    handleDeleteWorkItem, deletingItemId, paginationInfo, editingItemId, setEditingItemId,
-    draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus, setDraftStatus, draftPriority, setDraftPriority } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser})
+    handleDeleteWorkItem, deletingItemId, paginationInfo, draft, setDraft, startEditing } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser})
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -186,9 +185,8 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
       {/* ===== Work items table ===== */}
       <div>
         <WorkItemsTable workItems={workItems} savingItemId={savingItemId}
-          onSaveAction={handleSaveAction} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} editingItemId={editingItemId}
-          setEditingItemId={setEditingItemId} draftTitle={draftTitle} setDraftTitle={setDraftTitle} draftDescription={draftDescription} setDraftDescription={setDraftDescription}
-          draftStatus={draftStatus} setDraftStatus={setDraftStatus} draftPriority={draftPriority} setDraftPriority={setDraftPriority}
+          onSaveAction={handleSaveAction} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} 
+          draft={draft} setDraft={setDraft} startEditing={startEditing} 
         />
       </div>
 

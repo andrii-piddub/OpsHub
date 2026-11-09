@@ -8,17 +8,26 @@ import type { User } from "../api/auth.ts";
 import { ApiErrors } from '../api/ApiError.ts'
 
 export type WorkItemsParam = {
-    retryCount?:number;
-    topSelector:'All'| WorkItemStatus;
+    retryCount?: number;
+    topSelector: 'All' | WorkItemStatus;
     searchValue: string;
     orderingType: WorkItemOrdering;
-    page:number;
-    setPage:(page: number) => void;
-    setSessionOver:(value: boolean) => void;
-    getUser:(value: User | null) => void;
+    page: number;
+    setPage: (page: number) => void;
+    setSessionOver: (value: boolean) => void;
+    getUser: (value: User | null) => void;
 
 }
-export function useWorkItems({retryCount=0,topSelector,searchValue,orderingType,page,setPage,setSessionOver,getUser}:WorkItemsParam) {
+export type DraftWorkItem = {
+    draftId: number | null;
+    draftTitle: string;
+    draftDescription: string;
+    draftStatus: WorkItemStatus;
+    draftPriority: WorkItemPriority;
+
+}
+
+export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderingType, page, setPage, setSessionOver, getUser }: WorkItemsParam) {
 
     // ===== STATE =====
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
@@ -29,18 +38,26 @@ export function useWorkItems({retryCount=0,topSelector,searchValue,orderingType,
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
-    const [editingItemId, setEditingItemId] = useState<number | null>(null)
-    const [draftTitle, setDraftTitle] = useState('')
-    const [draftDescription, setDraftDescription] = useState("")
-    const [draftStatus, setDraftStatus] = useState<WorkItemStatus>('OP')
-    const [draftPriority, setDraftPriority] = useState<WorkItemPriority>('ME')
+
+
+    // const [draftTitle, setDraftTitle] = useState('')
+    // const [draftDescription, setDraftDescription] = useState("")
+    // const [draftStatus, setDraftStatus] = useState<WorkItemStatus>('OP')
+    // const [draftPriority, setDraftPriority] = useState<WorkItemPriority>('ME')
+    const [draft, setDraft] = useState<DraftWorkItem>({
+        draftId: null ,
+        draftTitle: '',
+        draftDescription: '',
+        draftStatus: 'OP',
+        draftPriority: 'ME'
+    })
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
 
     async function handleErrors(
         error: unknown,
         signal?: AbortSignal,
     ): Promise<void> {
-        if ( error instanceof ApiErrors && error.status === 403) {
+        if (error instanceof ApiErrors && error.status === 403) {
             try {
                 if (signal?.aborted) return
                 await authMe()
@@ -56,18 +73,31 @@ export function useWorkItems({retryCount=0,topSelector,searchValue,orderingType,
 
     }
 
+    async function startEditing(item: WorkItem) {
 
+            setDraft((pr) => ({
+                ...pr,
+                draftId: item.id,
+                draftTitle: item.title,
+                draftDescription: item.description,
+                draftStatus: item.status,
+                draftPriority: item.priority
+            }));
+        
+    }
 
 
     // ===== handleSaveAction =====
     async function handleSaveAction(itemId: number) {
-        if (!editingItemId) return
+        if (!draft.draftId) return
         setItemsError('')
         setSavingItemId(itemId);
 
         try {
-            const updatedItem = await patchWorkitems(itemId, draftStatus, draftTitle, draftDescription, draftPriority)
-            setEditingItemId(null)
+            const updatedItem = await patchWorkitems(itemId, draft.draftStatus, draft.draftTitle, draft.draftDescription, draft.draftPriority)
+            setDraft((pr)=>({
+                ...pr,draftId:null
+            }));
             const leavesFilter = (topSelector !== 'All' && updatedItem.status !== topSelector) || !updatedItem.title.toLowerCase().includes(searchValue.toLowerCase())
 
             if (leavesFilter && workItems.length === 1 && page > 1) {
@@ -98,6 +128,10 @@ export function useWorkItems({retryCount=0,topSelector,searchValue,orderingType,
             if (page > 1 && workItems.length === 1) {
                 setPage(page - 1)
             }
+            setDraft((pr)=>({
+                ...pr,
+                draftId: pr.draftId === id? null:pr.draftId
+            }))
 
             setRefreshKey(prev => prev + 1)
         } catch (error) {
@@ -174,7 +208,6 @@ export function useWorkItems({retryCount=0,topSelector,searchValue,orderingType,
     return {
         workItems, itemsLoading, itemsError, creatingItem, createError,
         savingItemId, handleSaveAction,
-        createWorkItem, handleDeleteWorkItem, deletingItemId, paginationInfo, editingItemId, setEditingItemId, draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus, setDraftStatus,
-        draftPriority, setDraftPriority
+        createWorkItem, handleDeleteWorkItem, deletingItemId, paginationInfo, draft, setDraft, startEditing,
     }
 }
