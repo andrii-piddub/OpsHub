@@ -6,7 +6,19 @@ import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
 import { authMe } from "../api/auth.ts";
 import type { User } from "../api/auth.ts";
 import { ApiErrors } from '../api/ApiError.ts'
-export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page: number, setPage: (page: number) => void, setSessionOver: (value: boolean) => void, getUser: (value: User | null) => void) {
+
+export type WorkItemsParam = {
+    retryCount:number;
+    topSelector:'All'| WorkItemStatus;
+    searchValue: string;
+    orderingType: WorkItemOrdering;
+    page:number;
+    setPage:(page: number) => void;
+    setSessionOver:(value: boolean) => void;
+    getUser:(value: User | null) => void;
+
+}
+export function useWorkItems({retryCount=0,topSelector,searchValue,orderingType,page,setPage,setSessionOver,getUser}:WorkItemsParam) {
 
     // ===== STATE =====
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
