@@ -25,12 +25,12 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
 
     async function HandleErrors(
-        err: { status?: number },
+        error: unknown,
         setSessionOver: (value: boolean) => void,
         getUser: (user: User | null) => void,
         signal?: AbortSignal,
     ): Promise<void> {
-        if (err.status === 403) {
+        if ( !(error instanceof ApiErrors) || error.status !== 403) {
             try {
                 await authMe()
             } catch (error) {
@@ -67,8 +67,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
 
 
         } catch (error) {
-            const err = error as { status?: number }
-            HandleErrors(err, setSessionOver, getUser)
+            await HandleErrors(error, setSessionOver, getUser)
             setItemsError(
                 error instanceof ApiErrors ? error.message : 'Failed to update status',
             )
@@ -91,8 +90,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
 
             setRefreshKey(prev => prev + 1)
         } catch (error) {
-            const err = error as { status?: number }
-            HandleErrors(err, setSessionOver, getUser)
+            await HandleErrors(error, setSessionOver, getUser)
 
             setItemsError(
                 error instanceof ApiErrors ? error.message : 'Failed to delete item',
@@ -120,7 +118,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
             } catch (error) {
                 if (controller.signal.aborted) return
                 const err = error as { status?: number }
-                HandleErrors(err, setSessionOver, getUser, controller.signal)
+                await HandleErrors(err, setSessionOver, getUser, controller.signal)
                 if (controller.signal.aborted) return
                 setItemsError(
                     error instanceof Error ? error.message : 'Failed to load message',
@@ -149,8 +147,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
             }
             return true
         } catch (error) {
-            const err = error as { status?: number }
-            HandleErrors(err, setSessionOver, getUser)
+            await HandleErrors(error, setSessionOver, getUser)
             setCreateError(
                 error instanceof ApiErrors
                     ? error.message
