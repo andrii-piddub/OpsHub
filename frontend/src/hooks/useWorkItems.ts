@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import type { WorkItem } from '../api/workitems.ts';
 import { getWorkItems, patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
-import type { WorkItemStatus, WorkItemPriority } from '../api/workitems'
+import type { WorkItemStatus } from '../api/workitems'
 import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
 import { authMe } from "../api/auth.ts";
 import type { User } from "../api/auth.ts";
 import { ApiErrors } from '../api/ApiError.ts'
+import {useWorkItemDraft} from './useWorkItemDraft.ts'
 
 export type WorkItemsParam = {
     retryCount?: number;
@@ -18,14 +19,7 @@ export type WorkItemsParam = {
     getUser: (value: User | null) => void;
 
 }
-export type DraftWorkItem = {
-    draftId: number | null;
-    draftTitle: string;
-    draftDescription: string;
-    draftStatus: WorkItemStatus;
-    draftPriority: WorkItemPriority;
 
-}
 
 export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderingType, page, setPage, setSessionOver, getUser }: WorkItemsParam) {
 
@@ -38,19 +32,9 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
+    const draftManager = useWorkItemDraft()
 
 
-    // const [draftTitle, setDraftTitle] = useState('')
-    // const [draftDescription, setDraftDescription] = useState("")
-    // const [draftStatus, setDraftStatus] = useState<WorkItemStatus>('OP')
-    // const [draftPriority, setDraftPriority] = useState<WorkItemPriority>('ME')
-    const [draft, setDraft] = useState<DraftWorkItem>({
-        draftId: null ,
-        draftTitle: '',
-        draftDescription: '',
-        draftStatus: 'OP',
-        draftPriority: 'ME'
-    })
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
 
     async function handleErrors(
@@ -73,29 +57,18 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
 
     }
 
-    async function startEditing(item: WorkItem) {
 
-            setDraft((pr) => ({
-                ...pr,
-                draftId: item.id,
-                draftTitle: item.title,
-                draftDescription: item.description,
-                draftStatus: item.status,
-                draftPriority: item.priority
-            }));
-        
-    }
 
 
     // ===== handleSaveAction =====
     async function handleSaveAction(itemId: number) {
-        if (!draft.draftId) return
+        if (!draftManager.draft.draftId) return
         setItemsError('')
         setSavingItemId(itemId);
 
         try {
-            const updatedItem = await patchWorkitems(itemId, draft.draftStatus, draft.draftTitle, draft.draftDescription, draft.draftPriority)
-            setDraft((pr)=>({
+            const updatedItem = await patchWorkitems(itemId, draftManager.draft.draftStatus, draftManager.draft.draftTitle, draftManager.draft.draftDescription, draftManager.draft.draftPriority)
+            draftManager.setDraft((pr)=>({
                 ...pr,draftId:null
             }));
             const leavesFilter = (topSelector !== 'All' && updatedItem.status !== topSelector) || !updatedItem.title.toLowerCase().includes(searchValue.toLowerCase())
@@ -128,7 +101,7 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
             if (page > 1 && workItems.length === 1) {
                 setPage(page - 1)
             }
-            setDraft((pr)=>({
+            draftManager.setDraft((pr)=>({
                 ...pr,
                 draftId: pr.draftId === id? null:pr.draftId
             }))
@@ -208,6 +181,6 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
     return {
         workItems, itemsLoading, itemsError, creatingItem, createError,
         savingItemId, handleSaveAction,
-        createWorkItem, handleDeleteWorkItem, deletingItemId, paginationInfo, draft, setDraft, startEditing,
+        createWorkItem, handleDeleteWorkItem, deletingItemId, paginationInfo, draftManager,
     }
 }

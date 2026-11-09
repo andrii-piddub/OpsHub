@@ -28,7 +28,7 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
   const [searchValue, setSearchValue] = useState('')
   const { workItems, itemsLoading, itemsError,
     creatingItem, createError, savingItemId, handleSaveAction, createWorkItem,
-    handleDeleteWorkItem, deletingItemId, paginationInfo, draft, setDraft, startEditing } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser})
+    handleDeleteWorkItem, deletingItemId, paginationInfo, draftManager } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser})
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -186,7 +186,7 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
       <div>
         <WorkItemsTable workItems={workItems} savingItemId={savingItemId}
           onSaveAction={handleSaveAction} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} 
-          draft={draft} setDraft={setDraft} startEditing={startEditing} 
+          draft={draftManager.draft} setDraft={draftManager.setDraft} startEditing={draftManager.startEditing} cancelEditing={draftManager.cancelEditing}
         />
       </div>
 

@@ -1,6 +1,6 @@
 import type { WorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus, WorkItemPriority } from '../api/workitems.ts'
-import type { DraftWorkItem } from '../hooks/useWorkItems.ts'
+import type { DraftWorkItem } from '../hooks/useWorkItemDraft.ts'
 import type { Dispatch, SetStateAction } from 'react';
 
 const statuses: { value: WorkItemStatus; label: string }[] = [
@@ -24,6 +24,7 @@ type WorkItemsTableProps = {
   startEditing: (item: WorkItem) => void
   draft: DraftWorkItem
   setDraft: Dispatch<SetStateAction<DraftWorkItem>>;
+  cancelEditing:()=>void
 }
 
 function WorkItemsTable(props: WorkItemsTableProps) {
@@ -192,7 +193,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       className="btn"
                       hidden={!isEditing}
                       disabled={fieldsDisabled}
-                      onClick={() => { props.setDraft((pr)=>({...pr, draftId:null})) }}
+                      onClick={props.cancelEditing}
 
                     >
                       Cancel
