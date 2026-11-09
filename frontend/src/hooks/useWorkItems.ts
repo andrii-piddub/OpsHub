@@ -24,7 +24,26 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
     const [draftPriority, setDraftPriority] = useState<WorkItemPriority>('ME')
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
 
+    async function HandleErrors(
+        err: { status?: number },
+        setSessionOver: (value: boolean) => void,
+        getUser: (user: User | null) => void,
+        signal?: AbortSignal,
+    ): Promise<void> {
+        if (err.status === 403) {
+            try {
+                await authMe()
+            } catch (error) {
+                if (signal?.aborted) return
+                const err2 = error as { status?: number }
+                if (err2.status === 403) {
+                    setSessionOver(true)
+                    getUser(null)
+                }
+            }
+        }
 
+    }
 
 
 
@@ -49,17 +68,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
 
         } catch (error) {
             const err = error as { status?: number }
-            if (err.status === 403) {
-                try {
-                    await authMe()
-                } catch (error) {
-                    const err2 = error as { status?: number }
-                    if (err2.status === 403) {
-                        setSessionOver(true)
-                        getUser(null)
-                    }
-                }
-            }
+            HandleErrors(err, setSessionOver, getUser)
             setItemsError(
                 error instanceof ApiErrors ? error.message : 'Failed to update status',
             )
@@ -83,17 +92,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
             setRefreshKey(prev => prev + 1)
         } catch (error) {
             const err = error as { status?: number }
-            if (err.status === 403) {
-                try {
-                    await authMe()
-                } catch (error) {
-                    const err2 = error as { status?: number }
-                    if (err2.status === 403) {
-                        setSessionOver(true)
-                        getUser(null)
-                    }
-                }
-            }
+            HandleErrors(err, setSessionOver, getUser)
 
             setItemsError(
                 error instanceof ApiErrors ? error.message : 'Failed to delete item',
@@ -121,18 +120,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
             } catch (error) {
                 if (controller.signal.aborted) return
                 const err = error as { status?: number }
-                if (err.status === 403) {
-                    try {
-                        await authMe()
-                    } catch (error) {
-                        if (controller.signal.aborted) return
-                        const err2 = error as { status?: number }
-                        if (err2.status === 403) {
-                            setSessionOver(true)
-                            getUser(null)
-                        }
-                    }
-                }
+                HandleErrors(err, setSessionOver, getUser, controller.signal)
                 if (controller.signal.aborted) return
                 setItemsError(
                     error instanceof Error ? error.message : 'Failed to load message',
@@ -162,17 +150,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
             return true
         } catch (error) {
             const err = error as { status?: number }
-            if (err.status === 403) {
-                try {
-                    await authMe()
-                } catch (error) {
-                    const err2 = error as { status?: number }
-                    if (err2.status === 403) {
-                        setSessionOver(true)
-                        getUser(null)
-                    }
-                }
-            }
+            HandleErrors(err, setSessionOver, getUser)
             setCreateError(
                 error instanceof ApiErrors
                     ? error.message
