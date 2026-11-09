@@ -81,7 +81,7 @@ function App() {
         <Route path="/register" element={<RegisterForm />} />
       </Route>
       <Route element={<RequireAuth authLoading={authLoading} user={user} />}>
-        <Route path="/workitem" element={<WorkItemPage user={user} getUser={setUser} sessionOver={sessionOver} setSessionOver={setSessionOver}/>} />
+        <Route path="/workitem" element={<WorkItemPage user={user} getUser={setUser} setSessionOver={setSessionOver}/>} />
         <Route path="/" element={<Navigate to="/workitem" replace />} />
         <Route path="*" element={<Navigate to="/workitem" replace />} />
 

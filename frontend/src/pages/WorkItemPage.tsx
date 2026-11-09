@@ -9,8 +9,13 @@ import type { WorkItemStatus, WorkItemOrdering } from '../api/workitems'
 import type { User } from '../api/auth'
 import { logout } from '../api/auth'
 
+export type WorkItemPageProps={
+  user:User | null;
+  getUser:(user:User | null)=>void;
+  setSessionOver:(value:boolean)=>void;
+}
 
-function WorkItemPage({ user,getUser, setSessionOver }: { user: User | null, getUser:(user: User|null) => void, sessionOver:boolean, setSessionOver:(value:boolean)=>void}) {
+function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
 
   // ===== STATE =====
   const [topSelector, setTopSelector] = useState<'All' | WorkItemStatus>('All')
