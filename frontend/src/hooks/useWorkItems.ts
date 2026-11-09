@@ -24,10 +24,8 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
     const [draftPriority, setDraftPriority] = useState<WorkItemPriority>('ME')
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
 
-    async function HandleErrors(
+    async function handleErrors(
         error: unknown,
-        setSessionOver: (value: boolean) => void,
-        getUser: (user: User | null) => void,
         signal?: AbortSignal,
     ): Promise<void> {
         if ( !(error instanceof ApiErrors) || error.status !== 403) {
@@ -67,7 +65,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
 
 
         } catch (error) {
-            await HandleErrors(error, setSessionOver, getUser)
+            await handleErrors(error)
             setItemsError(
                 error instanceof ApiErrors ? error.message : 'Failed to update status',
             )
@@ -90,7 +88,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
 
             setRefreshKey(prev => prev + 1)
         } catch (error) {
-            await HandleErrors(error, setSessionOver, getUser)
+            await handleErrors(error)
 
             setItemsError(
                 error instanceof ApiErrors ? error.message : 'Failed to delete item',
@@ -117,8 +115,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
                 })
             } catch (error) {
                 if (controller.signal.aborted) return
-                const err = error as { status?: number }
-                await HandleErrors(err, setSessionOver, getUser, controller.signal)
+                await handleErrors(error, controller.signal)
                 if (controller.signal.aborted) return
                 setItemsError(
                     error instanceof Error ? error.message : 'Failed to load message',
@@ -147,7 +144,7 @@ export function useWorkItems(retryCount: number = 0, topSelector: 'All' | WorkIt
             }
             return true
         } catch (error) {
-            await HandleErrors(error, setSessionOver, getUser)
+            await handleErrors(error)
             setCreateError(
                 error instanceof ApiErrors
                     ? error.message
