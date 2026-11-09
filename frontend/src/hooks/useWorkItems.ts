@@ -68,9 +68,7 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
 
         try {
             const updatedItem = await patchWorkitems(itemId, draftManager.draft.draftStatus, draftManager.draft.draftTitle, draftManager.draft.draftDescription, draftManager.draft.draftPriority)
-            draftManager.setDraft((pr)=>({
-                ...pr,draftId:null
-            }));
+            draftManager.cancelEditing()
             const leavesFilter = (topSelector !== 'All' && updatedItem.status !== topSelector) || !updatedItem.title.toLowerCase().includes(searchValue.toLowerCase())
 
             if (leavesFilter && workItems.length === 1 && page > 1) {
@@ -101,11 +99,8 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
             if (page > 1 && workItems.length === 1) {
                 setPage(page - 1)
             }
-            draftManager.setDraft((pr)=>({
-                ...pr,
-                draftId: pr.draftId === id? null:pr.draftId
-            }))
-
+            draftManager.cancelEditing()
+            
             setRefreshKey(prev => prev + 1)
         } catch (error) {
             await handleErrors(error)

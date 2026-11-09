@@ -23,9 +23,8 @@ type WorkItemsTableProps = {
   deletingItemId: number | null
   startEditing: (item: WorkItem) => void
   draft: DraftWorkItem
-  setDraft: Dispatch<SetStateAction<DraftWorkItem>>;
   cancelEditing:()=>void
-  updateDraft:(changes: Partial<DraftWorkItem>)=>void
+  updateDraft:(changes: Partial<Omit<DraftWorkItem, 'draftId'>>)=>void
 }
 
 function WorkItemsTable(props: WorkItemsTableProps) {

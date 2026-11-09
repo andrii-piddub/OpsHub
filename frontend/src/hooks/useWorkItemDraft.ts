@@ -38,7 +38,7 @@ export function useWorkItemDraft(){
        setDraft((pr)=>({...pr, draftId:null})) 
     }
     
-    function updateDraft(changes:Partial<DraftWorkItem>){
+    function updateDraft(changes:Partial<Omit<DraftWorkItem, 'draftId'>>){
         setDraft((pr)=>({
             ...pr,
             ...changes,

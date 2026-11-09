@@ -186,7 +186,7 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
       <div>
         <WorkItemsTable workItems={workItems} savingItemId={savingItemId}
           onSaveAction={handleSaveAction} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} 
-          draft={draftManager.draft} setDraft={draftManager.setDraft} startEditing={draftManager.startEditing} cancelEditing={draftManager.cancelEditing} updateDraft={draftManager.updateDraft}
+          draft={draftManager.draft} startEditing={draftManager.startEditing} cancelEditing={draftManager.cancelEditing} updateDraft={draftManager.updateDraft}
         />
       </div>
 
