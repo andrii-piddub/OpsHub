@@ -8,7 +8,7 @@ import type { User } from "../api/auth.ts";
 import { ApiErrors } from '../api/ApiError.ts'
 
 export type WorkItemsParam = {
-    retryCount:number;
+    retryCount?:number;
     topSelector:'All'| WorkItemStatus;
     searchValue: string;
     orderingType: WorkItemOrdering;

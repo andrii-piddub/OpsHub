@@ -24,7 +24,7 @@ function WorkItemPage({ user,getUser, setSessionOver }: { user: User | null, get
   const { workItems, itemsLoading, itemsError,
     creatingItem, createError, savingItemId, handleSaveAction, createWorkItem,
     handleDeleteWorkItem, deletingItemId, paginationInfo, editingItemId, setEditingItemId,
-    draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus, setDraftStatus, draftPriority, setDraftPriority } = useWorkItems(retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser)
+    draftTitle, setDraftTitle, draftDescription, setDraftDescription, draftStatus, setDraftStatus, draftPriority, setDraftPriority } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser})
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
