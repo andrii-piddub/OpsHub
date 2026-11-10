@@ -4,6 +4,7 @@ import { beforeEach, expect, test, vi } from 'vitest'
 import { getWorkItems } from '../api/workitems'
 import type { WorkItemsResponse } from '../api/workitems'
 import { useWorkItemsList } from './useWorkItemsList'
+import { ApiErrors } from '../api/ApiError'
 
 beforeEach(()=>{
     vi.mocked(getWorkItems).mockReset()
@@ -61,4 +62,27 @@ test('get workItems list', async () => {
     expect(result.current.listErrors).toBe('')
     expect(result.current.workItems).toHaveLength(2)
     expect(getWorkItems).toHaveBeenCalledTimes(1)
+})
+test('handles a failed workItems request', async () => {
+    const error = new ApiErrors('Request failed: 500', 500)
+    vi.mocked(getWorkItems).mockRejectedValue(error)
+    const handleErrors = vi.fn(async () => { })
+
+    const { result } = renderHook(() =>
+        useWorkItemsList({
+            retryCount: 0,
+            topSelector: 'All',
+            searchValue: '',
+            orderingType: '-created_at',
+            page: 1,
+            handleErrors,
+        })
+    )
+
+    await waitFor(() => {
+        expect(result.current.itemsLoading).toBe(false)
+        expect(result.current.workItems).toEqual([])
+        expect(result.current.listErrors).toBe(error.message)
+        expect(handleErrors).toHaveBeenCalledWith(error, expect.any(AbortSignal))
+    })
 })
