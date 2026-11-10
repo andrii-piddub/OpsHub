@@ -26,9 +26,8 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
   const [page, setPage] = useState(1)
   const [orderingType, setOrderingType] = useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
-  const {  itemsError,
-    creatingItem, createError, savingItemId, handleSaveAction, createWorkItem,
-    handleDeleteWorkItem, deletingItemId, workItemListManager, draftManager } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser})
+  const {  itemsError,mutationManager,
+ workItemListManager, draftManager } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser})
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -99,7 +98,7 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
   // ===== handleSubmit =====
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const success = await createWorkItem(title, description)
+    const success = await mutationManager.createWorkItem(title, description)
     if (success === true) {
       setTitle('');
       setDescription('');
@@ -185,8 +184,8 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
 
       {/* ===== Work items table ===== */}
       <div>
-        <WorkItemsTable savingItemId={savingItemId}
-          onSaveAction={handleSaveAction} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} 
+        <WorkItemsTable savingItemId={mutationManager.savingItemId}
+          onSaveAction={mutationManager.handleSaveAction} onDeleteWorkItem={mutationManager.handleDeleteWorkItem} deletingItemId={mutationManager.deletingItemId} 
           draft={draftManager.draft} startEditing={draftManager.startEditing} cancelEditing={draftManager.cancelEditing} updateDraft={draftManager.updateDraft} workItemListManager={workItemListManager}
         />
       </div>
@@ -231,12 +230,12 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
           onDescriptionChange={setDescription}
         />
 
-        <button type="submit" disabled={creatingItem}>
-          {creatingItem ? 'Creating' : 'Submit'}
+        <button type="submit" disabled={mutationManager.creatingItem}>
+          {mutationManager.creatingItem ? 'Creating' : 'Submit'}
         </button>
       </form>
 
-      {createError && <p role="alert">Error: {createError}</p>}
+      {mutationManager.createError && <p role="alert">Error: {mutationManager.createError}</p>}
 
     </main>
   )
