@@ -33,6 +33,7 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [logouting,setLogouting]=useState(false)
+  const full_error = itemsError || workItemListManager.listErrors
 
   async function logoutRequest() {
     setError('')
@@ -212,9 +213,9 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
 
       {/* ===== Loading / error / empty messages ===== */}
       {workItemListManager.itemsLoading && <p>Loading work items</p>}
-      {itemsError && <p role="alert">Error: {itemsError}</p>}
+      {full_error && <p role="alert">Error: {full_error}</p>}
 
-      {workItemListManager.workItems.length === 0 && !workItemListManager.itemsLoading && !itemsError && (
+      {workItemListManager.workItems.length === 0 && !workItemListManager.itemsLoading && !full_error && (
         <p>There are no Work Items yet</p>
       )}
 

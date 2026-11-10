@@ -24,10 +24,7 @@ export type WorkItemsParam = {
 export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderingType, page, setPage, setSessionOver, getUser }: WorkItemsParam) {
 
     // ===== STATE =====
-    // const [workItems, setWorkItems] = useState<WorkItem[]>([])
-    // const [itemsLoading, setItemsLoading] = useState(true)
-    // const [refreshKey, setRefreshKey] = useState(0)
-    // const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({ 'count': 1, 'num_pages': 1, 'current_page': 1, 'next': null, 'previous': null })
+
     const [itemsError, setItemsError] = useState('')
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
@@ -99,12 +96,13 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
             await deleteWorkItem(id)
             if (page > 1 && workItemListManager.workItems.length === 1) {
                 setPage(page - 1)
+            }else {
+                workItemListManager.refresh()
             }
             if (draftManager.draft.draftId === id) {
                 draftManager.cancelEditing()
             }
 
-            workItemListManager.refresh()
         } catch (error) {
             await handleErrors(error)
 
@@ -115,41 +113,6 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
             setDeletingItemId(null)
         }
     }
-
-
-    // ===== useEffect: load work items =====
-    // useEffect(() => {
-    //     const controller = new AbortController()
-    //     async function checkWorkItem() {
-    //         setItemsLoading(true);
-    //         setItemsError('');
-    //         setWorkItems([]);
-    //         try {
-    //             const data = await getWorkItems(controller.signal, topSelector, searchValue, orderingType, page)
-    //             setWorkItems(data.results)
-    //             setPaginationInfo({
-    //                 count: data.count, num_pages: data.num_pages, current_page: data.current_page,
-    //                 next: data.next, previous: data.previous
-    //             })
-    //         } catch (error) {
-    //             if (controller.signal.aborted) return
-    //             await handleErrors(error, controller.signal)
-    //             if (controller.signal.aborted) return
-    //             setItemsError(
-    //                 error instanceof Error ? error.message : 'Failed to load message',
-    //             )
-    //         } finally {
-    //             if (!controller.signal.aborted) {
-    //                 setItemsLoading(false)
-    //             }
-    //         }
-    //     }
-    //     checkWorkItem()
-    //     return (() => {
-    //         controller.abort()
-    //     })
-    // }, [retryCount, topSelector, searchValue, orderingType, page, refreshKey])
-
 
     // ===== createWorkItem =====
     async function createWorkItem(title: string, description: string) {
