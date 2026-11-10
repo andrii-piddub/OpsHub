@@ -26,7 +26,7 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
   const [page, setPage] = useState(1)
   const [orderingType, setOrderingType] = useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
-  const { workItems, itemsError,
+  const {  itemsError,
     creatingItem, createError, savingItemId, handleSaveAction, createWorkItem,
     handleDeleteWorkItem, deletingItemId, workItemListManager, draftManager } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser})
   const [title, setTitle] = useState('')
@@ -184,9 +184,9 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
 
       {/* ===== Work items table ===== */}
       <div>
-        <WorkItemsTable workItems={workItems} savingItemId={savingItemId}
+        <WorkItemsTable savingItemId={savingItemId}
           onSaveAction={handleSaveAction} onDeleteWorkItem={handleDeleteWorkItem} deletingItemId={deletingItemId} 
-          draft={draftManager.draft} startEditing={draftManager.startEditing} cancelEditing={draftManager.cancelEditing} updateDraft={draftManager.updateDraft}
+          draft={draftManager.draft} startEditing={draftManager.startEditing} cancelEditing={draftManager.cancelEditing} updateDraft={draftManager.updateDraft} workItemListManager={workItemListManager}
         />
       </div>
 
@@ -214,7 +214,7 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
       {workItemListManager.itemsLoading && <p>Loading work items</p>}
       {itemsError && <p role="alert">Error: {itemsError}</p>}
 
-      {workItems.length === 0 && !workItemListManager.itemsLoading && !itemsError && (
+      {workItemListManager.workItems.length === 0 && !workItemListManager.itemsLoading && !itemsError && (
         <p>There are no Work Items yet</p>
       )}
 

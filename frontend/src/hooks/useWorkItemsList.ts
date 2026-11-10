@@ -9,9 +9,6 @@ export type WorkItemListParam = {
     searchValue: string,
     orderingType: WorkItemOrdering,
     page: number,
-    refreshKey: number,
-    setItemsError: (value: string) => void,
-    setWorkItems: (value: WorkItem[]) => void,
     handleErrors: (error: unknown,
         signal?: AbortSignal) =>  Promise<void>;
 }
@@ -19,15 +16,21 @@ export type WorkItemListParam = {
 export function useWorkItemsList(props: WorkItemListParam) {
     const [itemsLoading, setItemsLoading] = useState(true)
     const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({ 'count': 1, 'num_pages': 1, 'current_page': 1, 'next': null, 'previous': null })
+    const [workItems, setWorkItems] = useState<WorkItem[]>([])
+    const [refreshKey, setRefreshKey] = useState(0)
+    const [listErrors, setListErrors]= useState('')
+    function refresh(){
+        setRefreshKey(prev => prev + 1)
+    }
     useEffect(() => {
         const controller = new AbortController()
         async function checkWorkItem() {
             setItemsLoading(true);
-            props.setItemsError('');
-            props.setWorkItems([]);
+            setListErrors('');
+            setWorkItems([]);
             try {
                 const data = await getWorkItems(controller.signal, props.topSelector, props.searchValue, props.orderingType, props.page)
-                props.setWorkItems(data.results)
+                setWorkItems(data.results)
                 setPaginationInfo({
                     count: data.count, num_pages: data.num_pages, current_page: data.current_page,
                     next: data.next, previous: data.previous
@@ -36,7 +39,7 @@ export function useWorkItemsList(props: WorkItemListParam) {
                 if (controller.signal.aborted) return
                 await props.handleErrors(error, controller.signal)
                 if (controller.signal.aborted) return
-                props.setItemsError(
+                setListErrors(
                     error instanceof Error ? error.message : 'Failed to load message',
                 )
             } finally {
@@ -49,9 +52,9 @@ export function useWorkItemsList(props: WorkItemListParam) {
         return (() => {
             controller.abort()
         })
-    }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, props.refreshKey])
+    }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, refreshKey])
 
-    return{itemsLoading,paginationInfo
+    return{workItems, refreshKey,  itemsLoading,paginationInfo, listErrors, refresh
 
     }
 }

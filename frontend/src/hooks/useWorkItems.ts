@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
-import type { WorkItem } from '../api/workitems.ts';
-import { getWorkItems, patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
+import { useState } from "react";
+import {  patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus } from '../api/workitems'
-import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
+import type { WorkItemOrdering } from "../api/workitems.ts";
 import { authMe } from "../api/auth.ts";
 import type { User } from "../api/auth.ts";
 import { ApiErrors } from '../api/ApiError.ts'
@@ -25,16 +24,16 @@ export type WorkItemsParam = {
 export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderingType, page, setPage, setSessionOver, getUser }: WorkItemsParam) {
 
     // ===== STATE =====
-    const [workItems, setWorkItems] = useState<WorkItem[]>([])
+    // const [workItems, setWorkItems] = useState<WorkItem[]>([])
     // const [itemsLoading, setItemsLoading] = useState(true)
-    const [refreshKey, setRefreshKey] = useState(0)
+    // const [refreshKey, setRefreshKey] = useState(0)
     // const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({ 'count': 1, 'num_pages': 1, 'current_page': 1, 'next': null, 'previous': null })
     const [itemsError, setItemsError] = useState('')
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
     const draftManager = useWorkItemDraft()
-    const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page,refreshKey,setItemsError,setWorkItems,handleErrors})
+    const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, handleErrors})
 
 
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
@@ -73,10 +72,10 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
             draftManager.cancelEditing()
             const leavesFilter = (topSelector !== 'All' && updatedItem.status !== topSelector) || !updatedItem.title.toLowerCase().includes(searchValue.toLowerCase())
 
-            if (leavesFilter && workItems.length === 1 && page > 1) {
+            if (leavesFilter && workItemListManager.workItems.length === 1 && page > 1) {
                 setPage(page - 1)
             } else {
-                setRefreshKey(prev => prev + 1)
+                workItemListManager.refresh()
             }
 
 
@@ -98,14 +97,14 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
             setItemsError('');
             setDeletingItemId(id);
             await deleteWorkItem(id)
-            if (page > 1 && workItems.length === 1) {
+            if (page > 1 && workItemListManager.workItems.length === 1) {
                 setPage(page - 1)
             }
             if (draftManager.draft.draftId === id) {
                 draftManager.cancelEditing()
             }
 
-            setRefreshKey(prev => prev + 1)
+            workItemListManager.refresh()
         } catch (error) {
             await handleErrors(error)
 
@@ -159,7 +158,7 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
         try {
             const newItem = await postWorkItems(title, description)
             if ((newItem.status === topSelector || topSelector === 'All') && (searchValue === "" || newItem.title.toLowerCase().includes(searchValue.toLowerCase()))) {
-                setRefreshKey(prev => prev + 1)
+                workItemListManager.refresh()
             }
             return true
         } catch (error) {
@@ -178,7 +177,7 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
 
     // ===== RETURN =====
     return {
-        workItems, workItemListManager, itemsError, creatingItem, createError,
+        workItemListManager, itemsError, creatingItem, createError,
         savingItemId, handleSaveAction,
         createWorkItem, handleDeleteWorkItem, deletingItemId, draftManager,
     }

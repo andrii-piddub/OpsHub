@@ -1,7 +1,7 @@
 import type { WorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus, WorkItemPriority } from '../api/workitems.ts'
 import type { DraftWorkItem } from '../hooks/useWorkItemDraft.ts'
-
+import type {useWorkItemsList} from '../hooks/useWorkItemsList.ts'
 
 const statuses: { value: WorkItemStatus; label: string }[] = [
   { value: 'OP', label: 'Open' },
@@ -16,7 +16,6 @@ const priorities: { value: WorkItemPriority; label: string }[] = [
 ]
 
 type WorkItemsTableProps = {
-  workItems: WorkItem[]
   savingItemId: number | null
   onSaveAction(id: number): void
   onDeleteWorkItem(id: number): void
@@ -25,6 +24,7 @@ type WorkItemsTableProps = {
   draft: DraftWorkItem
   cancelEditing:()=>void
   updateDraft:(changes: Partial<Omit<DraftWorkItem, 'draftId'>>)=>void
+  workItemListManager:ReturnType<typeof useWorkItemsList>
 }
 
 function WorkItemsTable(props: WorkItemsTableProps) {
@@ -54,7 +54,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
         </thead>
 
         <tbody>
-          {props.workItems.map((item) => {
+          {props.workItemListManager.workItems.map((item) => {
             const isEditing = props.draft.draftId === item.id
             const isSaving = props.savingItemId === item.id
             const isBusy = props.savingItemId !== null || props.deletingItemId !== null
