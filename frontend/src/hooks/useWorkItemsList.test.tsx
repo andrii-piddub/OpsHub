@@ -1,11 +1,13 @@
 // @vitest-environment jsdom
 import { renderHook, waitFor } from '@testing-library/react'
-import { expect, test, vi } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 import { getWorkItems } from '../api/workitems'
 import type { WorkItemsResponse } from '../api/workitems'
 import { useWorkItemsList } from './useWorkItemsList'
 
-
+beforeEach(()=>{
+    vi.mocked(getWorkItems).mockReset()
+})
 vi.mock('../api/workitems', () => ({
     getWorkItems: vi.fn(),
 }))
@@ -21,8 +23,16 @@ test('get workItems list', async () => {
                 priority: 'HI',
                 created_at: '2026-11-10T10:00:00Z'
             },
+            {
+                id: 2,
+                title: 'Second title',
+                description: 'Second description',
+                status: 'IP',
+                priority: 'HI',
+                created_at: '2026-11-09T10:00:00Z'
+            }
         ],
-        count: 1,
+        count: 2,
         num_pages: 1,
         current_page: 1,
         next: null,
@@ -49,4 +59,6 @@ test('get workItems list', async () => {
 
     expect(result.current.workItems).toEqual(response.results)
     expect(result.current.listErrors).toBe('')
+    expect(result.current.workItems).toHaveLength(2)
+    expect(getWorkItems).toHaveBeenCalledTimes(1)
 })
