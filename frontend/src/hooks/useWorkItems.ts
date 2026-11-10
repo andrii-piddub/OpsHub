@@ -25,12 +25,10 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
 
     // ===== STATE =====
 
-    const [itemsError, setItemsError] = useState('')
+
     const draftManager = useWorkItemDraft()
     const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, handleErrors})
-    const mutationManager = useWorkItemMutations({draftManager, topSelector, searchValue, workItemListManager, page, setPage, handleErrors, setItemsError, setSessionOver})
-
-
+    const mutationManager = useWorkItemMutations({draftManager, topSelector, searchValue, workItemListManager, page, setPage,  handleErrors})
 
 
     async function handleErrors(
@@ -58,8 +56,9 @@ export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderin
 
 
 
+
     // ===== RETURN =====
     return {
-        workItemListManager, itemsError, draftManager, mutationManager
+        workItemListManager, draftManager, mutationManager
     }
 }

@@ -1,37 +1,36 @@
 import { useState } from "react"
-import {  patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
-import type {useWorkItemDraft} from './useWorkItemDraft.ts'
-import type {useWorkItemsList} from './useWorkItemsList.ts'
+import { patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
+import type { useWorkItemDraft } from './useWorkItemDraft.ts'
+import type { useWorkItemsList } from './useWorkItemsList.ts'
 import type { WorkItemStatus } from "../api/workitems.ts"
-import {ApiErrors} from '../api/ApiError'
+import { ApiErrors } from '../api/ApiError'
+
 
 export type WorkItemMutationParam = {
     draftManager: ReturnType<typeof useWorkItemDraft>
-    topSelector:'All' | WorkItemStatus
-    searchValue:string
-    workItemListManager:ReturnType<typeof useWorkItemsList>
-    page:number
-handleErrors: (
-    error: unknown,
-    signal?: AbortSignal,
-) => Promise<void>;
-    setItemsError:(value:string)=>void
-    setSessionOver:(value: boolean) => void
-    setPage:(value:number)=>void
+    topSelector: 'All' | WorkItemStatus
+    searchValue: string
+    workItemListManager: ReturnType<typeof useWorkItemsList>
+    page: number
+    setPage: (value: number) => void
+    handleErrors: (error: unknown,
+        signal?: AbortSignal) =>  Promise<void>;
 }
 
 
-export function useWorkItemMutations(props:WorkItemMutationParam) {
+export function useWorkItemMutations(props: WorkItemMutationParam) {
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
+    const [itemsError, setItemsError] = useState('')
+
 
 
 
     async function handleSaveAction(itemId: number) {
         if (!props.draftManager.draft.draftId) return
-        props.setItemsError('')
+        setItemsError('')
         setSavingItemId(itemId);
 
         try {
@@ -48,7 +47,7 @@ export function useWorkItemMutations(props:WorkItemMutationParam) {
 
         } catch (error) {
             await props.handleErrors(error)
-            props.setItemsError(
+            setItemsError(
                 error instanceof ApiErrors ? error.message : 'Failed to update status',
             )
         } finally {
@@ -63,7 +62,7 @@ export function useWorkItemMutations(props:WorkItemMutationParam) {
 
     async function handleDeleteWorkItem(id: number) {
         try {
-            props.setItemsError('');
+            setItemsError('');
             setDeletingItemId(id);
             await deleteWorkItem(id)
             if (props.page > 1 && props.workItemListManager.workItems.length === 1) {
@@ -78,7 +77,7 @@ export function useWorkItemMutations(props:WorkItemMutationParam) {
         } catch (error) {
             await props.handleErrors(error)
 
-            props.setItemsError(
+            setItemsError(
                 error instanceof ApiErrors ? error.message : 'Failed to delete item',
             )
         } finally {
@@ -108,5 +107,5 @@ export function useWorkItemMutations(props:WorkItemMutationParam) {
 
         }
     }
-    return {handleSaveAction, createWorkItem, handleDeleteWorkItem, creatingItem, createError, savingItemId, deletingItemId}
+    return { handleSaveAction, createWorkItem, handleDeleteWorkItem, creatingItem, createError, savingItemId, deletingItemId, itemsError }
 }

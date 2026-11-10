@@ -26,13 +26,13 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
   const [page, setPage] = useState(1)
   const [orderingType, setOrderingType] = useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
-  const {  itemsError,mutationManager,
+  const {  mutationManager,
  workItemListManager, draftManager } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser})
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [logouting,setLogouting]=useState(false)
-  const full_error = itemsError || workItemListManager.listErrors
+  const full_error = mutationManager.itemsError || workItemListManager.listErrors
 
   async function logoutRequest() {
     setError('')
