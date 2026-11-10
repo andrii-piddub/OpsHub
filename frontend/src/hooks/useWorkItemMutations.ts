@@ -29,7 +29,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
 
 
     async function handleSaveAction(itemId: number) {
-        if (!props.draftManager.draft.draftId) return
+        if (props.draftManager.draft.draftId!==itemId) return
         setItemsError('')
         setSavingItemId(itemId);
 

@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import type { WorkItemStatus } from '../api/workitems'
 import type { WorkItemOrdering } from "../api/workitems.ts";
 import { authMe } from "../api/auth.ts";
