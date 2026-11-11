@@ -33,9 +33,10 @@ function WorkItemForm({ title, description, priority, onTitleChange, onDescripti
         onDescriptionChange(event.target.value)
       }} />
     <label
-      htmlFor="priority">Description</label>
+      htmlFor="priority">Priority</label>
     <select
-      aria-label="Priority"
+      aria-label="priority"
+      id="priority"
       value={priority}
       onChange={(event) => {
         onPriorityChange(event?.target.value as WorkItemPriority)
