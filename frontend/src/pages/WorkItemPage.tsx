@@ -5,7 +5,7 @@ import type { HealthResponse } from '../api/health'
 import { useWorkItems } from '../hooks/useWorkItems.ts'
 import WorkItemsTable from '../components/WorkItemsTable.tsx'
 import WorkItemForm from '../components/WorkItemForm.tsx'
-import type { WorkItemStatus, WorkItemOrdering } from '../api/workitems'
+import type { WorkItemStatus, WorkItemOrdering, WorkItemPriority  } from '../api/workitems'
 import type { User } from '../api/auth'
 import { logout } from '../api/auth'
 
@@ -13,12 +13,19 @@ export type WorkItemPageProps={
   user:User | null;
   getUser:(user:User | null)=>void;
   setSessionOver:(value:boolean)=>void;
+
 }
 
-function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
 
+function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
+  
   // ===== STATE =====
   const [topSelector, setTopSelector] = useState<'All' | WorkItemStatus>('All')
+  const priorities: { value: WorkItemPriority; label: string }[] = [
+  { value: 'LO', label: 'Low' },
+  { value: 'ME', label: 'Medium' },
+  { value: 'HI', label: 'High' },
+  ]
   const [health, setHealth] = useState<HealthResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -26,8 +33,9 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
   const [page, setPage] = useState(1)
   const [orderingType, setOrderingType] = useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
+  const [priority, setPriority] = useState<WorkItemPriority>('ME')
   const {  mutationManager,
- workItemListManager, draftManager } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser})
+ workItemListManager, draftManager } = useWorkItems({retryCount, topSelector, searchValue, orderingType, page, setPage,  setSessionOver, getUser, setPriority})
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -98,9 +106,9 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
   // ===== handleSubmit =====
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const success = await mutationManager.createWorkItem(title, description)
+    const success = await mutationManager.createWorkItem(title, description,priority)
     if (success === true) {
-      setTitle('');
+      setTitle('');     
       setDescription('');
     }
 
@@ -187,6 +195,7 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
         <WorkItemsTable savingItemId={mutationManager.savingItemId}
           onSaveAction={mutationManager.handleSaveAction} onDeleteWorkItem={mutationManager.handleDeleteWorkItem} deletingItemId={mutationManager.deletingItemId} 
           draft={draftManager.draft} startEditing={draftManager.startEditing} cancelEditing={draftManager.cancelEditing} updateDraft={draftManager.updateDraft} workItemListManager={workItemListManager}
+          priorities={priorities}
         />
       </div>
 
@@ -228,6 +237,9 @@ function WorkItemPage({ user,getUser, setSessionOver }:WorkItemPageProps) {
           description={description}
           onTitleChange={setTitle}
           onDescriptionChange={setDescription}
+          priority={priority}
+          onPriorityChange={setPriority}
+          priorities={priorities}
         />
 
         <button type="submit" disabled={mutationManager.creatingItem}>

@@ -1,5 +1,5 @@
 import type { WorkItemStatus } from '../api/workitems'
-import type { WorkItemOrdering } from "../api/workitems.ts";
+import type { WorkItemOrdering, WorkItemPriority } from "../api/workitems.ts";
 import { authMe } from "../api/auth.ts";
 import type { User } from "../api/auth.ts";
 import { ApiErrors } from '../api/ApiError.ts'
@@ -15,18 +15,19 @@ export type WorkItemsParam = {
     setPage: (page: number) => void;
     setSessionOver: (value: boolean) => void;
     getUser: (value: User | null) => void;
+    setPriority:(value:WorkItemPriority)=>void
 
 }
 
 
-export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderingType, page, setPage, setSessionOver, getUser }: WorkItemsParam) {
+export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderingType, page, setPage, setSessionOver, getUser, setPriority }: WorkItemsParam) {
 
     // ===== STATE =====
 
 
     const draftManager = useWorkItemDraft()
     const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, handleErrors})
-    const mutationManager = useWorkItemMutations({draftManager, topSelector, searchValue, workItemListManager, page, setPage,  handleErrors})
+    const mutationManager = useWorkItemMutations({draftManager, topSelector, searchValue, workItemListManager, page, setPage,  handleErrors, setPriority})
 
 
     async function handleErrors(

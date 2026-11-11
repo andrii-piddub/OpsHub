@@ -2,8 +2,9 @@ import { useState } from "react"
 import { patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
 import type { useWorkItemDraft } from './useWorkItemDraft.ts'
 import type { useWorkItemsList } from './useWorkItemsList.ts'
-import type { WorkItemStatus } from "../api/workitems.ts"
+import type { WorkItemStatus, WorkItemPriority } from "../api/workitems.ts"
 import { ApiErrors } from '../api/ApiError'
+
 
 
 export type WorkItemMutationParam = {
@@ -15,6 +16,7 @@ export type WorkItemMutationParam = {
     setPage: (value: number) => void
     handleErrors: (error: unknown,
         signal?: AbortSignal) =>  Promise<void>;
+    setPriority:(value:WorkItemPriority)=>void
 }
 
 
@@ -86,11 +88,12 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
     }
 
 
-    async function createWorkItem(title: string, description: string) {
+    async function createWorkItem(title: string, description: string, priority:WorkItemPriority) {
         setCreatingItem(true);
         setCreateError('')
         try {
-            const newItem = await postWorkItems(title, description)
+            const newItem = await postWorkItems(title, description, priority)
+            props.setPriority('ME')
             if ((newItem.status === props.topSelector || props.topSelector === 'All') && (props.searchValue === "" || newItem.title.toLowerCase().includes(props.searchValue.toLowerCase()))) {
                 props.workItemListManager.refresh()
             }

@@ -9,11 +9,7 @@ const statuses: { value: WorkItemStatus; label: string }[] = [
   { value: 'DN', label: 'Done' },
 ]
 
-const priorities: { value: WorkItemPriority; label: string }[] = [
-  { value: 'LO', label: 'Low' },
-  { value: 'ME', label: 'Medium' },
-  { value: 'HI', label: 'High' },
-]
+
 
 type WorkItemsTableProps = {
   savingItemId: number | null
@@ -25,6 +21,7 @@ type WorkItemsTableProps = {
   cancelEditing:()=>void
   updateDraft:(changes: Partial<Omit<DraftWorkItem, 'draftId'>>)=>void
   workItemListManager:ReturnType<typeof useWorkItemsList>
+  priorities:{value: WorkItemPriority; label: string}[]
 }
 
 function WorkItemsTable(props: WorkItemsTableProps) {
@@ -107,7 +104,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       onChange={(event)=>{
                         props.updateDraft({draftPriority:event?.target.value as WorkItemPriority})}}
                     >
-                      {priorities.map((priority) => (
+                      {props.priorities.map((priority) => (
                         <option key={priority.value} value={priority.value}>
                           {priority.label}
                         </option>
@@ -115,7 +112,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                     </select>
                   ) : (
                     <span className={`badge badge-priority-${item.priority}`}>
-                      {priorities.find((p) => p.value === item.priority)?.label ??
+                      {props.priorities.find((p) => p.value === item.priority)?.label ??
                         item.priority}
                     </span>
                   )}
