@@ -31,6 +31,11 @@ def work_item(request):
             return Response({'status':[f'{status_item} is not valid. Choose one from {WorkItem.different_status}']}, status=status.HTTP_400_BAD_REQUEST)
         elif status_item:
             query_set = query_set.filter(status=status_item)
+        priority_item = request.query_params.get('priority')
+        if priority_item not in WorkItem.different_priorities and priority_item is not None:
+            return Response({'priority':[f'{priority_item} is not valid. Choose one from {WorkItem.different_priorities}']},status=status.HTTP_400_BAD_REQUEST )
+        elif priority_item:
+            query_set=query_set.filter(priority=priority_item)
         search = request.query_params.get('search',"").strip()
         if search:
             query_set = query_set.filter(title__icontains=search)

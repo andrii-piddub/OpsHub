@@ -11,6 +11,7 @@ export type WorkItemsParam = {
     topSelector: 'All' | WorkItemStatus;
     searchValue: string;
     orderingType: WorkItemOrdering;
+    prioritySelector:'All'|WorkItemPriority;
     page: number;
     setPage: (page: number) => void;
     setSessionOver: (value: boolean) => void;
@@ -20,13 +21,13 @@ export type WorkItemsParam = {
 }
 
 
-export function useWorkItems({ retryCount = 0, topSelector, searchValue, orderingType, page, setPage, setSessionOver, getUser, setPriority }: WorkItemsParam) {
+export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, searchValue, orderingType, page, setPage, setSessionOver, getUser, setPriority }: WorkItemsParam) {
 
     // ===== STATE =====
 
 
     const draftManager = useWorkItemDraft()
-    const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, handleErrors})
+    const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, handleErrors, prioritySelector})
     const mutationManager = useWorkItemMutations({draftManager, topSelector, searchValue, workItemListManager, page, setPage,  handleErrors, setPriority})
 
 

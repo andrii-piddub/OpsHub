@@ -23,7 +23,7 @@ export type WorkItemsResponse = {
 export type PaginationInfo = Omit<WorkItemsResponse, 'results'>
 
 export type WorkItemOrdering = 'created_at' | '-created_at'
-export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, searchValue: string, orderingType: WorkItemOrdering, page: number): Promise<WorkItemsResponse> {
+export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, prioritySelector:'All' |WorkItemPriority, searchValue: string, orderingType: WorkItemOrdering, page: number): Promise<WorkItemsResponse> {
   const url = new URL('/api/v1/workitem/', window.location.origin)
   const params = new URLSearchParams(url.search)
   if (topSelector && topSelector != 'All') {
@@ -34,6 +34,9 @@ export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | Wor
   }
   if (orderingType) {
     params.append('ordering', orderingType)
+  }
+  if (prioritySelector && prioritySelector !='All'){
+    params.append('priority',prioritySelector)
   }
   if (page) {
     params.append('page', String(page))
@@ -59,7 +62,7 @@ export async function postWorkItems(title: string, description: string, priority
       body: JSON.stringify({ title: title, description: description, priority:priority }),
     },
   )
-  
+
   if (!response.ok) {
     throw new ApiErrors(`Request failed: ${response.status}`,response.status )
   }

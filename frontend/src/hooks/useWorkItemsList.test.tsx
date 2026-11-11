@@ -50,6 +50,7 @@ test('get workItems list', async () => {
             topSelector: 'All',
             searchValue: '',
             orderingType: '-created_at',
+            prioritySelector:'All',
             page: 1,
             handleErrors: vi.fn(async () => { }),
         })
@@ -77,6 +78,7 @@ test('get error 500', async () => {
         useWorkItemsList({
             retryCount: 0,
             topSelector: 'All',
+            prioritySelector:'All',
             searchValue: '',
             orderingType: '-created_at',
             page: 1,
