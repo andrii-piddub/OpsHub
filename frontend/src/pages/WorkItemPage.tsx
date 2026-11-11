@@ -193,10 +193,10 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
           <option value='created_at'>Oldest first</option>
         </select>
 
-        <label htmlFor="priority">
+        <label htmlFor="filter-priority">
           Priority filter
         </label>
-        <select id="priority"
+        <select id="filter-priority"
           value={prioritySelector}
           onChange={(event) => {
             setPrioritySelector(event.target.value as 'All' | WorkItemPriority)
