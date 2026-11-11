@@ -117,7 +117,6 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
 
 
   // ===== RENDER =====
-  {console.log(prioritySelector)}
   return (
         <main>
       <header className="workspace-header">

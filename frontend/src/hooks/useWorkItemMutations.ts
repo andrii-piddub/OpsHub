@@ -95,7 +95,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
         try {
             const newItem = await postWorkItems(title, description, priority)
             props.setPriority('ME')
-            if ((newItem.status === props.topSelector || props.topSelector === 'All') && (props.searchValue === "" || newItem.title.toLowerCase().includes(props.searchValue.toLowerCase()))) {
+            if (((newItem.status === props.topSelector || props.topSelector === 'All')&&(newItem.priority === props.prioritySelector || props.prioritySelector === 'All')) && (props.searchValue === "" || newItem.title.toLowerCase().includes(props.searchValue.toLowerCase()))) {
                 props.workItemListManager.refresh()
             }
             return true
