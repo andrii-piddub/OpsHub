@@ -21,7 +21,7 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
 
   // ===== STATE =====
   const [topSelector, setTopSelector] = useState<'All' | WorkItemStatus>('All')
-  const [prioritySelector, setPrioritySelector] = useState<'All' | WorkItemPriority>('All')
+  const [prioritySelector, setPrioritySelector] = useState<'All' | 'FHL' | 'FLH'| WorkItemPriority>('All')
   const priorities: { value: WorkItemPriority; label: string }[] = [
     { value: 'LO', label: 'Low' },
     { value: 'ME', label: 'Medium' },
@@ -193,14 +193,16 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
         </select>
 
         <label htmlFor="filter-priority">
-          Priority filter
+          Sort/Filter by
         </label>
         <select id="filter-priority"
           value={prioritySelector}
           onChange={(event) => {
-            setPrioritySelector(event.target.value as 'All' | WorkItemPriority)
+            setPrioritySelector(event.target.value as 'All'| 'FHL'|'FLH'|WorkItemPriority)
             setPage(1)
           }}>
+          <option value="FHL">From high to low</option>
+          <option value="FLH">From low to high</option>
           <option value="All">All priorities</option>
           <option value="LO">Low</option>
           <option value="ME">Medium</option>

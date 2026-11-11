@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from accounts.models import User
+from django.db.models import Case, Value, When
 
 
 
@@ -25,22 +26,38 @@ def health_check(request):
 @permission_classes([IsAuthenticated])
 def work_item(request):
     if request.method == "GET":
-        query_set = WorkItem.objects.filter(owner=request.user).order_by('-created_at')
+        query_set = WorkItem.objects.filter(owner=request.user).order_by('-created_at').annotate(
+            prioriry_order=Case(
+                When(priority='HI', then=Value(3)),
+                When(priority='ME', then=Value(2)),
+                When(priority='LO', then=Value(1)),
+            )
+        )
         status_item = request.query_params.get('status')
         if status_item not in WorkItem.different_status and status_item is not None:
             return Response({'status':[f'{status_item} is not valid. Choose one from {WorkItem.different_status}']}, status=status.HTTP_400_BAD_REQUEST)
         elif status_item:
             query_set = query_set.filter(status=status_item)
         priority_item = request.query_params.get('priority')
-        if priority_item not in WorkItem.different_priorities and priority_item is not None:
+        if priority_item not in WorkItem.different_priorities and priority_item is not None and priority_item not in ('FHL','FLH'):
             return Response({'priority':[f'{priority_item} is not valid. Choose one from {WorkItem.different_priorities}']},status=status.HTTP_400_BAD_REQUEST )
-        elif priority_item:
+        elif priority_item in ('HI','ME','LO'):
             query_set=query_set.filter(priority=priority_item)
+
         search = request.query_params.get('search',"").strip()
         if search:
             query_set = query_set.filter(title__icontains=search)
         ordering = request.query_params.get('ordering')
-        if ordering=='created_at':
+       
+        if priority_item=='FLH' and ordering=='created_at':
+            query_set = query_set.order_by('prioriry_order','created_at')
+        elif priority_item=='FLH' and ordering=='-created_at':
+            query_set = query_set.order_by('prioriry_order','-created_at')
+        elif priority_item=='FHL' and ordering=='created_at':
+            query_set = query_set.order_by('-prioriry_order','created_at')
+        elif priority_item=='FHL' and ordering=='-created_at':
+            query_set = query_set.order_by('-prioriry_order','-created_at')
+        elif ordering=='created_at':
             query_set = query_set.order_by('created_at')
         elif ordering=='-created_at':
             query_set = query_set.order_by('-created_at')

@@ -17,7 +17,7 @@ export type WorkItemMutationParam = {
     handleErrors: (error: unknown,
         signal?: AbortSignal) =>  Promise<void>;
     setPriority:(value:WorkItemPriority)=>void,
-    prioritySelector:'All'|WorkItemPriority
+    prioritySelector:'All'| 'FHL' | 'FLH' | WorkItemPriority
 }
 
 
@@ -39,7 +39,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
         try {
             const updatedItem = await patchWorkitems(itemId, props.draftManager.draft.draftStatus, props.draftManager.draft.draftTitle, props.draftManager.draft.draftDescription, props.draftManager.draft.draftPriority)
             props.draftManager.cancelEditing()
-            const leavesFilter = ((props.topSelector !== 'All' && updatedItem.status !== props.topSelector) || (props.prioritySelector !== 'All' && updatedItem.priority !==props.prioritySelector)) || !updatedItem.title.toLowerCase().includes(props.searchValue.toLowerCase())
+            const leavesFilter = ((props.topSelector !== 'All' && updatedItem.status !== props.topSelector) || ((props.prioritySelector !== 'All' && props.prioritySelector !=='FHL' && props.prioritySelector !=='FLH') && updatedItem.priority !==props.prioritySelector)) || !updatedItem.title.toLowerCase().includes(props.searchValue.toLowerCase())
 
             if (leavesFilter && props.workItemListManager.workItems.length === 1 && props.page > 1) {
                 props.setPage(props.page - 1)
@@ -95,7 +95,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
         try {
             const newItem = await postWorkItems(title, description, priority)
             props.setPriority('ME')
-            if (((newItem.status === props.topSelector || props.topSelector === 'All')&&(newItem.priority === props.prioritySelector || props.prioritySelector === 'All')) && (props.searchValue === "" || newItem.title.toLowerCase().includes(props.searchValue.toLowerCase()))) {
+            if (((newItem.status === props.topSelector || props.topSelector === 'All')&&(newItem.priority === props.prioritySelector || props.prioritySelector === 'All' || props.prioritySelector === 'FHL' || props.prioritySelector === 'FLH')) && (props.searchValue === "" || newItem.title.toLowerCase().includes(props.searchValue.toLowerCase()))) {
                 props.workItemListManager.refresh()
             }
             return true

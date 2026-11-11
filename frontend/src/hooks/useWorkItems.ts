@@ -11,7 +11,7 @@ export type WorkItemsParam = {
     topSelector: 'All' | WorkItemStatus;
     searchValue: string;
     orderingType: WorkItemOrdering;
-    prioritySelector:'All'|WorkItemPriority;
+    prioritySelector:'All'| 'FHL' | 'FLH' | WorkItemPriority;
     page: number;
     setPage: (page: number) => void;
     setSessionOver: (value: boolean) => void;

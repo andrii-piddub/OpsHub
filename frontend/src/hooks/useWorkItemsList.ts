@@ -11,7 +11,7 @@ export type WorkItemListParam = {
     page: number,
     handleErrors: (error: unknown,
         signal?: AbortSignal) =>  Promise<void>;
-    prioritySelector:'All' | WorkItemPriority,
+    prioritySelector:'All'|'FHL'|'FLH'|WorkItemPriority,
 }
 
 export function useWorkItemsList(props: WorkItemListParam) {
