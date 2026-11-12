@@ -10,6 +10,7 @@ import type { User } from '../api/auth'
 import { logout } from '../api/auth'
 
 export type PrioritySortSelectorPar = 'FHL' | 'FLH' | ''
+export type DeadlinePar = 'All' | 'OD' | 'DT' | 'ND'
 
 export type WorkItemPageProps = {
   user: User | null;
@@ -25,6 +26,7 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
   const [topSelector, setTopSelector] = useState<'All' | WorkItemStatus>('All')
   const [prioritySelector, setPrioritySelector] = useState<'All' | WorkItemPriority>('All')
   const [prioritySortSelector, setPrioritySortSelector] = useState<PrioritySortSelectorPar>('')
+  const [deadlineFilter, setDeadlineFilter] = useState<DeadlinePar>('All')
   const priorities: { value: WorkItemPriority; label: string }[] = [
     { value: 'LO', label: 'Low' },
     { value: 'ME', label: 'Medium' },
@@ -40,7 +42,7 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
   const [priority, setPriority] = useState<WorkItemPriority>('ME')
   const [dueDate, setDueDate] = useState<string | null>(null)
   const { mutationManager,
-    workItemListManager, draftManager } = useWorkItems({ retryCount, topSelector, searchValue, orderingType, prioritySelector, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate })
+    workItemListManager, draftManager } = useWorkItems({ retryCount, topSelector, searchValue, orderingType, prioritySelector, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate, deadlineFilter })
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -155,82 +157,79 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
       <p></p>
 
 
-      {/* ===== Filters: status, search, ordering ===== */}
-      <section className="workitem-filters" aria-label="Work item filters">
-        <label htmlFor="workitems">
-          Choose Work Item
-        </label>
-        <select id="workitems"
-          value={topSelector}
-          onChange={(event) => {
-            setTopSelector(event.target.value as 'All' | WorkItemStatus)
-            setPage(1)
-          }}>
-          <option value="All">All</option>
-          <option value="OP">Open</option>
-          <option value="IP">In Progress</option>
-          <option value="DN">Done</option>
+      <section className="workitem-filters" aria-label="Work item filters and sorting">
+        <fieldset className="workitem-filter-group">
+          <legend>Filtering</legend>
+          <div className="workitem-filter-grid">
+            <label htmlFor="search">Search
+              <input id="search" type="search" placeholder="Search WorkItems..." value={inputValue}
+                onChange={(event) => setInputValue(event.target.value)} />
+            </label>
+            <label htmlFor="workitems">Status
+              <select id="workitems" value={topSelector} onChange={(event) => {
+                setTopSelector(event.target.value as 'All' | WorkItemStatus)
+                setPage(1)
+              }}>
+                <option value="All">All statuses</option>
+                <option value="OP">Open</option>
+                <option value="IP">In Progress</option>
+                <option value="DN">Done</option>
+              </select>
+            </label>
+            <label htmlFor="filter-priority">Priority filter
+              <select id="filter-priority" value={prioritySelector} onChange={(event) => {
+                setPrioritySelector(event.target.value as 'All' | WorkItemPriority)
+                setPage(1)
+              }}>
+                <option value="All">All priorities</option>
+                <option value="LO">Low</option>
+                <option value="ME">Medium</option>
+                <option value="HI">High</option>
+              </select>
+            </label>
+            <label htmlFor="deadlineFilter">Deadline filter
+              <select 
+              id="deadlineFilter" 
+              value={deadlineFilter}
+              onChange={(event)=>{
+                setDeadlineFilter(event.target.value as DeadlinePar)
+                setPage(1)
 
-        </select>
-        <label htmlFor='search'>Search</label>
-        <input
-          id='search'
-          className='search-button'
-          placeholder='Search'
-          value={inputValue}
-          onChange={(event) => {
-            setInputValue(event.target.value)
-          }
-
-          }
-        />
-
-
-        <label htmlFor="sort-priority">
-          Sorted by priority
-        </label>
-        <select id="sort-priority"
-          value={prioritySortSelector}
-          onChange={(event) => {
-            setPrioritySortSelector(event.target.value as PrioritySortSelectorPar)
-            setPage(1)
-          }}
-        >
-          <option value=''>Default</option>
-          <option value="FHL">From high to low</option>
-          <option value="FLH">From low to high</option>
-        </select>
-
-        <label htmlFor="filter-priority">
-          Filter by priority
-        </label>
-        <select id="filter-priority"
-          value={prioritySelector}
-          onChange={(event) => {
-            setPrioritySelector(event.target.value as 'All' | WorkItemPriority)
-            setPage(1)
-          }}>
-
-          <option value="All">All </option>
-          <option value="LO">Low</option>
-          <option value="ME">Medium</option>
-          <option value="HI">High</option>
-
-        </select>
-
-        <label htmlFor='ordering'>Date sorting</label>
-        <select
-          id='ordering'
-          value={orderingType}
-          onChange={(event) => {
-            setOrderingType(event.target.value as WorkItemOrdering)
-            setPage(1)
-          }}>
-          <option value='-created_at'>Newest first</option>
-          <option value='created_at'>Oldest first</option>
-        </select>
-
-
+              }}
+              
+              >
+                <option value="All">All deadlines</option>
+                <option value="OD">Overdue</option>
+                <option value="DT"> Due today</option>
+                <option value="ND">Next 7 days</option>
+              </select>
+            </label>
+          </div>
+        </fieldset>
+        <fieldset className="workitem-filter-group">
+          <legend>Sorting</legend>
+          <div className="workitem-filter-grid">
+            <label htmlFor="sort-priority">Priority sort
+              <select id="sort-priority" value={prioritySortSelector} onChange={(event) => {
+                setPrioritySortSelector(event.target.value as PrioritySortSelectorPar)
+                setPage(1)
+              }}>
+                <option value="">Default</option>
+                <option value="FHL">From high to low</option>
+                <option value="FLH">From low to high</option>
+              </select>
+            </label>
+            <label htmlFor="ordering">Date sort
+              <select id="ordering" value={orderingType} onChange={(event) => {
+                setOrderingType(event.target.value as WorkItemOrdering)
+                setPage(1)
+              }}>
+                <option value="-created_at">Newest first</option>
+                <option value="created_at">Oldest first</option>
+              </select>
+            </label>
+          </div>
+        </fieldset>
       </section>
       {/* ===== Work items table ===== */}
       <div>

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { getWorkItems } from '../api/workitems.ts'
 import type { WorkItem, WorkItemStatus, WorkItemPriority } from '../api/workitems'
 import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
-import type {PrioritySortSelectorPar} from "../pages/WorkItemPage.tsx"
+import type {PrioritySortSelectorPar, DeadlinePar} from "../pages/WorkItemPage.tsx"
 export type WorkItemListParam = {
     retryCount: number,
     topSelector: 'All' | WorkItemStatus,
@@ -12,7 +12,8 @@ export type WorkItemListParam = {
     handleErrors: (error: unknown,
         signal?: AbortSignal) =>  Promise<void>;
     prioritySelector:'All'|WorkItemPriority,
-    prioritySortSelector:PrioritySortSelectorPar
+    prioritySortSelector:PrioritySortSelectorPar,
+    deadlineFilter:DeadlinePar;
 }
 
 export function useWorkItemsList(props: WorkItemListParam) {
@@ -31,7 +32,7 @@ export function useWorkItemsList(props: WorkItemListParam) {
             setListErrors('');
             setWorkItems([]);
             try {
-                const data = await getWorkItems(controller.signal, props.topSelector, props.prioritySelector, props.prioritySortSelector, props.searchValue, props.orderingType, props.page)
+                const data = await getWorkItems(controller.signal, props.topSelector, props.prioritySelector, props.prioritySortSelector, props.searchValue, props.orderingType, props.page, props.deadlineFilter)
                 setWorkItems(data.results)
                 setPaginationInfo({
                     count: data.count, num_pages: data.num_pages, current_page: data.current_page,
@@ -54,7 +55,7 @@ export function useWorkItemsList(props: WorkItemListParam) {
         return (() => {
             controller.abort()
         })
-    }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, refreshKey, props.prioritySelector, props.prioritySortSelector])
+    }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, refreshKey, props.prioritySelector, props.prioritySortSelector, props.deadlineFilter])
 
     return{workItems,  itemsLoading,paginationInfo, listErrors, refresh
 

@@ -56,6 +56,7 @@ test('get workItems list', async () => {
             page: 1,
             handleErrors: vi.fn(async () => { }),
             prioritySortSelector: '',
+            deadlineFilter:'All'
         })
     )
 
@@ -87,6 +88,7 @@ test('get error 500', async () => {
             page: 1,
             handleErrors,
             prioritySortSelector: '',
+            deadlineFilter:'All',
         })
     )
 

@@ -221,23 +221,22 @@ main > p[role='alert'] { color: var(--danger); font-weight: 500; }
   flex: 1 1 100%;
   min-width: 0;
   display: grid;
-  grid-template-columns: auto minmax(100px, 1fr) auto minmax(110px, 1.2fr) auto minmax(130px, 1fr) auto minmax(120px, 1fr) auto minmax(100px, 1fr);
-  align-items: center;
-  gap: 12px;
+  gap: 24px;
   margin-top: 20px;
-  overflow-x: auto;
-  padding: 4px 2px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
 }
-.workitem-filters label {
-  white-space: nowrap;
-  font-weight: 500;
-}
+.workitem-filter-group { min-width: 0; margin: 0; padding: 0; border: 0; }
+.workitem-filter-group + .workitem-filter-group { border-top: 1px solid var(--line); padding-top: 24px; }
+.workitem-filter-group legend { float: left; width: 100%; margin-bottom: 18px; font-weight: 600; }
+.workitem-filter-grid { clear: both; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.workitem-filters label { display: grid; gap: 6px; min-width: 0; color: var(--muted); font-weight: 500; }
 .workitem-filters select,
-.workitem-filters input {
-  box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
-  margin: 0;
+.workitem-filters input { box-sizing: border-box; width: 100%; min-width: 0; margin: 0; border-radius: 20px; }
+@media (max-width: 600px) {
+  .workitem-filter-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 select, input, textarea {
