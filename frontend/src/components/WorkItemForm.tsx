@@ -52,11 +52,12 @@ function WorkItemForm({ title, description, priority, onTitleChange, onDescripti
        <label
       htmlFor="create-dueDate">Due Date</label>
       <input 
+        id="create-dueDate"
         type="date" 
         name="due_date"
         value={dueDate?.slice(0,10)??""}
         onChange={(event)=>{
-          onDueDateChange(event?.target.value)
+          onDueDateChange(event?.target.value || null)
         }}
                    />
   </>)
