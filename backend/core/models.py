@@ -10,6 +10,7 @@ class WorkItem(models.Model):
   status = models.CharField(max_length=2, choices=different_status,default='OP')
   owner = models.ForeignKey(User, on_delete=models.CASCADE)
   created_at = models.DateTimeField(auto_now_add=True)
+  due_date = models.DateTimeField(blank=True, null=True)
   
 
 

@@ -37,7 +37,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
         setSavingItemId(itemId);
 
         try {
-            const updatedItem = await patchWorkitems(itemId, props.draftManager.draft.draftStatus, props.draftManager.draft.draftTitle, props.draftManager.draft.draftDescription, props.draftManager.draft.draftPriority)
+            const updatedItem = await patchWorkitems(itemId, props.draftManager.draft.draftStatus, props.draftManager.draft.draftTitle, props.draftManager.draft.draftDescription, props.draftManager.draft.draftPriority, props.draftManager.draft.draftDueDate)
             props.draftManager.cancelEditing()
             const leavesFilter = ((props.topSelector !== 'All' && updatedItem.status !== props.topSelector) || (props.prioritySelector !== 'All'  && updatedItem.priority !==props.prioritySelector)) || !updatedItem.title.toLowerCase().includes(props.searchValue.toLowerCase())
 

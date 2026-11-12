@@ -146,7 +146,7 @@ p { margin: 0; }
 #root { padding: 32px 20px 64px; }
 
 main {
-  max-width: 1300px;
+  max-width: 1500px;
   margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
@@ -261,24 +261,41 @@ main > div:has(table) { flex: 1 0 100%; }
 
 .work-table {
   width: 100%;
-  min-width: 1100px;          /* на вузьких екранах працює скрол у .table-wrap */
+  min-width: 1300px;          /* на вузьких екранах працює скрол у .table-wrap */
   table-layout: fixed;       /* ширини стовпчиків задає <colgroup>, а не вміст */
   border-collapse: collapse;
   text-align: left;
 }
 .work-table th {
-  padding: 12px 14px;
+  padding: 12px 10px;
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--muted);
   border-bottom: 1px solid var(--line);
   white-space: nowrap;
+  background: color-mix(in srgb, var(--ink) 4%, var(--surface));
 }
 .work-table td {
-  padding: 14px;
+  padding: 12px 10px;
   vertical-align: top;
   border-bottom: 1px solid var(--line);
   overflow-wrap: anywhere;   /* довгий текст переноситься, а не розтягує стовпчик */
+}
+.work-table th:first-child,
+.work-table td:first-child { padding-left: 16px; }
+.work-table th:last-child,
+.work-table td:last-child { padding-right: 16px; }
+.work-table tbody tr:hover {
+  background: color-mix(in srgb, var(--accent) 4%, var(--surface));
+}
+.work-table .row-actions { gap: 6px; }
+.work-table .btn { padding: 6px 10px; white-space: nowrap; }
+.work-table input[type="date"] {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 6px;
+  font: inherit;
 }
 .work-table tbody tr:last-child td { border-bottom: 0; }
 .work-table td:nth-child(1) { color: var(--muted); font-variant-numeric: tabular-nums; }

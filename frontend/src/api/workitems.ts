@@ -10,6 +10,7 @@ export type WorkItem = {
   priority: WorkItemPriority;
   status: WorkItemStatus
   created_at: string
+  due_date:string | null;
 }
 
 export type WorkItemsResponse = {
@@ -79,6 +80,7 @@ export async function patchWorkitems(
   title: string,
   description: string,
   priority: WorkItemPriority,
+  due_date:string | null,
 ): Promise<WorkItem> {
   const response = await fetch(
     `/api/v1/workitem/${id}/`,
@@ -88,7 +90,7 @@ export async function patchWorkitems(
         'Content-Type': 'application/json',
         'X-CSRFToken': getCsrfToken()?? ''
       },
-      body: JSON.stringify({ title: title, status: status, description: description, priority: priority }),
+      body: JSON.stringify({ title: title, status: status, description: description, priority: priority, due_date:due_date }),
     },
   )
 

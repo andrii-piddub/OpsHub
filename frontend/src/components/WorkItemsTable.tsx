@@ -30,13 +30,14 @@ function WorkItemsTable(props: WorkItemsTableProps) {
       <table className="work-table">
         <colgroup>
           <col style={{ width: '56px' }} /> {/* ID */}
-          <col style={{ width: '20%' }} /> {/* Title */}
-          <col style={{ width: '28%' }} /> {/* Description */}
-          <col style={{ width: '110px' }} /> {/* Priority */}
-          <col style={{ width: '130px' }} /> {/* Status */}
-          <col style={{ width: '170px' }} /> {/* Action */}
-          <col style={{ width: '100px' }} /> {/* Delete */}
-          <col style={{ width: '160px' }} /> {/* Created */}
+          <col style={{ width: '16%' }} /> {/* Title */}
+          <col /> {/* Description: remaining space */}
+          <col style={{ width: '100px' }} /> {/* Priority */}
+          <col style={{ width: '140px' }} /> {/* Status */}
+          <col style={{ width: '164px' }} /> {/* Action */}
+          <col style={{ width: '92px' }} /> {/* Delete */}
+          <col style={{ width: '150px' }} /> {/* Created */}
+          <col style={{ width: '164px' }} /> {/* Deadline */}
         </colgroup>
 
         <thead>
@@ -49,6 +50,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
             <th scope="col">Action</th>
             <th scope="col">Delete</th>
             <th scope="col">Created</th>
+            <th scope="col">Deadline</th>
           </tr>
         </thead>
 
@@ -204,6 +206,24 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       minute: '2-digit',
                     })}
                   </time>
+                </td>
+                <td className="created-cell">
+                  {isEditing ? (
+                    <input 
+                    type="date" 
+                    name="due_date" 
+                    value={props.draft.draftDueDate?.slice(0,10)??""}
+                    onChange={(event) => {
+                        props.updateDraft({ draftDueDate: event?.target.value })
+                    }}
+                    />
+                  ) : item.due_date !== null ? (
+                    <time dateTime={item.due_date}>
+                      {new Date(item.due_date).toLocaleDateString('uk-UA')}
+                    </time>
+                  ) : (
+                    '-'
+                  )}
                 </td>
               </tr>
             )

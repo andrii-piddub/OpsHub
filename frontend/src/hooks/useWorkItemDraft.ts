@@ -8,6 +8,7 @@ export type DraftWorkItem = {
     draftDescription: string;
     draftStatus: WorkItemStatus;
     draftPriority: WorkItemPriority;
+    draftDueDate:string | null;
 
 }
 
@@ -18,7 +19,8 @@ export function useWorkItemDraft(){
         draftTitle: '',
         draftDescription: '',
         draftStatus: 'OP',
-        draftPriority: 'ME'
+        draftPriority: 'ME',
+        draftDueDate: null,
     })
     
     function startEditing(item: WorkItem) {
