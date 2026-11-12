@@ -32,7 +32,7 @@ export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, se
 
     const draftManager = useWorkItemDraft()
     const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, handleErrors, prioritySelector, prioritySortSelector, deadlineFilter})
-    const mutationManager = useWorkItemMutations({draftManager, topSelector, searchValue, workItemListManager, page, setPage,  handleErrors, setPriority, prioritySelector, setDueDate})
+    const mutationManager = useWorkItemMutations({draftManager, topSelector, searchValue, workItemListManager, page, setPage,  handleErrors, setPriority, prioritySelector, setDueDate, deadlineFilter})
 
 
     async function handleErrors(

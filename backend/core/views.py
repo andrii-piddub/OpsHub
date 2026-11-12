@@ -9,6 +9,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from accounts.models import User
 from django.db.models import Case, Value, When
 import datetime
+from django.utils import timezone
 
 
 
@@ -26,6 +27,7 @@ def health_check(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def work_item(request):
+    today = timezone.localdate()
     if request.method == "GET":
         query_set = WorkItem.objects.filter(owner=request.user).order_by('-created_at').annotate(
             priority_order=Case(
@@ -48,9 +50,9 @@ def work_item(request):
         if deadline_filter not in ('OD','DT','ND') and deadline_filter is not None:
             return Response({f'Deadline filter {deadline_filter} is not correct. Please choose - "OD", "DT","ND"'},status=status.HTTP_400_BAD_REQUEST)
         elif deadline_filter=='OD':
-            query_set=query_set.filter(due_date__lt=datetime.date.today()).exclude(status='DN')
+            query_set=query_set.filter(due_date__lt=today).exclude(status='DN')
         elif deadline_filter=='DT':
-            query_set=query_set.filter(due_date=datetime.date.today()).exclude(status='DN')
+            query_set=query_set.filter(due_date=today).exclude(status='DN')
         elif deadline_filter=='ND':
             today = datetime.date.today()
             query_set = query_set.filter(
