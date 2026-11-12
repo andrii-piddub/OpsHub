@@ -4,7 +4,6 @@ import type { useWorkItemDraft } from './useWorkItemDraft.ts'
 import type { useWorkItemsList } from './useWorkItemsList.ts'
 import type { WorkItemStatus, WorkItemPriority } from "../api/workitems.ts"
 import { ApiErrors } from '../api/ApiError'
-import type {PrioritySortSelectorPar} from '../pages/WorkItemPage.tsx'
 
 
 export type WorkItemMutationParam = {

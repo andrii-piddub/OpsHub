@@ -49,18 +49,20 @@ def work_item(request):
             query_set = query_set.filter(title__icontains=search)
         ordering = request.query_params.get('ordering')
         sorting_priority = request.query_params.get('priority_sort')
-        if sorting_priority=='FLH' and ordering=='created_at':
-            query_set = query_set.order_by('prioriry_order','created_at')
+        if sorting_priority not in ('FHL','FLH','') and status_item is not None:
+            return Response({f'Sorting type is not correct:{sorting_priority} Correct one is - FHL, FLH or empty'},status=status.HTTP_400_BAD_REQUEST )
+        elif sorting_priority=='FLH' and ordering=='created_at':
+            query_set = query_set.order_by('priority_order','created_at','id')
         elif sorting_priority=='FLH' and ordering=='-created_at':
-            query_set = query_set.order_by('prioriry_order','-created_at')
+            query_set = query_set.order_by('priority_order','-created_at','id')
         elif sorting_priority=='FHL' and ordering=='created_at':
-            query_set = query_set.order_by('-prioriry_order','created_at')
+            query_set = query_set.order_by('-priority_order','created_at','id')
         elif sorting_priority=='FHL' and ordering=='-created_at':
-            query_set = query_set.order_by('-prioriry_order','-created_at')
+            query_set = query_set.order_by('-priority_order','-created_at','id')
         elif ordering=='created_at':
-            query_set = query_set.order_by('created_at')
+            query_set = query_set.order_by('created_at','id')
         elif ordering=='-created_at':
-            query_set = query_set.order_by('-created_at')
+            query_set = query_set.order_by('-created_at','id')
         elif ordering is not None and ordering not in ['created_at','-created_at']:
             return Response({'ordering':f'Wrong ordering atribute - {ordering}'}, status=status.HTTP_400_BAD_REQUEST)
         paginator = Paginator(query_set,10)
