@@ -1,7 +1,7 @@
 import type { WorkItem } from '../api/workitems.ts'
 import type { WorkItemStatus, WorkItemPriority } from '../api/workitems.ts'
 import type { DraftWorkItem } from '../hooks/useWorkItemDraft.ts'
-import type {useWorkItemsList} from '../hooks/useWorkItemsList.ts'
+import type { useWorkItemsList } from '../hooks/useWorkItemsList.ts'
 
 const statuses: { value: WorkItemStatus; label: string }[] = [
   { value: 'OP', label: 'Open' },
@@ -18,10 +18,10 @@ type WorkItemsTableProps = {
   deletingItemId: number | null
   startEditing: (item: WorkItem) => void
   draft: DraftWorkItem
-  cancelEditing:()=>void
-  updateDraft:(changes: Partial<Omit<DraftWorkItem, 'draftId'>>)=>void
-  workItemListManager:ReturnType<typeof useWorkItemsList>
-  priorities:{value: WorkItemPriority; label: string}[]
+  cancelEditing: () => void
+  updateDraft: (changes: Partial<Omit<DraftWorkItem, 'draftId'>>) => void
+  workItemListManager: ReturnType<typeof useWorkItemsList>
+  priorities: { value: WorkItemPriority; label: string }[]
 }
 
 function WorkItemsTable(props: WorkItemsTableProps) {
@@ -36,6 +36,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
           <col style={{ width: '130px' }} /> {/* Status */}
           <col style={{ width: '170px' }} /> {/* Action */}
           <col style={{ width: '100px' }} /> {/* Delete */}
+          <col style={{ width: '160px' }} /> {/* Created */}
         </colgroup>
 
         <thead>
@@ -47,6 +48,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
             <th scope="col">Current status</th>
             <th scope="col">Action</th>
             <th scope="col">Delete</th>
+            <th scope="col">Created</th>
           </tr>
         </thead>
 
@@ -70,8 +72,9 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       aria-label="Title"
                       value={props.draft.draftTitle}
                       disabled={fieldsDisabled}
-                      onChange={(event)=>{
-                        props.updateDraft({draftTitle:event?.target.value})}}
+                      onChange={(event) => {
+                        props.updateDraft({ draftTitle: event?.target.value })
+                      }}
                     />
                   ) : (
                     item.title
@@ -87,8 +90,9 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       aria-label="Description"
                       value={props.draft.draftDescription}
                       disabled={fieldsDisabled}
-                      onChange={(event)=>{
-                        props.updateDraft({draftDescription:event?.target.value})}}
+                      onChange={(event) => {
+                        props.updateDraft({ draftDescription: event?.target.value })
+                      }}
                     />
                   ) : (
                     item.description
@@ -99,10 +103,11 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                   {isEditing ? (
                     <select
                       aria-label="Priority"
-                      value={props.draft.draftPriority }
+                      value={props.draft.draftPriority}
                       disabled={fieldsDisabled}
-                      onChange={(event)=>{
-                        props.updateDraft({draftPriority:event?.target.value as WorkItemPriority})}}
+                      onChange={(event) => {
+                        props.updateDraft({ draftPriority: event?.target.value as WorkItemPriority })
+                      }}
                     >
                       {props.priorities.map((priority) => (
                         <option key={priority.value} value={priority.value}>
@@ -124,8 +129,9 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                       aria-label="Status"
                       value={props.draft.draftStatus}
                       disabled={fieldsDisabled}
-                      onChange={(event)=>{
-                        props.updateDraft({draftStatus:event?.target.value as WorkItemStatus})}}
+                      onChange={(event) => {
+                        props.updateDraft({ draftStatus: event?.target.value as WorkItemStatus })
+                      }}
                     >
                       {statuses.map((status) => (
                         <option key={status.value} value={status.value}>
@@ -187,6 +193,17 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                   >
                     {props.deletingItemId === item.id ? 'Deleting' : 'Delete'}
                   </button>
+                </td>
+                <td className="created-cell">
+                  <time dateTime={item.created_at}>
+                    {new Date(item.created_at).toLocaleString('uk-UA', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </time>
                 </td>
               </tr>
             )

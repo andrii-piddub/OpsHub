@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { getWorkItems } from '../api/workitems.ts'
 import type { WorkItem, WorkItemStatus, WorkItemPriority } from '../api/workitems'
 import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
-
+import type {PrioritySortSelectorPar} from "../pages/WorkItemPage.tsx"
 export type WorkItemListParam = {
     retryCount: number,
     topSelector: 'All' | WorkItemStatus,
@@ -11,7 +11,8 @@ export type WorkItemListParam = {
     page: number,
     handleErrors: (error: unknown,
         signal?: AbortSignal) =>  Promise<void>;
-    prioritySelector:'All'|'FHL'|'FLH'|WorkItemPriority,
+    prioritySelector:'All'|WorkItemPriority,
+    prioritySortSelector:PrioritySortSelectorPar
 }
 
 export function useWorkItemsList(props: WorkItemListParam) {
@@ -30,7 +31,7 @@ export function useWorkItemsList(props: WorkItemListParam) {
             setListErrors('');
             setWorkItems([]);
             try {
-                const data = await getWorkItems(controller.signal, props.topSelector, props.prioritySelector, props.searchValue, props.orderingType, props.page)
+                const data = await getWorkItems(controller.signal, props.topSelector, props.prioritySelector, props.prioritySortSelector, props.searchValue, props.orderingType, props.page)
                 setWorkItems(data.results)
                 setPaginationInfo({
                     count: data.count, num_pages: data.num_pages, current_page: data.current_page,
@@ -53,7 +54,7 @@ export function useWorkItemsList(props: WorkItemListParam) {
         return (() => {
             controller.abort()
         })
-    }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, refreshKey, props.prioritySelector])
+    }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, refreshKey, props.prioritySelector, props.prioritySortSelector])
 
     return{workItems,  itemsLoading,paginationInfo, listErrors, refresh
 

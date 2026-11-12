@@ -9,6 +9,8 @@ import type { WorkItemStatus, WorkItemOrdering, WorkItemPriority } from '../api/
 import type { User } from '../api/auth'
 import { logout } from '../api/auth'
 
+export type PrioritySortSelectorPar = 'FHL' | 'FLH' | ''
+
 export type WorkItemPageProps = {
   user: User | null;
   getUser: (user: User | null) => void;
@@ -21,7 +23,8 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
 
   // ===== STATE =====
   const [topSelector, setTopSelector] = useState<'All' | WorkItemStatus>('All')
-  const [prioritySelector, setPrioritySelector] = useState<'All' | 'FHL' | 'FLH'| WorkItemPriority>('All')
+  const [prioritySelector, setPrioritySelector] = useState<'All' | WorkItemPriority>('All')
+  const [prioritySortSelector, setPrioritySortSelector] = useState<PrioritySortSelectorPar>('')
   const priorities: { value: WorkItemPriority; label: string }[] = [
     { value: 'LO', label: 'Low' },
     { value: 'ME', label: 'Medium' },
@@ -36,7 +39,7 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
   const [searchValue, setSearchValue] = useState('')
   const [priority, setPriority] = useState<WorkItemPriority>('ME')
   const { mutationManager,
-    workItemListManager, draftManager } = useWorkItems({ retryCount, topSelector, searchValue, orderingType, prioritySelector, page, setPage, setSessionOver, getUser, setPriority })
+    workItemListManager, draftManager } = useWorkItems({ retryCount, topSelector, searchValue, orderingType, prioritySelector, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector })
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -118,7 +121,7 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
 
   // ===== RENDER =====
   return (
-        <main>
+    <main>
       <header className="workspace-header">
         <h1>OpsHub</h1>
         <button
@@ -180,6 +183,40 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
 
           }
         />
+
+
+        <label htmlFor="sort-priority">
+          Sorted by priority
+        </label>
+        <select id="sort-priority"
+          value={prioritySortSelector}
+          onChange={(event) => {
+            setPrioritySortSelector(event.target.value as PrioritySortSelectorPar)
+            setPage(1)
+          }}
+        >
+          <option value=''>Default</option>
+          <option value="FHL">From high to low</option>
+          <option value="FLH">From low to high</option>
+        </select>
+
+        <label htmlFor="filter-priority">
+          Filter by priority
+        </label>
+        <select id="filter-priority"
+          value={prioritySelector}
+          onChange={(event) => {
+            setPrioritySelector(event.target.value as 'All' | WorkItemPriority)
+            setPage(1)
+          }}>
+
+          <option value="All">All </option>
+          <option value="LO">Low</option>
+          <option value="ME">Medium</option>
+          <option value="HI">High</option>
+
+        </select>
+
         <label htmlFor='ordering'>Date sorting</label>
         <select
           id='ordering'
@@ -190,24 +227,6 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
           }}>
           <option value='-created_at'>Newest first</option>
           <option value='created_at'>Oldest first</option>
-        </select>
-
-        <label htmlFor="filter-priority">
-          Sort/Filter by
-        </label>
-        <select id="filter-priority"
-          value={prioritySelector}
-          onChange={(event) => {
-            setPrioritySelector(event.target.value as 'All'| 'FHL'|'FLH'|WorkItemPriority)
-            setPage(1)
-          }}>
-          <option value="FHL">From high to low</option>
-          <option value="FLH">From low to high</option>
-          <option value="All">All priorities</option>
-          <option value="LO">Low</option>
-          <option value="ME">Medium</option>
-          <option value="HI">High</option>
-
         </select>
 
 

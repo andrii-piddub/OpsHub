@@ -6,28 +6,30 @@ import { ApiErrors } from '../api/ApiError.ts'
 import { useWorkItemDraft } from './useWorkItemDraft.ts'
 import {useWorkItemsList} from './useWorkItemsList.ts'
 import { useWorkItemMutations } from "./useWorkItemMutations.ts";
+import type {PrioritySortSelectorPar} from "../pages/WorkItemPage.tsx"
 export type WorkItemsParam = {
     retryCount?: number;
     topSelector: 'All' | WorkItemStatus;
     searchValue: string;
     orderingType: WorkItemOrdering;
-    prioritySelector:'All'| 'FHL' | 'FLH' | WorkItemPriority;
+    prioritySelector:'All'| WorkItemPriority;
     page: number;
     setPage: (page: number) => void;
     setSessionOver: (value: boolean) => void;
     getUser: (value: User | null) => void;
-    setPriority:(value:WorkItemPriority)=>void
+    setPriority:(value:WorkItemPriority)=>void;
+    prioritySortSelector:PrioritySortSelectorPar;
 
 }
 
 
-export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, searchValue, orderingType, page, setPage, setSessionOver, getUser, setPriority }: WorkItemsParam) {
+export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, searchValue, orderingType, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector }: WorkItemsParam) {
 
     // ===== STATE =====
 
 
     const draftManager = useWorkItemDraft()
-    const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, handleErrors, prioritySelector})
+    const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, handleErrors, prioritySelector, prioritySortSelector})
     const mutationManager = useWorkItemMutations({draftManager, topSelector, searchValue, workItemListManager, page, setPage,  handleErrors, setPriority, prioritySelector})
 
 

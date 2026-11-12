@@ -53,6 +53,7 @@ test('get workItems list', async () => {
             prioritySelector:'All',
             page: 1,
             handleErrors: vi.fn(async () => { }),
+            prioritySortSelector: '',
         })
     )
 
@@ -83,6 +84,7 @@ test('get error 500', async () => {
             orderingType: '-created_at',
             page: 1,
             handleErrors,
+            prioritySortSelector: '',
         })
     )
 

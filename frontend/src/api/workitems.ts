@@ -1,5 +1,6 @@
 import {ApiErrors} from './ApiError'
 import {getCsrfToken} from './auth'
+import type {PrioritySortSelectorPar} from '../pages/WorkItemPage'
 export type WorkItemStatus = 'OP' | 'IP' | 'DN'
 export type WorkItemPriority = 'LO' | 'ME' | 'HI'
 export type WorkItem = {
@@ -23,7 +24,7 @@ export type WorkItemsResponse = {
 export type PaginationInfo = Omit<WorkItemsResponse, 'results'>
 
 export type WorkItemOrdering = 'created_at' | '-created_at'
-export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, prioritySelector:'All'|'FHL'|'FLH'|WorkItemPriority, searchValue: string, orderingType: WorkItemOrdering, page: number): Promise<WorkItemsResponse> {
+export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | WorkItemStatus, prioritySelector:'All'|WorkItemPriority, prioritySortSelector:PrioritySortSelectorPar, searchValue: string, orderingType: WorkItemOrdering, page: number): Promise<WorkItemsResponse> {
   const url = new URL('/api/v1/workitem/', window.location.origin)
   const params = new URLSearchParams(url.search)
   if (topSelector && topSelector != 'All') {
@@ -34,6 +35,9 @@ export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | Wor
   }
   if (orderingType) {
     params.append('ordering', orderingType)
+  }
+  if (prioritySortSelector){
+    params.append('priority_sort',prioritySortSelector)
   }
   if (prioritySelector && prioritySelector !='All'){
     params.append('priority',prioritySelector)
