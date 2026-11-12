@@ -6,8 +6,8 @@ import { renderHook } from '@testing-library/react'
 import { act } from '@testing-library/react'
 import type { WorkItem } from '../api/workitems'
 
-const item: WorkItem = { id: 1, title: 'New', description: 'New Description', priority: 'ME', status: 'IP', created_at: '2026-11-10T10:00:00Z', }
-const item2: WorkItem = { id: 2, title: 'Second', description: 'Second Description', priority: 'HI', status: 'OP', created_at: '2026-11-10T10:00:00Z', }
+const item: WorkItem = { id: 1, title: 'New', description: 'New Description', priority: 'ME', status: 'IP', created_at: '2026-11-10T10:00:00Z', due_date: '2026-11-20T00:00:00Z' }
+const item2: WorkItem = { id: 2, title: 'Second', description: 'Second Description', priority: 'HI', status: 'OP', created_at: '2026-11-10T10:00:00Z', due_date: null }
 
 test('initial draftId is null', () => {
     const { result } = renderHook(() => useWorkItemDraft())
@@ -26,7 +26,8 @@ test('update draft', () => {
         draftTitle: 'New',
         draftDescription: 'New Description',
         draftPriority: 'ME',
-        draftStatus: 'IP'
+        draftStatus: 'IP',
+        draftDueDate: item.due_date,
     })
 })
 
@@ -43,7 +44,8 @@ test('partial update draft', () => {
         draftTitle: 'New title',
         draftDescription: 'New Description',
         draftPriority: 'ME',
-        draftStatus: 'IP'
+        draftStatus: 'IP',
+        draftDueDate: item.due_date,
     })
 
 })
@@ -72,7 +74,23 @@ test('draft two items', () => {
         draftTitle: 'Second',
         draftDescription: 'Second Description',
         draftPriority: 'HI',
-        draftStatus: 'OP'
+        draftStatus: 'OP',
+        draftDueDate: null,
     })
+})
+
+test('clear an existing deadline without changing other draft fields', () => {
+    const { result } = renderHook(() => useWorkItemDraft())
+
+    act(() => {
+        result.current.startEditing(item)
+    })
+    const previousDraft = result.current.draft
+
+    act(() => {
+        result.current.updateDraft({ draftDueDate: null })
+    })
+
+    expect(result.current.draft).toStrictEqual({ ...previousDraft, draftDueDate: null })
 })
 

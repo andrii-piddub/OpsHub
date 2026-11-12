@@ -16,7 +16,8 @@ export type WorkItemMutationParam = {
     handleErrors: (error: unknown,
         signal?: AbortSignal) =>  Promise<void>;
     setPriority:(value:WorkItemPriority)=>void,
-    prioritySelector:'All'| WorkItemPriority
+    prioritySelector:'All'| WorkItemPriority,
+    setDueDate:(value:string|null)=>void,
 
 }
 
@@ -89,12 +90,13 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
     }
 
 
-    async function createWorkItem(title: string, description: string, priority:WorkItemPriority) {
+    async function createWorkItem(title: string, description: string, priority:WorkItemPriority, dueDate:string|null) {
         setCreatingItem(true);
         setCreateError('')
         try {
-            const newItem = await postWorkItems(title, description, priority)
+            const newItem = await postWorkItems(title, description, priority, dueDate)
             props.setPriority('ME')
+            props.setDueDate(null)
             if (((newItem.status === props.topSelector || props.topSelector === 'All')&&(newItem.priority === props.prioritySelector || props.prioritySelector === 'All' )) && (props.searchValue === "" || newItem.title.toLowerCase().includes(props.searchValue.toLowerCase()))) {
                 props.workItemListManager.refresh()
             }

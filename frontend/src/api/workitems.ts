@@ -55,7 +55,7 @@ export async function getWorkItems(signal: AbortSignal, topSelector: 'All' | Wor
   return (await response.json()) as WorkItemsResponse
 }
 
-export async function postWorkItems(title: string, description: string, priority:WorkItemPriority) {
+export async function postWorkItems(title: string, description: string, priority:WorkItemPriority, dueDate:string | null) {
   const response = await fetch(
     '/api/v1/workitem/',
     {
@@ -64,7 +64,7 @@ export async function postWorkItems(title: string, description: string, priority
         'Content-Type': 'application/json',
         'X-CSRFToken': getCsrfToken()?? ''
       },
-      body: JSON.stringify({ title: title, description: description, priority:priority }),
+      body: JSON.stringify({ title: title, description: description, priority:priority, due_date: dueDate }),
     },
   )
 

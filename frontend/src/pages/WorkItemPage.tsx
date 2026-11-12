@@ -38,8 +38,9 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
   const [orderingType, setOrderingType] = useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
   const [priority, setPriority] = useState<WorkItemPriority>('ME')
+  const [dueDate, setDueDate] = useState<string | null>(null)
   const { mutationManager,
-    workItemListManager, draftManager } = useWorkItems({ retryCount, topSelector, searchValue, orderingType, prioritySelector, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector })
+    workItemListManager, draftManager } = useWorkItems({ retryCount, topSelector, searchValue, orderingType, prioritySelector, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate })
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -110,7 +111,7 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
   // ===== handleSubmit =====
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const success = await mutationManager.createWorkItem(title, description, priority)
+    const success = await mutationManager.createWorkItem(title, description, priority, dueDate)
     if (success === true) {
       setTitle('');
       setDescription('');
@@ -281,6 +282,8 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
           priority={priority}
           onPriorityChange={setPriority}
           priorities={priorities}
+          dueDate={dueDate}
+          onDueDateChange={setDueDate}
         />
 
         <button type="submit" disabled={mutationManager.creatingItem}>

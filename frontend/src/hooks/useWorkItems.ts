@@ -19,18 +19,19 @@ export type WorkItemsParam = {
     getUser: (value: User | null) => void;
     setPriority:(value:WorkItemPriority)=>void;
     prioritySortSelector:PrioritySortSelectorPar;
+    setDueDate:(value:string|null)=>void;
 
 }
 
 
-export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, searchValue, orderingType, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector }: WorkItemsParam) {
+export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, searchValue, orderingType, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate }: WorkItemsParam) {
 
     // ===== STATE =====
 
 
     const draftManager = useWorkItemDraft()
     const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, handleErrors, prioritySelector, prioritySortSelector})
-    const mutationManager = useWorkItemMutations({draftManager, topSelector, searchValue, workItemListManager, page, setPage,  handleErrors, setPriority, prioritySelector})
+    const mutationManager = useWorkItemMutations({draftManager, topSelector, searchValue, workItemListManager, page, setPage,  handleErrors, setPriority, prioritySelector, setDueDate})
 
 
     async function handleErrors(

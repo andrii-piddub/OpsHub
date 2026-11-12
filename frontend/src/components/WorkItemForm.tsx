@@ -6,13 +6,15 @@ type WorkItemFormProps = {
   onTitleChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
   onPriorityChange: (value: WorkItemPriority) => void;
-  priorities:{value: WorkItemPriority; label: string}[]
+  priorities:{value: WorkItemPriority; label: string}[];
+  dueDate:string | null;
+  onDueDateChange:(value:string | null)=>void;
 
 }
 
 
 
-function WorkItemForm({ title, description, priority, onTitleChange, onDescriptionChange, onPriorityChange, priorities }: WorkItemFormProps) {
+function WorkItemForm({ title, description, priority, onTitleChange, onDescriptionChange, onPriorityChange, priorities, dueDate, onDueDateChange }: WorkItemFormProps) {
   return (<>
     <label
       htmlFor="title"
@@ -47,6 +49,16 @@ function WorkItemForm({ title, description, priority, onTitleChange, onDescripti
         </option>
       ))}
     </select>
+       <label
+      htmlFor="create-dueDate">Due Date</label>
+      <input 
+        type="date" 
+        name="due_date"
+        value={dueDate?.slice(0,10)??""}
+        onChange={(event)=>{
+          onDueDateChange(event?.target.value)
+        }}
+                   />
   </>)
 }
 

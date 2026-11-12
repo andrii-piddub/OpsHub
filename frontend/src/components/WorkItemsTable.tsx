@@ -214,7 +214,7 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                     name="due_date" 
                     value={props.draft.draftDueDate?.slice(0,10)??""}
                     onChange={(event) => {
-                        props.updateDraft({ draftDueDate: event?.target.value })
+                        props.updateDraft({ draftDueDate: event.target.value || null })
                     }}
                     />
                   ) : item.due_date !== null ? (

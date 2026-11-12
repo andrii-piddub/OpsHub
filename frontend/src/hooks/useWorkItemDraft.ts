@@ -31,7 +31,8 @@ export function useWorkItemDraft(){
             draftTitle: item.title,
             draftDescription: item.description,
             draftStatus: item.status,
-            draftPriority: item.priority
+            draftPriority: item.priority,
+            draftDueDate:item.due_date
         }));
     
     }

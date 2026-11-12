@@ -25,7 +25,8 @@ test('get workItems list', async () => {
                 description: 'First description',
                 status: 'IP',
                 priority: 'HI',
-                created_at: '2026-11-10T10:00:00Z'
+                created_at: '2026-11-10T10:00:00Z',
+                due_date: '2026-11-20T00:00:00Z',
             },
             {
                 id: 2,
@@ -33,7 +34,8 @@ test('get workItems list', async () => {
                 description: 'Second description',
                 status: 'IP',
                 priority: 'HI',
-                created_at: '2026-11-09T10:00:00Z'
+                created_at: '2026-11-09T10:00:00Z',
+                due_date: null,
             }
         ],
         count: 2,
