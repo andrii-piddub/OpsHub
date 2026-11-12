@@ -27,7 +27,7 @@ def health_check(request):
 def work_item(request):
     if request.method == "GET":
         query_set = WorkItem.objects.filter(owner=request.user).order_by('-created_at').annotate(
-            prioriry_order=Case(
+            priority_order=Case(
                 When(priority='HI', then=Value(3)),
                 When(priority='ME', then=Value(2)),
                 When(priority='LO', then=Value(1)),
@@ -49,7 +49,7 @@ def work_item(request):
             query_set = query_set.filter(title__icontains=search)
         ordering = request.query_params.get('ordering')
         sorting_priority = request.query_params.get('priority_sort')
-        if sorting_priority not in ('FHL','FLH','') and status_item is not None:
+        if sorting_priority not in ('FHL','FLH','') and sorting_priority is not None:
             return Response({f'Sorting type is not correct:{sorting_priority} Correct one is - FHL, FLH or empty'},status=status.HTTP_400_BAD_REQUEST )
         elif sorting_priority=='FLH' and ordering=='created_at':
             query_set = query_set.order_by('priority_order','created_at','id')
