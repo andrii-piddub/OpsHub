@@ -5,7 +5,7 @@ import type { useWorkItemsList } from './useWorkItemsList.ts'
 import type { WorkItemStatus, WorkItemPriority } from "../api/workitems.ts"
 import { ApiErrors } from '../api/ApiError'
 import type { DeadlinePar } from '../pages/WorkItemPage.tsx'
-import dayjs from 'dayjs'
+import { getBusinessDateRange } from '../utils/businessDate'
 
 export type WorkItemMutationParam = {
     draftManager: ReturnType<typeof useWorkItemDraft>
@@ -30,11 +30,6 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
     const [itemsError, setItemsError] = useState('')
-    let today = dayjs().format('YYYY-MM-DD');
-    let range_seven_days = dayjs().add(7, 'days').format('YYYY-MM-DD')
-    console.log(today)
-
-    // today = today.slice(0,10)
 
 
     async function handleSaveAction(itemId: number) {
@@ -44,8 +39,8 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
         try {
             const updatedItem = await patchWorkitems(itemId, props.draftManager.draft.draftStatus, props.draftManager.draft.draftTitle, props.draftManager.draft.draftDescription, props.draftManager.draft.draftPriority, props.draftManager.draft.draftDueDate)
             props.draftManager.cancelEditing()
-            const leavesFilter = ((props.topSelector !== 'All' && updatedItem.status !== props.topSelector) || (props.prioritySelector !== 'All' && updatedItem.priority !== props.prioritySelector) || (props.deadlineFilter === 'OD' && (updatedItem.due_date === null || updatedItem.due_date >= today || updatedItem.status === 'DN')) || (props.deadlineFilter === 'DT' && (updatedItem.due_date === null || updatedItem.due_date !== today || updatedItem.status === 'DN')) || (props.deadlineFilter === 'ND' && (updatedItem.due_date === null || updatedItem.due_date >= range_seven_days || updatedItem.status === 'DN' || updatedItem.due_date < today)) || !updatedItem.title.toLowerCase().includes(props.searchValue.toLowerCase()))
-            console.log(updatedItem.due_date)
+            const { today, range_seven_days } = getBusinessDateRange()
+            const leavesFilter = ((props.topSelector !== 'All' && updatedItem.status !== props.topSelector) || (props.prioritySelector !== 'All' && updatedItem.priority !== props.prioritySelector) || (props.deadlineFilter === 'OD' && (updatedItem.due_date === null || updatedItem.due_date >= today || updatedItem.status === 'DN')) || (props.deadlineFilter === 'DT' && (updatedItem.due_date === null || updatedItem.due_date !== today || updatedItem.status === 'DN')) || (props.deadlineFilter === 'ND' && (updatedItem.due_date === null || updatedItem.due_date > range_seven_days || updatedItem.status === 'DN' || updatedItem.due_date <= today)) || !updatedItem.title.toLowerCase().includes(props.searchValue.toLowerCase()))
             if (leavesFilter && props.workItemListManager.workItems.length === 1 && props.page > 1) {
                 props.setPage(props.page - 1)
             } else {
@@ -99,6 +94,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
         setCreateError('')
         try {
             const newItem = await postWorkItems(title, description, priority, dueDate)
+            const { today, range_seven_days } = getBusinessDateRange()
             props.setPriority('ME')
             props.setDueDate(null)
             if (((newItem.status === props.topSelector || props.topSelector === 'All') &&
@@ -107,7 +103,8 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
                     (newItem.due_date !== null && newItem.status !=='DN')&&
                     ((props.deadlineFilter === 'OD' &&  newItem.due_date < today ) ||
                     (props.deadlineFilter === 'DT' &&  newItem.due_date === today) ||
-                    (props.deadlineFilter === 'ND' && newItem.due_date <= range_seven_days && newItem.due_date > today)))))) {
+                    (props.deadlineFilter === 'ND' && newItem.due_date <= range_seven_days && newItem.due_date > today))))
+                    &&(props.searchValue === "" || newItem.title.toLowerCase().includes(props.searchValue.toLowerCase())))) {
                 props.workItemListManager.refresh()
             }
             return true
