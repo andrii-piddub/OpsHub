@@ -4,7 +4,7 @@ import type { useWorkItemDraft } from './useWorkItemDraft.ts'
 import type { useWorkItemsList } from './useWorkItemsList.ts'
 import type { WorkItemStatus, WorkItemPriority } from "../api/workitems.ts"
 import { ApiErrors } from '../api/ApiError'
-import type {DeadlinePar} from '../pages/WorkItemPage.tsx'
+import type { DeadlinePar } from '../pages/WorkItemPage.tsx'
 import dayjs from 'dayjs'
 
 export type WorkItemMutationParam = {
@@ -15,11 +15,11 @@ export type WorkItemMutationParam = {
     page: number
     setPage: (value: number) => void
     handleErrors: (error: unknown,
-        signal?: AbortSignal) =>  Promise<void>;
-    setPriority:(value:WorkItemPriority)=>void,
-    prioritySelector:'All'| WorkItemPriority,
-    setDueDate:(value:string|null)=>void,
-    deadlineFilter:DeadlinePar,
+        signal?: AbortSignal) => Promise<void>;
+    setPriority: (value: WorkItemPriority) => void,
+    prioritySelector: 'All' | WorkItemPriority,
+    setDueDate: (value: string | null) => void,
+    deadlineFilter: DeadlinePar,
 
 }
 
@@ -30,21 +30,21 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
     const [itemsError, setItemsError] = useState('')
-    let  today = dayjs().format('YYYY-MM-DD');
-    let range_seven_days=dayjs().add(7,'days').format('YYYY-MM-DD')
+    let today = dayjs().format('YYYY-MM-DD');
+    let range_seven_days = dayjs().add(7, 'days').format('YYYY-MM-DD')
     console.log(today)
 
     // today = today.slice(0,10)
 
 
     async function handleSaveAction(itemId: number) {
-        if (props.draftManager.draft.draftId!==itemId) return
+        if (props.draftManager.draft.draftId !== itemId) return
         setItemsError('')
         setSavingItemId(itemId);
         try {
             const updatedItem = await patchWorkitems(itemId, props.draftManager.draft.draftStatus, props.draftManager.draft.draftTitle, props.draftManager.draft.draftDescription, props.draftManager.draft.draftPriority, props.draftManager.draft.draftDueDate)
             props.draftManager.cancelEditing()
-            const leavesFilter = ((props.topSelector !== 'All' && updatedItem.status !== props.topSelector) || (props.prioritySelector !== 'All'  && updatedItem.priority !==props.prioritySelector)|| (props.deadlineFilter ==='OD' && (updatedItem.due_date === null || updatedItem.due_date>=today || updatedItem.status === 'DN'  ))|| (props.deadlineFilter ==='DT' && (updatedItem.due_date === null || updatedItem.due_date !==today || updatedItem.status === 'DN'  ))|| (props.deadlineFilter ==='ND' && (updatedItem.due_date === null || updatedItem.due_date>=range_seven_days || updatedItem.status === 'DN'   ))|| !updatedItem.title.toLowerCase().includes(props.searchValue.toLowerCase()))
+            const leavesFilter = ((props.topSelector !== 'All' && updatedItem.status !== props.topSelector) || (props.prioritySelector !== 'All' && updatedItem.priority !== props.prioritySelector) || (props.deadlineFilter === 'OD' && (updatedItem.due_date === null || updatedItem.due_date >= today || updatedItem.status === 'DN')) || (props.deadlineFilter === 'DT' && (updatedItem.due_date === null || updatedItem.due_date !== today || updatedItem.status === 'DN')) || (props.deadlineFilter === 'ND' && (updatedItem.due_date === null || updatedItem.due_date >= range_seven_days || updatedItem.status === 'DN' || updatedItem.due_date < today)) || !updatedItem.title.toLowerCase().includes(props.searchValue.toLowerCase()))
             console.log(updatedItem.due_date)
             if (leavesFilter && props.workItemListManager.workItems.length === 1 && props.page > 1) {
                 props.setPage(props.page - 1)
@@ -94,14 +94,20 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
     }
 
 
-    async function createWorkItem(title: string, description: string, priority:WorkItemPriority, dueDate:string|null) {
+    async function createWorkItem(title: string, description: string, priority: WorkItemPriority, dueDate: string | null) {
         setCreatingItem(true);
         setCreateError('')
         try {
             const newItem = await postWorkItems(title, description, priority, dueDate)
             props.setPriority('ME')
             props.setDueDate(null)
-            if (((newItem.status === props.topSelector || props.topSelector === 'All')&&(newItem.priority === props.prioritySelector || props.prioritySelector === 'All' )) && (props.searchValue === "" || newItem.title.toLowerCase().includes(props.searchValue.toLowerCase()))) {
+            if (((newItem.status === props.topSelector || props.topSelector === 'All') &&
+                (newItem.priority === props.prioritySelector || props.prioritySelector === 'All') &&
+                (props.deadlineFilter === 'All' || ( 
+                    (newItem.due_date !== null && newItem.status !=='DN')&&
+                    ((props.deadlineFilter === 'OD' &&  newItem.due_date < today ) ||
+                    (props.deadlineFilter === 'DT' &&  newItem.due_date === today) ||
+                    (props.deadlineFilter === 'ND' && newItem.due_date <= range_seven_days && newItem.due_date > today)))))) {
                 props.workItemListManager.refresh()
             }
             return true

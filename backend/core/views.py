@@ -54,7 +54,6 @@ def work_item(request):
         elif deadline_filter=='DT':
             query_set=query_set.filter(due_date=today).exclude(status='DN')
         elif deadline_filter=='ND':
-            today = datetime.date.today()
             query_set = query_set.filter(
             due_date__gt=today,
             due_date__lte=today + datetime.timedelta(days=7),).exclude(status='DN')
