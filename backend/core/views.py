@@ -131,3 +131,24 @@ class ItemPartialUpdateView(APIView):
             )
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def stats_view(request):
+    today = timezone.localdate()
+    if request.method == "GET":
+        total_count = WorkItem.objects.filter(owner=request.user).count()
+        open_count = WorkItem.objects.filter(owner=request.user).filter(status='OP').count()
+        in_progress_count = WorkItem.objects.filter(owner=request.user).filter(status='IP').count()
+        done_count = WorkItem.objects.filter(owner=request.user).filter(status='DN').count()
+        high_prio_count = WorkItem.objects.filter(owner=request.user).filter(priority='HI').count()
+        overdue_count=WorkItem.objects.filter(owner=request.user).filter(due_date__lt=today).count()
+    return Response({'dashboard_total':total_count,
+                     'dashboard_open':open_count,
+                     'dashboard_in_progress':in_progress_count,
+                     'dashboard_done':done_count,
+                     'dashboard_high_priority':high_prio_count,
+                     'dashboard_overdue':overdue_count        
+                     },status=status.HTTP_200_OK)

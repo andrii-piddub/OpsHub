@@ -31,6 +31,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
     const [itemsError, setItemsError] = useState('')
+    const [patchCount, setPatchCount]=useState(0)
     
     
     async function handleSaveAction(itemId: number) {
@@ -40,6 +41,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
         const { today, range_seven_days } = getBusinessDateRange()
         try {
             const updatedItem = await patchWorkitems(itemId, props.draftManager.draft.draftStatus, props.draftManager.draft.draftTitle, props.draftManager.draft.draftDescription, props.draftManager.draft.draftPriority, props.draftManager.draft.draftDueDate)
+            setPatchCount((previous)=>(previous+1))
             props.draftManager.cancelEditing()
             const matchesFilters = matchesDeadlineFilter({item:updatedItem, deadlineFilter:props.deadlineFilter, today:today, range_seven_days:range_seven_days,topSelector:props.topSelector, prioritySelector:props.prioritySelector,searchValue:props.searchValue })
             if (!matchesFilters && props.workItemListManager.workItems.length === 1 && props.page > 1) {
@@ -69,6 +71,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
             setItemsError('');
             setDeletingItemId(id);
             await deleteWorkItem(id)
+                        setPatchCount((previous)=>(previous+1))
             if (props.page > 1 && props.workItemListManager.workItems.length === 1) {
                 props.setPage(props.page - 1)
             } else {
@@ -95,6 +98,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
         setCreateError('')
         try {
             const newItem = await postWorkItems(title, description, priority, dueDate)
+                        setPatchCount((previous)=>(previous+1))
             const { today, range_seven_days } = getBusinessDateRange()
             props.setPriority('ME')
             props.setDueDate(null)
@@ -116,5 +120,5 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
 
         }
     }
-    return { handleSaveAction, createWorkItem, handleDeleteWorkItem, creatingItem, createError, savingItemId, deletingItemId, itemsError }
+    return { handleSaveAction, createWorkItem, handleDeleteWorkItem, creatingItem, createError, savingItemId, deletingItemId, itemsError, patchCount }
 }

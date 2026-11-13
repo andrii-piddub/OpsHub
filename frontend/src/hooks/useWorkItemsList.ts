@@ -57,7 +57,7 @@ export function useWorkItemsList(props: WorkItemListParam) {
         })
     }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, refreshKey, props.prioritySelector, props.prioritySortSelector, props.deadlineFilter])
 
-    return{workItems,  itemsLoading,paginationInfo, listErrors, refresh
+    return{workItems,  itemsLoading,paginationInfo, listErrors, refresh, setListErrors, setItemsLoading
 
     }
 }

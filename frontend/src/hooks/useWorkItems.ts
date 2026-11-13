@@ -7,6 +7,7 @@ import { useWorkItemDraft } from './useWorkItemDraft.ts'
 import {useWorkItemsList} from './useWorkItemsList.ts'
 import { useWorkItemMutations } from "./useWorkItemMutations.ts";
 import type {PrioritySortSelectorPar, DeadlinePar} from "../pages/WorkItemPage.tsx"
+import {useWorkItemStats} from './useWorkItemStats.ts'
 export type WorkItemsParam = {
     retryCount?: number;
     topSelector: 'All' | WorkItemStatus;
@@ -21,11 +22,12 @@ export type WorkItemsParam = {
     prioritySortSelector:PrioritySortSelectorPar;
     setDueDate:(value:string|null)=>void;
     deadlineFilter:DeadlinePar;
+    refreshKey:number;
 
 }
 
 
-export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, searchValue, orderingType, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate, deadlineFilter }: WorkItemsParam) {
+export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, searchValue, orderingType, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate, deadlineFilter, refreshKey }: WorkItemsParam) {
 
     // ===== STATE =====
 
@@ -33,7 +35,7 @@ export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, se
     const draftManager = useWorkItemDraft()
     const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, handleErrors, prioritySelector, prioritySortSelector, deadlineFilter})
     const mutationManager = useWorkItemMutations({draftManager, topSelector, searchValue, workItemListManager, page, setPage,  handleErrors, setPriority, prioritySelector, setDueDate, deadlineFilter})
-
+    const dashboardManager = useWorkItemStats({mutationManager, handleErrors, workItemListManager})
 
     async function handleErrors(
         error: unknown,
@@ -63,6 +65,6 @@ export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, se
 
     // ===== RETURN =====
     return {
-        workItemListManager, draftManager, mutationManager
+        workItemListManager, draftManager, mutationManager, dashboardManager
     }
 }

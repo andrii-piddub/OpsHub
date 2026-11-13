@@ -8,6 +8,7 @@ import WorkItemForm from '../components/WorkItemForm.tsx'
 import type { WorkItemStatus, WorkItemOrdering, WorkItemPriority } from '../api/workitems'
 import type { User } from '../api/auth'
 import { logout } from '../api/auth'
+import WorkItemDashboard from '../components/WorkItemDashboard.tsx'
 
 export type PrioritySortSelectorPar = 'FHL' | 'FLH' | ''
 export type DeadlinePar = 'All' | 'OD' | 'DT' | 'ND'
@@ -36,13 +37,14 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
+  const [refreshKey, setRefreshKey]=useState(0)
   const [page, setPage] = useState(1)
   const [orderingType, setOrderingType] = useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
   const [priority, setPriority] = useState<WorkItemPriority>('ME')
   const [dueDate, setDueDate] = useState<string | null>(null)
   const { mutationManager,
-    workItemListManager, draftManager } = useWorkItems({ retryCount, topSelector, searchValue, orderingType, prioritySelector, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate, deadlineFilter })
+    workItemListManager, draftManager,dashboardManager } = useWorkItems({ retryCount, topSelector, searchValue, orderingType, prioritySelector, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate, deadlineFilter, refreshKey })
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -117,6 +119,7 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
     if (success === true) {
       setTitle('');
       setDescription('');
+      setRefreshKey((previous) => previous + 1)
     }
 
   }
@@ -155,7 +158,7 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
         </div>
       )}
       <p></p>
-
+      <WorkItemDashboard dashboardManager={dashboardManager}/>
 
       <section className="workitem-filters" aria-label="Work item filters and sorting">
         <fieldset className="workitem-filter-group">

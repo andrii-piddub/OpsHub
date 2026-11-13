@@ -486,3 +486,68 @@ button:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; }
   cursor: pointer;
 }
 .session-dialog__button:hover { filter: brightness(1.08); }
+.wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 40px auto;
+}
+
+.rectangle {
+  box-sizing: border-box;
+  width: 140px;
+  height: 100px;
+  border: 4px solid black;
+  flex-shrink: 0;
+}
+
+
+.rectangle1,
+.rectangle2,
+.rectangle3,
+.rectangle4,
+.rectangle5,
+.rectangle6{
+  box-sizing: border-box;
+  width: 450px;
+  min-height: 220px;
+  padding: 14px;
+
+  background-color: #dedbdbf0;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  font-family: Arial, sans-serif;
+}
+
+
+.rectangle1 .label,
+.rectangle2 .label,
+.rectangle3 .label,
+.rectangle4 .label,
+.rectangle5 .label,
+.rectangle6 .label
+ {
+  font-size: 28px;
+  color: #666;
+  padding-left: 50px;
+}
+
+.rectangle1 .value,
+.rectangle2 .value,
+.rectangle3 .value,
+.rectangle4 .value,
+.rectangle5 .value,
+.rectangle6 .value
+{
+  font-size: 45px;
+  font-weight: 600;
+  color: #171717;
+  padding-left: 50px;
+  padding-top: 15px;
+}
