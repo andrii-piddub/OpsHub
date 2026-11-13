@@ -97,14 +97,26 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
             const { today, range_seven_days } = getBusinessDateRange()
             props.setPriority('ME')
             props.setDueDate(null)
-            if (((newItem.status === props.topSelector || props.topSelector === 'All') &&
-                (newItem.priority === props.prioritySelector || props.prioritySelector === 'All') &&
-                (props.deadlineFilter === 'All' || ( 
-                    (newItem.due_date !== null && newItem.status !=='DN')&&
-                    ((props.deadlineFilter === 'OD' &&  newItem.due_date < today ) ||
-                    (props.deadlineFilter === 'DT' &&  newItem.due_date === today) ||
-                    (props.deadlineFilter === 'ND' && newItem.due_date <= range_seven_days && newItem.due_date > today))))
-                    &&(props.searchValue === "" || newItem.title.toLowerCase().includes(props.searchValue.toLowerCase())))) {
+            const matchesDeadline =
+                props.deadlineFilter === 'All' ||
+                (newItem.due_date !== null &&
+                    newItem.status !== 'DN' &&
+                    (
+                        (props.deadlineFilter === 'OD' && newItem.due_date < today) ||
+                        (props.deadlineFilter === 'DT' && newItem.due_date === today) ||
+                        (props.deadlineFilter === 'ND' &&
+                            newItem.due_date > today &&
+                            newItem.due_date <= range_seven_days)
+                    ))
+
+            const matchesFilters =
+                (props.topSelector === 'All' || newItem.status === props.topSelector) &&
+                (props.prioritySelector === 'All' || newItem.priority === props.prioritySelector) &&
+                newItem.title.toLowerCase().includes(props.searchValue.trim().toLowerCase()) &&
+                matchesDeadline
+
+
+            if (matchesFilters) {
                 props.workItemListManager.refresh()
             }
             return true
