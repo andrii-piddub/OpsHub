@@ -6,6 +6,7 @@ import type { WorkItemStatus, WorkItemPriority } from "../api/workitems.ts"
 import { ApiErrors } from '../api/ApiError'
 import type { DeadlinePar } from '../pages/WorkItemPage.tsx'
 import { getBusinessDateRange } from '../utils/businessDate'
+import {matchesDeadlineFilter} from '../utils/workItemFilters.ts'
 
 export type WorkItemMutationParam = {
     draftManager: ReturnType<typeof useWorkItemDraft>
@@ -30,18 +31,18 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
     const [itemsError, setItemsError] = useState('')
-
-
+    
+    
     async function handleSaveAction(itemId: number) {
         if (props.draftManager.draft.draftId !== itemId) return
         setItemsError('')
         setSavingItemId(itemId);
+        const { today, range_seven_days } = getBusinessDateRange()
         try {
             const updatedItem = await patchWorkitems(itemId, props.draftManager.draft.draftStatus, props.draftManager.draft.draftTitle, props.draftManager.draft.draftDescription, props.draftManager.draft.draftPriority, props.draftManager.draft.draftDueDate)
             props.draftManager.cancelEditing()
-            const { today, range_seven_days } = getBusinessDateRange()
-            const leavesFilter = ((props.topSelector !== 'All' && updatedItem.status !== props.topSelector) || (props.prioritySelector !== 'All' && updatedItem.priority !== props.prioritySelector) || (props.deadlineFilter === 'OD' && (updatedItem.due_date === null || updatedItem.due_date >= today || updatedItem.status === 'DN')) || (props.deadlineFilter === 'DT' && (updatedItem.due_date === null || updatedItem.due_date !== today || updatedItem.status === 'DN')) || (props.deadlineFilter === 'ND' && (updatedItem.due_date === null || updatedItem.due_date > range_seven_days || updatedItem.status === 'DN' || updatedItem.due_date <= today)) || !updatedItem.title.toLowerCase().includes(props.searchValue.toLowerCase()))
-            if (leavesFilter && props.workItemListManager.workItems.length === 1 && props.page > 1) {
+            const matchesFilters = matchesDeadlineFilter({item:updatedItem, deadlineFilter:props.deadlineFilter, today:today, range_seven_days:range_seven_days,topSelector:props.topSelector, prioritySelector:props.prioritySelector,searchValue:props.searchValue })
+            if (!matchesFilters && props.workItemListManager.workItems.length === 1 && props.page > 1) {
                 props.setPage(props.page - 1)
             } else {
                 props.workItemListManager.refresh()
@@ -97,24 +98,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
             const { today, range_seven_days } = getBusinessDateRange()
             props.setPriority('ME')
             props.setDueDate(null)
-            const matchesDeadline =
-                props.deadlineFilter === 'All' ||
-                (newItem.due_date !== null &&
-                    newItem.status !== 'DN' &&
-                    (
-                        (props.deadlineFilter === 'OD' && newItem.due_date < today) ||
-                        (props.deadlineFilter === 'DT' && newItem.due_date === today) ||
-                        (props.deadlineFilter === 'ND' &&
-                            newItem.due_date > today &&
-                            newItem.due_date <= range_seven_days)
-                    ))
-
-            const matchesFilters =
-                (props.topSelector === 'All' || newItem.status === props.topSelector) &&
-                (props.prioritySelector === 'All' || newItem.priority === props.prioritySelector) &&
-                newItem.title.toLowerCase().includes(props.searchValue.trim().toLowerCase()) &&
-                matchesDeadline
-
+            const matchesFilters = matchesDeadlineFilter({item:newItem,deadlineFilter:props.deadlineFilter,today:today,range_seven_days:range_seven_days,topSelector:props.topSelector,prioritySelector:props.prioritySelector,searchValue:props.searchValue})
 
             if (matchesFilters) {
                 props.workItemListManager.refresh()
