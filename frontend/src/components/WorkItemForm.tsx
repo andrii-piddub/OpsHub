@@ -1,65 +1,65 @@
 import type { WorkItemPriority } from '../api/workitems'
-type WorkItemFormProps = {
-  title: string;
-  description: string;
-  priority: WorkItemPriority;
-  onTitleChange: (value: string) => void;
-  onDescriptionChange: (value: string) => void;
-  onPriorityChange: (value: WorkItemPriority) => void;
-  priorities:{value: WorkItemPriority; label: string}[];
-  dueDate:string | null;
-  onDueDateChange:(value:string | null)=>void;
-
-}
+import { useWorkItem } from '../hooks/useWorkItem' 
 
 
-
-function WorkItemForm({ title, description, priority, onTitleChange, onDescriptionChange, onPriorityChange, priorities, dueDate, onDueDateChange }: WorkItemFormProps) {
+function WorkItemForm( handleErrors : (error: unknown,
+    signal?: AbortSignal) => Promise<void>) {
+  const creationManager = useWorkItem(handleErrors)
   return (<>
-    <label
-      htmlFor="title"
-    >Title</label>
-    <input
-      id="title"
-      type="text"
-      value={title}
-      onChange={(event) => {
-        onTitleChange(event.target.value)
-      }} />
-    <label
-      htmlFor="description">Description</label>
-    <textarea
-      id="description"
-      value={description}
-      onChange={(event) => {
-        onDescriptionChange(event.target.value)
-      }} />
-    <label
-      htmlFor="create-priority">Priority</label>
-    <select
-      aria-label="priority"
-      id="create-priority"
-      value={priority}
-      onChange={(event) => {
-        onPriorityChange(event?.target.value as WorkItemPriority)
-      }}>
-      {priorities.map((priority) => (
-        <option key={priority.value} value={priority.value}>
-          {priority.label}
-        </option>
-      ))}
-    </select>
-       <label
-      htmlFor="create-dueDate">Due Date</label>
-      <input 
+    <form
+      className="workitem-form"
+      onSubmit={creationManager.handleSubmit}>
+      <label
+        htmlFor="title"
+      >Title</label>
+      <input
+        id="title"
+        type="text"
+        value={creationManager.title}
+        onChange={(event) => {
+          creationManager.setTitle(event.target.value)
+        }} />
+      <label
+        htmlFor="description">Description</label>
+      <textarea
+        id="description"
+        value={creationManager.description}
+        onChange={(event) => {
+          creationManager.setDescription(event.target.value)
+        }} />
+      <label
+        htmlFor="create-priority">Priority</label>
+      <select
+        aria-label="priority"
+        id="create-priority"
+        value={creationManager.priority}
+        onChange={(event) => {
+          creationManager.setPriority(event?.target.value as WorkItemPriority)
+        }}>
+        {creationManager.priorities.map((priority) => (
+          <option key={priority.value} value={priority.value}>
+            {priority.label}
+          </option>
+        ))}
+      </select>
+      <label
+        htmlFor="create-dueDate">Due Date</label>
+      <input
         id="create-dueDate"
-        type="date" 
+        type="date"
         name="due_date"
-        value={dueDate?.slice(0,10)??""}
-        onChange={(event)=>{
-          onDueDateChange(event?.target.value || null)
+        value={creationManager.dueDate?.slice(0, 10) ?? ""}
+        onChange={(event) => {
+          creationManager.setDueDate(event?.target.value || null)
         }}
-                   />
+      />
+      <button type="submit" disabled={creationManager.creatingItem}>
+        {creationManager.creatingItem ? 'Creating' : 'Submit'}
+      </button>
+    </form>
+    {creationManager.createError && <p role="alert">Error: {creationManager.createError}</p>}
+
+
   </>)
 }
 

@@ -24,7 +24,7 @@ function LoginForm(props:LoginFormProps) {
             await login(username, password);
             const response = await authMe();
             props.getUser(response)
-            navigate('/workitem')
+            navigate('/dashboard')
           
         } catch (error) {
             setError(

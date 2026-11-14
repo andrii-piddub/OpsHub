@@ -14,6 +14,6 @@ export function GuestRoute(props: RequireAuthProps) {
             </div>
         )
     }
-  if (props.user) return <Navigate to="/workitem" replace />
+  if (props.user) return <Navigate to="/dashboard" replace />
   return <Outlet />
 }

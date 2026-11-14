@@ -5,15 +5,41 @@ import type { User } from './api/auth.ts'
 import { authMe } from './api/auth.ts'
 import RegisterForm from "./components/RegisterForm.tsx"
 import { Route, Routes } from "react-router"
-import {RequireAuth} from "./components/RequireAuth.tsx"
+import { RequireAuth } from "./components/RequireAuth.tsx"
 import { Navigate } from "react-router"
-import {GuestRoute} from './components/GuestRoute.tsx'
+import { GuestRoute } from './components/GuestRoute.tsx'
+import { AppLayout } from "./components/AppLayout.tsx"
+import WorkItemDashboard from "./components/WorkItemDashboard.tsx"
+import {ApiErrors} from './api/ApiError.ts'
+import WorkItemsTable from './components/WorkItemsTable.tsx'
+import WorkItemForm from './components/WorkItemForm.tsx'
 function App() {
   const [user, setUser] = useState<User | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
   const [authError, setAuthError] = useState('')
   const [sessionOver, setSessionOver] = useState(false)
   const sessionDialog = useRef<HTMLDialogElement>(null)
+
+  async function handleErrors(
+    error: unknown,
+    signal?: AbortSignal,
+  ): Promise<void> {
+    if (error instanceof ApiErrors && error.status === 403) {
+      try {
+        if (signal?.aborted) return
+        await authMe()
+      } catch (error) {
+        if (signal?.aborted) return
+        const err2 = error as { status?: number }
+        if (err2.status === 403) {
+          setSessionOver(true)
+          setUser(null)
+        }
+      }
+    }
+
+  }
+
 
   useEffect(() => {
     if (sessionOver) sessionDialog.current?.showModal()
@@ -76,15 +102,22 @@ function App() {
     </dialog>
 
     <Routes>
-      <Route element={<GuestRoute authLoading={authLoading} user={user}/>}>
+      <Route element={<GuestRoute authLoading={authLoading} user={user} />}>
         <Route path="/login" element={<LoginForm getUser={setUser} />} />
         <Route path="/register" element={<RegisterForm />} />
       </Route>
       <Route element={<RequireAuth authLoading={authLoading} user={user} />}>
-        <Route path="/workitem" element={<WorkItemPage user={user} getUser={setUser} setSessionOver={setSessionOver}/>} />
-        <Route path="/" element={<Navigate to="/workitem" replace />} />
-        <Route path="*" element={<Navigate to="/workitem" replace />} />
+        <Route element={<AppLayout authLoading={authLoading} user={user} setUser={setUser}/>}>
+          {/* <Route path="/workitem" element={<WorkItemPage user={user} getUser={setUser} setSessionOver={setSessionOver} />} /> */}
+          <Route path="/dashboard" element={<WorkItemDashboard handleErrors={handleErrors} />} />
+          <Route path="/workitem" element={<WorkItemPage user={user} getUser={setUser} setSessionOver={setSessionOver} handleErrors={handleErrors} />} />
+          <Route path="/workitem/create" element={<WorkItemForm handleErrors={handleErrors}/>} />
 
+
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+        </Route>
       </Route>
     </Routes>
 

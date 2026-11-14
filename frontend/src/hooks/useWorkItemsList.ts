@@ -22,6 +22,7 @@ export function useWorkItemsList(props: WorkItemListParam) {
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
     const [listErrors, setListErrors] = useState('')
     const [refreshKey, setRefreshKey] = useState(0)
+    
     function refresh() {
         setRefreshKey(prev => prev + 1)
     }

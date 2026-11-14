@@ -1,7 +1,8 @@
-import type { useWorkItemStats } from '../hooks/useWorkItemStats'
+import type { WorkItemStatsParams } from '../hooks/useWorkItemStats'
+import {useWorkItemStats} from '../hooks/useWorkItemStats'
 
-
-function WorkItemDashboard({ dashboardManager, }: { dashboardManager: ReturnType<typeof useWorkItemStats>; }) {
+function WorkItemDashboard(props:WorkItemStatsParams) {
+    const dashboardManager = useWorkItemStats(props)
     return (<>
         <div className="wrapper">
             <div className="rectangle1">

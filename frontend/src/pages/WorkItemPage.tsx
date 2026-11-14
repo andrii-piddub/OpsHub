@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react'
-import type { FormEvent } from 'react'
+
 import { getHealth } from '../api/health'
 import type { HealthResponse } from '../api/health'
-import { useWorkItems } from '../hooks/useWorkItems.ts'
+// import { useWorkItems } from '../hooks/useWorkItems.ts'
 import WorkItemsTable from '../components/WorkItemsTable.tsx'
 import WorkItemForm from '../components/WorkItemForm.tsx'
 import type { WorkItemStatus, WorkItemOrdering, WorkItemPriority } from '../api/workitems'
 import type { User } from '../api/auth'
 import { logout } from '../api/auth'
 import WorkItemDashboard from '../components/WorkItemDashboard.tsx'
+import { useWorkItemsList } from '../hooks/useWorkItemsList.ts'
+import { useWorkItemMutations } from '../hooks/useWorkItemMutations.ts'
+import {useWorkItemDraft} from '../hooks/useWorkItemDraft.ts'
 
 export type PrioritySortSelectorPar = 'FHL' | 'FLH' | ''
 export type DeadlinePar = 'All' | 'OD' | 'DT' | 'ND'
@@ -17,11 +20,13 @@ export type WorkItemPageProps = {
   user: User | null;
   getUser: (user: User | null) => void;
   setSessionOver: (value: boolean) => void;
+  handleErrors: (error: unknown,
+        signal?: AbortSignal) => Promise<void>;
 
 }
 
 
-function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
+function WorkItemPage({ user, getUser, setSessionOver, handleErrors }: WorkItemPageProps) {
 
   // ===== STATE =====
   const [topSelector, setTopSelector] = useState<'All' | WorkItemStatus>('All')
@@ -37,36 +42,25 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
+  const [refreshKey, setRefreshKey] = useState(0)
   const [page, setPage] = useState(1)
   const [orderingType, setOrderingType] = useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
-  const [priority, setPriority] = useState<WorkItemPriority>('ME')
-  const [dueDate, setDueDate] = useState<string | null>(null)
-  const { mutationManager,
-    workItemListManager, draftManager,dashboardManager } = useWorkItems({ retryCount, topSelector, searchValue, orderingType, prioritySelector, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate, deadlineFilter })
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
+
+
+
+
   const [inputValue, setInputValue] = useState('')
   const [logouting, setLogouting] = useState(false)
-  const full_error = mutationManager.itemsError || workItemListManager.listErrors 
+  const draftManager = useWorkItemDraft()
+  const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, prioritySelector, prioritySortSelector, deadlineFilter, handleErrors})
+  const mutationManager = useWorkItemMutations({ draftManager, topSelector, searchValue, workItemListManager, page, setPage, handleErrors, prioritySelector, deadlineFilter })
+  const full_error = mutationManager.itemsError || workItemListManager.listErrors
 
-  async function logoutRequest() {
-    setError('')
-    try {
-      setLogouting(true)
-      await logout()
-      getUser(null)
-    } catch (error) {
-      setError(
-        error instanceof Error
-          ? error.message
-          : 'Did not receive an answer',
-      )
 
-    } finally {
-      setLogouting(false)
-    }
-  }
+
+
+
 
   // ===== useEffect: search debounce =====
   useEffect(() => {
@@ -79,74 +73,58 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
 
 
   // ===== useEffect: health check =====
-  useEffect(() => {
-    const controller = new AbortController()
+  // useEffect(() => {
+  //   const controller = new AbortController()
 
-    async function checkHealth() {
-      setLoading(true)
-      setError('')
-      setHealth(null)
+  //   async function checkHealth() {
+  //     setLoading(true)
+  //     setError('')
+  //     setHealth(null)
 
-      try {
-        const data = await getHealth(controller.signal)
-        setHealth(data)
-      } catch (error) {
-        if (controller.signal.aborted) return
+  //     try {
+  //       const data = await getHealth(controller.signal)
+  //       setHealth(data)
+  //     } catch (error) {
+  //       if (controller.signal.aborted) return
 
-        setError(
-          error instanceof Error
-            ? error.message
-            : 'Did not receive an answer',
-        )
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false)
-        }
-      }
-    }
+  //       setError(
+  //         error instanceof Error
+  //           ? error.message
+  //           : 'Did not receive an answer',
+  //       )
+  //     } finally {
+  //       if (!controller.signal.aborted) {
+  //         setLoading(false)
+  //       }
+  //     }
+  //   }
 
-    checkHealth()
+  //   checkHealth()
 
-    return () => controller.abort()
-  }, [retryCount])
+  //   return () => controller.abort()
+  // }, [retryCount])
 
 
   // ===== handleSubmit =====
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const success = await mutationManager.createWorkItem(title, description, priority, dueDate)
-    if (success === true) {
-      setTitle('');
-      setDescription('');
-    }
 
-  }
 
 
   // ===== RENDER =====
   return (
     <main>
-      <header className="workspace-header">
-        <h1>OpsHub</h1>
-        <button
-          className="logout-button"
-          type="button"
-          onClick={() => { logoutRequest() }}
-          disabled={logouting}
-        >Logout</button>
-      </header>
-      <p>{user && `Welcome ${user.username}`}</p>
+
+      {/* <p>{user && `Welcome ${user.username}`}</p> */}
 
       {/* ===== Health check ===== */}
-      <button
+      {/* <button
         type="button"
         onClick={() => setRetryCount((previous) => previous + 1)}
         disabled={loading || workItemListManager.itemsLoading}
       >
         {loading || workItemListManager.itemsLoading ? 'Checking' : 'Checking again'}
-      </button>
+      </button> */}
 
-      {loading && <p>Checking connection with server</p>}
+      {/* {loading && <p>Checking connection with server</p>}
       {error && <p role="alert">Error: {error}</p>}
 
       {health && (
@@ -154,9 +132,9 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
           <p>Сервіс: {health.service}</p>
           <p>Статус: {health.status}</p>
         </div>
-      )}
+      )} */}
       <p></p>
-      <WorkItemDashboard dashboardManager={dashboardManager}/>
+
 
       <section className="workitem-filters" aria-label="Work item filters and sorting">
         <fieldset className="workitem-filter-group">
@@ -189,15 +167,15 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
               </select>
             </label>
             <label htmlFor="deadlineFilter">Deadline filter
-              <select 
-              id="deadlineFilter" 
-              value={deadlineFilter}
-              onChange={(event)=>{
-                setDeadlineFilter(event.target.value as DeadlinePar)
-                setPage(1)
+              <select
+                id="deadlineFilter"
+                value={deadlineFilter}
+                onChange={(event) => {
+                  setDeadlineFilter(event.target.value as DeadlinePar)
+                  setPage(1)
 
-              }}
-              
+                }}
+
               >
                 <option value="All">All deadlines</option>
                 <option value="OD">Overdue</option>
@@ -271,7 +249,7 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
 
 
       {/* ===== Create form ===== */}
-      <form
+      {/* <form
         className="workitem-form"
         onSubmit={handleSubmit}>
         <WorkItemForm
@@ -289,9 +267,9 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
         <button type="submit" disabled={mutationManager.creatingItem}>
           {mutationManager.creatingItem ? 'Creating' : 'Submit'}
         </button>
-      </form>
+      </form> */}
 
-      {mutationManager.createError && <p role="alert">Error: {mutationManager.createError}</p>}
+
 
     </main>
   )

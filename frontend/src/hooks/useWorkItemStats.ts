@@ -2,8 +2,7 @@ import type { DashboardStats } from "../api/workItemStats";
 import { useEffect, useState } from "react";
 import { getDashboardStats } from "../api/workItemStats";
 import type { useWorkItemMutations } from "./useWorkItemMutations"
-type WorkItemStatsParams = {
-    mutationManager: ReturnType<typeof useWorkItemMutations>;
+export type WorkItemStatsParams = {
     handleErrors: (
         error: unknown, signal?: AbortSignal) => Promise<void>;
 };
@@ -38,6 +37,6 @@ export function useWorkItemStats(props: WorkItemStatsParams) {
         return (() => {
             controller.abort()
         })
-    }, [props.mutationManager.patchCount])
+    }, [])
     return { dashboardStats, dashboardErrors, dashboardLoading }
 }
