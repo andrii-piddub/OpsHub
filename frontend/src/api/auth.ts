@@ -1,7 +1,7 @@
 export type User = { id: number, username: string }
 
 export async function getCsrf(): Promise<void> {
-    let url = new URL('/api/v1/auth/csrf/', window.location.origin)
+    const url = new URL('/api/v1/auth/csrf/', window.location.origin)
     const response = await fetch(url)
     if (!response.ok) {
         throw new Error(`Request failed: ${response.status}`)

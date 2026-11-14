@@ -56,7 +56,7 @@ export function useWorkItemsList(props: WorkItemListParam) {
         return (() => {
             controller.abort()
         })
-    }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, props.prioritySelector, props.prioritySortSelector, props.deadlineFilter])
+    }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, props.prioritySelector, props.prioritySortSelector, props.deadlineFilter, refreshKey])
 
     return {
         workItems, itemsLoading, paginationInfo, listErrors, setListErrors, setItemsLoading, refresh

@@ -433,12 +433,19 @@ class WorkitemStatsTests(TestCase):
         patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps({'status':'DN'}), content_type="application/json")
         self.assertEqual(patch_response.status_code,200)
         response_stats = self.client.get(path="/api/v1/workitem/stats/")
+        self.assertEqual(response_stats.status_code,200)
         self.assertEqual(response_stats.json()['dashboard_total'],6)
+        self.assertEqual(response_stats.status_code,200)
         self.assertEqual(response_stats.json()['dashboard_open'],1)
+        self.assertEqual(response_stats.status_code,200)
         self.assertEqual(response_stats.json()['dashboard_in_progress'],2)
+        self.assertEqual(response_stats.status_code,200)
         self.assertEqual(response_stats.json()['dashboard_done'],3)
+        self.assertEqual(response_stats.status_code,200)
         self.assertEqual(response_stats.json()['dashboard_high_priority'],3)
+        self.assertEqual(response_stats.status_code,200)
         self.assertEqual(response_stats.json()['dashboard_overdue'],1)
+        self.assertEqual(response_stats.status_code,200)
     def test_stats_after_delete(self):
         loginA = self.client.post(data={'username':'UserA', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
         created_item=WorkItem.objects.get(title="A2")
@@ -446,11 +453,18 @@ class WorkitemStatsTests(TestCase):
         response_stats = self.client.get(path="/api/v1/workitem/stats/")
         self.assertEqual(response.status_code,204)
         self.assertEqual(response_stats.json()['dashboard_total'],5)
+        self.assertEqual(response_stats.status_code,200)
         self.assertEqual(response_stats.json()['dashboard_open'],2)
+        self.assertEqual(response_stats.status_code,200)
         self.assertEqual(response_stats.json()['dashboard_in_progress'],1)
+        self.assertEqual(response_stats.status_code,200)
         self.assertEqual(response_stats.json()['dashboard_done'],2)
+        self.assertEqual(response_stats.status_code,200)
         self.assertEqual(response_stats.json()['dashboard_high_priority'],3)
+        self.assertEqual(response_stats.status_code,200)
         self.assertEqual(response_stats.json()['dashboard_overdue'],1)
+        self.assertEqual(response_stats.status_code,200)
+
 
 
 
