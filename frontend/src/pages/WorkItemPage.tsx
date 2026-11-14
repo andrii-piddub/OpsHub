@@ -48,7 +48,7 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [logouting, setLogouting] = useState(false)
-  const full_error = mutationManager.itemsError || workItemListManager.listErrors || dashboardManager.dashboardErrors
+  const full_error = mutationManager.itemsError || workItemListManager.listErrors 
 
   async function logoutRequest() {
     setError('')

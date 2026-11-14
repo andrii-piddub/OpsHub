@@ -360,6 +360,123 @@ class WorkItemAuthorizedTests(TestCase):
         self.assertEqual(second_item.status_code,201)
         self.assertEqual(WorkItem.objects.filter(title='Second case').count(),1)
 
+class WorkitemStatsTests(TestCase):
+    def setUp(self):
+        today = timezone.localdate()    
+        UserA = self.client.post(data={'username':'UserA', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')  
+        self.assertEqual(UserA.status_code,201)
+        UserB = self.client.post(data={'username':'UserB', 'password':'Five234oaks!'}, path='/api/v1/auth/register/') 
+        self.assertEqual(UserB.status_code,201)
+        loginA = self.client.post(data={'username':'UserA', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        self.assertEqual(loginA.status_code,200)
+        A1 = self.client.post(path="/api/v1/workitem/", data={"title":"A1","status":"OP","priority":"HI","due_date":f"{today-timedelta(days=1)}"})
+        self.assertEqual(A1.status_code,201)
+        A2 = self.client.post(path="/api/v1/workitem/", data={"title":"A2","status":"IP","priority":"ME","due_date":f"{today-timedelta(days=1)}"})
+        self.assertEqual(A2.status_code,201)
+        A3 = self.client.post(path="/api/v1/workitem/", data={"title":"A3","status":"DN","priority":"HI","due_date":f"{today-timedelta(days=1)}"})
+        self.assertEqual(A3.status_code,201)
+        A4 = self.client.post(path="/api/v1/workitem/", data={"title":"A4","status":"OP","priority":"LO","due_date":f"{today}"})
+        self.assertEqual(A4.status_code,201)
+        A5 = self.client.post(path="/api/v1/workitem/", data={"title":"A5","status":"DN","priority":"ME","due_date":f"{today+timedelta(days=1)}"})
+        self.assertEqual(A5.status_code,201)
+        A6 = self.client.post(path="/api/v1/workitem/", data={"title":"A6","status":"IP","priority":"HI","due_date":""})
+        self.assertEqual(A6.status_code,201)
+        logoutA=self.client.post(path="/api/v1/auth/logout/")
+        self.assertEqual(logoutA.status_code,200)
+        loginB = self.client.post(data={'username':'UserB', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        self.assertEqual(loginB.status_code,200)
+        B1 = self.client.post(path="/api/v1/workitem/", data={"title":"B1","status":"OP","priority":"HI","due_date":f"{today-timedelta(days=1)}"})
+        self.assertEqual(B1.status_code,201)
+        logoutB=self.client.post(path="/api/v1/auth/logout/")
+        self.assertEqual(logoutB.status_code,200)
+    def test_stats_unauthorized(self):
+        response_get = self.client.get(path="/api/v1/workitem/stats/")
+        self.assertEqual(response_get.status_code,403)
+    def test_stats_user_a(self):
+        loginA = self.client.post(data={'username':'UserA', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        self.assertEqual(loginA.status_code,200)
+        response_stats = self.client.get(path="/api/v1/workitem/stats/")
+        self.assertEqual(response_stats.status_code,200)
+        self.assertEqual(response_stats.json()['dashboard_total'],6)
+        self.assertEqual(response_stats.json()['dashboard_open'],2)
+        self.assertEqual(response_stats.json()['dashboard_in_progress'],2)
+        self.assertEqual(response_stats.json()['dashboard_done'],2)
+        self.assertEqual(response_stats.json()['dashboard_high_priority'],3)
+        self.assertEqual(response_stats.json()['dashboard_overdue'],2)
+    def test_stats_user_b(self):
+        loginB = self.client.post(data={'username':'UserB', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        self.assertEqual(loginB.status_code,200)
+        response_stats = self.client.get(path="/api/v1/workitem/stats/")
+        self.assertEqual(response_stats.status_code,200)
+        self.assertEqual(response_stats.json()['dashboard_total'],1)
+        self.assertEqual(response_stats.json()['dashboard_open'],1)
+        self.assertEqual(response_stats.json()['dashboard_in_progress'],0)
+        self.assertEqual(response_stats.json()['dashboard_done'],0)
+        self.assertEqual(response_stats.json()['dashboard_high_priority'],1)
+        self.assertEqual(response_stats.json()['dashboard_overdue'],1)
+    def test_stats_empty(self):
+        UserC = self.client.post(data={'username':'UserC', 'password':'Five234oaks!'}, path='/api/v1/auth/register/')  
+        self.assertEqual(UserC.status_code,201)
+        loginC = self.client.post(data={'username':'UserC', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        self.assertEqual(loginC.status_code,200)
+        response_stats = self.client.get(path="/api/v1/workitem/stats/")
+        self.assertEqual(response_stats.status_code,200)
+        self.assertEqual(response_stats.json()['dashboard_total'],0)
+        self.assertEqual(response_stats.json()['dashboard_open'],0)
+        self.assertEqual(response_stats.json()['dashboard_in_progress'],0)
+        self.assertEqual(response_stats.json()['dashboard_done'],0)
+        self.assertEqual(response_stats.json()['dashboard_high_priority'],0)
+        self.assertEqual(response_stats.json()['dashboard_overdue'],0)
+    def test_stats_after_update(self):
+        loginA = self.client.post(data={'username':'UserA', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        created_item=WorkItem.objects.get(title='A1')
+        patch_response = self.client.patch(path=f"/api/v1/workitem/{created_item.id}/",data=json.dumps({'status':'DN'}), content_type="application/json")
+        self.assertEqual(patch_response.status_code,200)
+        response_stats = self.client.get(path="/api/v1/workitem/stats/")
+        self.assertEqual(response_stats.json()['dashboard_total'],6)
+        self.assertEqual(response_stats.json()['dashboard_open'],1)
+        self.assertEqual(response_stats.json()['dashboard_in_progress'],2)
+        self.assertEqual(response_stats.json()['dashboard_done'],3)
+        self.assertEqual(response_stats.json()['dashboard_high_priority'],3)
+        self.assertEqual(response_stats.json()['dashboard_overdue'],1)
+    def test_stats_after_delete(self):
+        loginA = self.client.post(data={'username':'UserA', 'password':'Five234oaks!'}, path='/api/v1/auth/login/')
+        created_item=WorkItem.objects.get(title="A2")
+        response = self.client.delete(path=f"/api/v1/workitem/{created_item.id}/")
+        response_stats = self.client.get(path="/api/v1/workitem/stats/")
+        self.assertEqual(response.status_code,204)
+        self.assertEqual(response_stats.json()['dashboard_total'],5)
+        self.assertEqual(response_stats.json()['dashboard_open'],2)
+        self.assertEqual(response_stats.json()['dashboard_in_progress'],1)
+        self.assertEqual(response_stats.json()['dashboard_done'],2)
+        self.assertEqual(response_stats.json()['dashboard_high_priority'],3)
+        self.assertEqual(response_stats.json()['dashboard_overdue'],1)
+
+
+
+
+
+
+
+
+
+
+
+        
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

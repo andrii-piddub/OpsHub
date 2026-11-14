@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { getWorkItems } from '../api/workitems.ts'
 import type { WorkItem, WorkItemStatus, WorkItemPriority } from '../api/workitems'
 import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
-import type {PrioritySortSelectorPar, DeadlinePar} from "../pages/WorkItemPage.tsx"
+import type { PrioritySortSelectorPar, DeadlinePar } from "../pages/WorkItemPage.tsx"
 export type WorkItemListParam = {
     retryCount: number,
     topSelector: 'All' | WorkItemStatus,
@@ -10,17 +10,21 @@ export type WorkItemListParam = {
     orderingType: WorkItemOrdering,
     page: number,
     handleErrors: (error: unknown,
-        signal?: AbortSignal) =>  Promise<void>;
-    prioritySelector:'All'|WorkItemPriority,
-    prioritySortSelector:PrioritySortSelectorPar,
-    deadlineFilter:DeadlinePar;
+        signal?: AbortSignal) => Promise<void>;
+    prioritySelector: 'All' | WorkItemPriority,
+    prioritySortSelector: PrioritySortSelectorPar,
+    deadlineFilter: DeadlinePar;
 }
 
 export function useWorkItemsList(props: WorkItemListParam) {
     const [itemsLoading, setItemsLoading] = useState(true)
     const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({ 'count': 1, 'num_pages': 1, 'current_page': 1, 'next': null, 'previous': null })
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
-    const [listErrors, setListErrors]= useState('')
+    const [listErrors, setListErrors] = useState('')
+    const [refreshKey, setRefreshKey] = useState(0)
+    function refresh() {
+        setRefreshKey(prev => prev + 1)
+    }
 
     useEffect(() => {
         const controller = new AbortController()
@@ -54,7 +58,8 @@ export function useWorkItemsList(props: WorkItemListParam) {
         })
     }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, props.prioritySelector, props.prioritySortSelector, props.deadlineFilter])
 
-    return{workItems,  itemsLoading,paginationInfo, listErrors, setListErrors, setItemsLoading
+    return {
+        workItems, itemsLoading, paginationInfo, listErrors, setListErrors, setItemsLoading, refresh
 
     }
 }

@@ -1,7 +1,7 @@
 import type { useWorkItemStats } from '../hooks/useWorkItemStats'
 
 
-function WorkItemDashboard({dashboardManager,}: {dashboardManager: ReturnType<typeof useWorkItemStats>;}) {
+function WorkItemDashboard({ dashboardManager, }: { dashboardManager: ReturnType<typeof useWorkItemStats>; }) {
     return (<>
         <div className="wrapper">
             <div className="rectangle1">
@@ -30,6 +30,8 @@ function WorkItemDashboard({dashboardManager,}: {dashboardManager: ReturnType<ty
                 <span className='value'>{dashboardManager.dashboardStats?.dashboard_overdue ?? ''}</span>
             </div>
         </div>
+        {dashboardManager.dashboardErrors && <p role="alert">Error: {dashboardManager.dashboardErrors}</p>}
+              {dashboardManager.dashboardLoading && <p>Loading dashboard stats</p>}
     </>)
 }
 
