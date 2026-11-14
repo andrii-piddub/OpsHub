@@ -37,19 +37,18 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [retryCount, setRetryCount] = useState(0)
-  const [refreshKey, setRefreshKey]=useState(0)
   const [page, setPage] = useState(1)
   const [orderingType, setOrderingType] = useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
   const [priority, setPriority] = useState<WorkItemPriority>('ME')
   const [dueDate, setDueDate] = useState<string | null>(null)
   const { mutationManager,
-    workItemListManager, draftManager,dashboardManager } = useWorkItems({ retryCount, topSelector, searchValue, orderingType, prioritySelector, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate, deadlineFilter, refreshKey })
+    workItemListManager, draftManager,dashboardManager } = useWorkItems({ retryCount, topSelector, searchValue, orderingType, prioritySelector, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate, deadlineFilter })
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [logouting, setLogouting] = useState(false)
-  const full_error = mutationManager.itemsError || workItemListManager.listErrors
+  const full_error = mutationManager.itemsError || workItemListManager.listErrors || dashboardManager.dashboardErrors
 
   async function logoutRequest() {
     setError('')
@@ -119,7 +118,6 @@ function WorkItemPage({ user, getUser, setSessionOver }: WorkItemPageProps) {
     if (success === true) {
       setTitle('');
       setDescription('');
-      setRefreshKey((previous) => previous + 1)
     }
 
   }

@@ -7,7 +7,6 @@ type WorkItemStatsParams = {
   mutationManager: ReturnType<typeof useWorkItemMutations>;
     handleErrors: (
     error: unknown, signal?: AbortSignal) => Promise<void>;
-    workItemListManager: ReturnType<typeof useWorkItemsList >;
 };
 
 export function useWorkItemStats(props:WorkItemStatsParams) {
@@ -25,13 +24,9 @@ export function useWorkItemStats(props:WorkItemStatsParams) {
                 if (controller.signal.aborted) return
                 await props.handleErrors(error, controller.signal)
                 if (controller.signal.aborted) return
-                props.workItemListManager.setListErrors(
-                    error instanceof Error ? error.message : 'Failed to load message',
+                setDashboardErrors(
+                    error instanceof Error ? error.message : 'Failed to load dashboards',
                 )
-            } finally {
-                if (!controller.signal.aborted) {
-                    props.workItemListManager.setItemsLoading(false)
-                }
             }
         }
         checkWorkItem()
@@ -39,5 +34,5 @@ export function useWorkItemStats(props:WorkItemStatsParams) {
             controller.abort()
         })
     }, [props.mutationManager.patchCount])
-    return {dashboardStats}
+    return {dashboardStats, dashboardErrors}
 }

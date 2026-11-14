@@ -144,7 +144,7 @@ def stats_view(request):
         in_progress_count = WorkItem.objects.filter(owner=request.user).filter(status='IP').count()
         done_count = WorkItem.objects.filter(owner=request.user).filter(status='DN').count()
         high_prio_count = WorkItem.objects.filter(owner=request.user).filter(priority='HI').count()
-        overdue_count=WorkItem.objects.filter(owner=request.user).filter(due_date__lt=today).count()
+        overdue_count=WorkItem.objects.filter(owner=request.user).filter(due_date__lt=today).exclude(status='DN').count()
     return Response({'dashboard_total':total_count,
                      'dashboard_open':open_count,
                      'dashboard_in_progress':in_progress_count,

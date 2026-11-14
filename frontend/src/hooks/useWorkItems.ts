@@ -22,12 +22,12 @@ export type WorkItemsParam = {
     prioritySortSelector:PrioritySortSelectorPar;
     setDueDate:(value:string|null)=>void;
     deadlineFilter:DeadlinePar;
-    refreshKey:number;
+
 
 }
 
 
-export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, searchValue, orderingType, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate, deadlineFilter, refreshKey }: WorkItemsParam) {
+export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, searchValue, orderingType, page, setPage, setSessionOver, getUser, setPriority, prioritySortSelector, setDueDate, deadlineFilter }: WorkItemsParam) {
 
     // ===== STATE =====
 
@@ -35,7 +35,7 @@ export function useWorkItems({ retryCount = 0, topSelector, prioritySelector, se
     const draftManager = useWorkItemDraft()
     const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, handleErrors, prioritySelector, prioritySortSelector, deadlineFilter})
     const mutationManager = useWorkItemMutations({draftManager, topSelector, searchValue, workItemListManager, page, setPage,  handleErrors, setPriority, prioritySelector, setDueDate, deadlineFilter})
-    const dashboardManager = useWorkItemStats({mutationManager, handleErrors, workItemListManager})
+    const dashboardManager = useWorkItemStats({mutationManager, handleErrors})
 
     async function handleErrors(
         error: unknown,

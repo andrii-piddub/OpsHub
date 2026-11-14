@@ -20,11 +20,8 @@ export function useWorkItemsList(props: WorkItemListParam) {
     const [itemsLoading, setItemsLoading] = useState(true)
     const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({ 'count': 1, 'num_pages': 1, 'current_page': 1, 'next': null, 'previous': null })
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
-    const [refreshKey, setRefreshKey] = useState(0)
     const [listErrors, setListErrors]= useState('')
-    function refresh(){
-        setRefreshKey(prev => prev + 1)
-    }
+
     useEffect(() => {
         const controller = new AbortController()
         async function checkWorkItem() {
@@ -55,9 +52,9 @@ export function useWorkItemsList(props: WorkItemListParam) {
         return (() => {
             controller.abort()
         })
-    }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, refreshKey, props.prioritySelector, props.prioritySortSelector, props.deadlineFilter])
+    }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, props.prioritySelector, props.prioritySortSelector, props.deadlineFilter])
 
-    return{workItems,  itemsLoading,paginationInfo, listErrors, refresh, setListErrors, setItemsLoading
+    return{workItems,  itemsLoading,paginationInfo, listErrors, setListErrors, setItemsLoading
 
     }
 }
