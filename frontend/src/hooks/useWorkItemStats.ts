@@ -1,13 +1,12 @@
 import type { DashboardStats } from "../api/workItemStats";
 import { useEffect, useState } from "react";
 import { getDashboardStats } from "../api/workItemStats";
-import type { useWorkItemMutations } from "./useWorkItemMutations"
 export type WorkItemStatsParams = {
     handleErrors: (
         error: unknown, signal?: AbortSignal) => Promise<void>;
 };
 
-export function useWorkItemStats(props: WorkItemStatsParams) {
+export function useWorkItemStats({handleErrors}: WorkItemStatsParams) {
     const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
     const [dashboardErrors, setDashboardErrors] = useState('')
     const [dashboardLoading, setDashboardLoading] = useState(true)
@@ -22,7 +21,7 @@ export function useWorkItemStats(props: WorkItemStatsParams) {
 
             } catch (error) {
                 if (controller.signal.aborted) return
-                await props.handleErrors(error, controller.signal)
+                await handleErrors(error, controller.signal)
                 if (controller.signal.aborted) return
                 setDashboardErrors(
                     error instanceof Error ? error.message : 'Failed to load dashboards',
@@ -37,6 +36,6 @@ export function useWorkItemStats(props: WorkItemStatsParams) {
         return (() => {
             controller.abort()
         })
-    }, [])
+    }, [handleErrors])
     return { dashboardStats, dashboardErrors, dashboardLoading }
 }

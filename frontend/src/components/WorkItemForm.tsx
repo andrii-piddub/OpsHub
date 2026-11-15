@@ -1,9 +1,12 @@
 import type { WorkItemPriority } from '../api/workitems'
 import { useWorkItem } from '../hooks/useWorkItem' 
 
+type WorkItemFormPar ={
+  handleErrors: (error: unknown,
+    signal?: AbortSignal) => Promise<void>
+}
 
-function WorkItemForm( handleErrors : (error: unknown,
-    signal?: AbortSignal) => Promise<void>) {
+function WorkItemForm( {handleErrors} :WorkItemFormPar) {
   const creationManager = useWorkItem(handleErrors)
   return (<>
     <form

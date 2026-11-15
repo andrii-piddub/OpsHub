@@ -48,7 +48,6 @@ test('get workItems list', async () => {
 
     const { result } = renderHook(() =>
         useWorkItemsList({
-            retryCount: 0,
             topSelector: 'All',
             searchValue: '',
             orderingType: '-created_at',
@@ -80,7 +79,6 @@ test('get error 500', async () => {
 
     const { result } = renderHook(() =>
         useWorkItemsList({
-            retryCount: 0,
             topSelector: 'All',
             prioritySelector:'All',
             searchValue: '',

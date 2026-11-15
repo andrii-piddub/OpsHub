@@ -4,7 +4,6 @@ import type { WorkItem, WorkItemStatus, WorkItemPriority } from '../api/workitem
 import type { WorkItemOrdering, PaginationInfo } from "../api/workitems.ts";
 import type { PrioritySortSelectorPar, DeadlinePar } from "../pages/WorkItemPage.tsx"
 export type WorkItemListParam = {
-    retryCount: number,
     topSelector: 'All' | WorkItemStatus,
     searchValue: string,
     orderingType: WorkItemOrdering,
@@ -16,7 +15,7 @@ export type WorkItemListParam = {
     deadlineFilter: DeadlinePar;
 }
 
-export function useWorkItemsList(props: WorkItemListParam) {
+export function useWorkItemsList({topSelector, searchValue, orderingType, page, handleErrors, prioritySelector, prioritySortSelector, deadlineFilter}: WorkItemListParam) {
     const [itemsLoading, setItemsLoading] = useState(true)
     const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({ 'count': 1, 'num_pages': 1, 'current_page': 1, 'next': null, 'previous': null })
     const [workItems, setWorkItems] = useState<WorkItem[]>([])
@@ -34,7 +33,7 @@ export function useWorkItemsList(props: WorkItemListParam) {
             setListErrors('');
             setWorkItems([]);
             try {
-                const data = await getWorkItems(controller.signal, props.topSelector, props.prioritySelector, props.prioritySortSelector, props.searchValue, props.orderingType, props.page, props.deadlineFilter)
+                const data = await getWorkItems(controller.signal, topSelector, prioritySelector, prioritySortSelector, searchValue, orderingType, page, deadlineFilter)
                 setWorkItems(data.results)
                 setPaginationInfo({
                     count: data.count, num_pages: data.num_pages, current_page: data.current_page,
@@ -42,7 +41,7 @@ export function useWorkItemsList(props: WorkItemListParam) {
                 })
             } catch (error) {
                 if (controller.signal.aborted) return
-                await props.handleErrors(error, controller.signal)
+                await handleErrors(error, controller.signal)
                 if (controller.signal.aborted) return
                 setListErrors(
                     error instanceof Error ? error.message : 'Failed to load message',
@@ -57,7 +56,7 @@ export function useWorkItemsList(props: WorkItemListParam) {
         return (() => {
             controller.abort()
         })
-    }, [props.retryCount, props.topSelector, props.searchValue, props.orderingType, props.page, props.prioritySelector, props.prioritySortSelector, props.deadlineFilter, refreshKey])
+    }, [topSelector, searchValue, orderingType, page, prioritySelector, prioritySortSelector, deadlineFilter, refreshKey, handleErrors])
 
     return {
         workItems, itemsLoading, paginationInfo, listErrors, setListErrors, setItemsLoading, refresh

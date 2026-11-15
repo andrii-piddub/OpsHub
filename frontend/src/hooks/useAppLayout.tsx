@@ -22,6 +22,6 @@ export function useAppLayout(setUser:(value:User | null)=>void) {
             setLogouting(false)
         }
     }
-return {logoutRequest, logouting}
+return {logoutRequest, logouting,error}
 }
 

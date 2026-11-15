@@ -16,8 +16,6 @@ beforeEach(() => {
 
 afterEach(cleanup)
 
-const mutationManager = { patchCount: 0 } as Parameters<typeof useWorkItemStats>[0]['mutationManager']
-
 test('loads dashboard statistics', async () => {
     const response: DashboardStats = {
         dashboard_total: 10,
@@ -31,7 +29,7 @@ test('loads dashboard statistics', async () => {
     vi.mocked(getDashboardStats).mockResolvedValue(response)
 
     const { result } = renderHook(() =>
-        useWorkItemStats({ mutationManager, handleErrors }),
+        useWorkItemStats({ handleErrors }),
     )
 
     await waitFor(() => {
@@ -39,6 +37,7 @@ test('loads dashboard statistics', async () => {
     })
 
     expect(result.current.dashboardErrors).toBe('')
+    expect(result.current.dashboardLoading).toBe(false)
     expect(getDashboardStats).toHaveBeenCalledExactlyOnceWith(expect.any(AbortSignal))
     expect(handleErrors).not.toHaveBeenCalled()
 })
@@ -49,7 +48,7 @@ test('reports a dashboard loading error', async () => {
     vi.mocked(getDashboardStats).mockRejectedValue(error)
 
     const { result } = renderHook(() =>
-        useWorkItemStats({ mutationManager, handleErrors }),
+        useWorkItemStats({ handleErrors }),
     )
 
     await waitFor(() => {
@@ -57,6 +56,7 @@ test('reports a dashboard loading error', async () => {
     })
 
     expect(result.current.dashboardStats).toBeNull()
+    expect(result.current.dashboardLoading).toBe(false)
     expect(handleErrors).toHaveBeenCalledExactlyOnceWith(error, expect.any(AbortSignal))
     expect(getDashboardStats).toHaveBeenCalledTimes(1)
 })

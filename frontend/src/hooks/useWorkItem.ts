@@ -21,12 +21,12 @@ export function useWorkItem(handleErrors: (error: unknown,
         setCreatingItem(true);
         setCreateError('')
         try {
-            const newItem = await postWorkItems(title, description, priority, dueDate)
-            // const { today, range_seven_days } = getBusinessDateRange()
+            await postWorkItems(title, description, priority, dueDate)
             setPriority('ME')
             setDueDate(null)
             return true
         } catch (error) {
+            console.log(error)
             await handleErrors(error)
             setCreateError(
                 error instanceof ApiErrors

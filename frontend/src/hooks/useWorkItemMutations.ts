@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { patchWorkitems, postWorkItems, deleteWorkItem } from '../api/workitems.ts'
+import { patchWorkitems, deleteWorkItem } from '../api/workitems.ts'
 import type { useWorkItemDraft } from './useWorkItemDraft.ts'
 import type { useWorkItemsList } from './useWorkItemsList.ts'
 import type { WorkItemStatus, WorkItemPriority } from "../api/workitems.ts"
@@ -29,7 +29,6 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
     const [savingItemId, setSavingItemId] = useState<number | null>(null)
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
     const [itemsError, setItemsError] = useState('')
-    const [patchCount, setPatchCount] = useState(0)
 
 
 
@@ -40,7 +39,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
         const { today, range_seven_days } = getBusinessDateRange()
         try {
             const updatedItem = await patchWorkitems(itemId, props.draftManager.draft.draftStatus, props.draftManager.draft.draftTitle, props.draftManager.draft.draftDescription, props.draftManager.draft.draftPriority, props.draftManager.draft.draftDueDate)
-            setPatchCount((previous) => (previous + 1))
+
             props.draftManager.cancelEditing()
             const matchesFilters = matchesDeadlineFilter({ item: updatedItem, deadlineFilter: props.deadlineFilter, today: today, range_seven_days: range_seven_days, topSelector: props.topSelector, prioritySelector: props.prioritySelector, searchValue: props.searchValue })
             if (!matchesFilters && props.workItemListManager.workItems.length === 1 && props.page > 1) {
@@ -70,7 +69,7 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
             setItemsError('');
             setDeletingItemId(id);
             await deleteWorkItem(id)
-            setPatchCount((previous) => (previous + 1))
+
             if (props.page > 1 && props.workItemListManager.workItems.length === 1) {
                 props.setPage(props.page - 1)
             } else {
@@ -93,5 +92,5 @@ export function useWorkItemMutations(props: WorkItemMutationParam) {
 
 
 
-    return { handleSaveAction, handleDeleteWorkItem, savingItemId, deletingItemId, itemsError, patchCount }
+    return { handleSaveAction, handleDeleteWorkItem, savingItemId, deletingItemId, itemsError }
 }

@@ -1,14 +1,6 @@
 import { useState, useEffect } from 'react'
-
-import { getHealth } from '../api/health'
-import type { HealthResponse } from '../api/health'
-// import { useWorkItems } from '../hooks/useWorkItems.ts'
 import WorkItemsTable from '../components/WorkItemsTable.tsx'
-import WorkItemForm from '../components/WorkItemForm.tsx'
 import type { WorkItemStatus, WorkItemOrdering, WorkItemPriority } from '../api/workitems'
-import type { User } from '../api/auth'
-import { logout } from '../api/auth'
-import WorkItemDashboard from '../components/WorkItemDashboard.tsx'
 import { useWorkItemsList } from '../hooks/useWorkItemsList.ts'
 import { useWorkItemMutations } from '../hooks/useWorkItemMutations.ts'
 import {useWorkItemDraft} from '../hooks/useWorkItemDraft.ts'
@@ -17,16 +9,13 @@ export type PrioritySortSelectorPar = 'FHL' | 'FLH' | ''
 export type DeadlinePar = 'All' | 'OD' | 'DT' | 'ND'
 
 export type WorkItemPageProps = {
-  user: User | null;
-  getUser: (user: User | null) => void;
-  setSessionOver: (value: boolean) => void;
   handleErrors: (error: unknown,
         signal?: AbortSignal) => Promise<void>;
 
 }
 
 
-function WorkItemPage({ user, getUser, setSessionOver, handleErrors }: WorkItemPageProps) {
+function WorkItemPage({ handleErrors }: WorkItemPageProps) {
 
   // ===== STATE =====
   const [topSelector, setTopSelector] = useState<'All' | WorkItemStatus>('All')
@@ -38,11 +27,8 @@ function WorkItemPage({ user, getUser, setSessionOver, handleErrors }: WorkItemP
     { value: 'ME', label: 'Medium' },
     { value: 'HI', label: 'High' },
   ]
-  const [health, setHealth] = useState<HealthResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [retryCount, setRetryCount] = useState(0)
-  const [refreshKey, setRefreshKey] = useState(0)
+
+
   const [page, setPage] = useState(1)
   const [orderingType, setOrderingType] = useState<WorkItemOrdering>('-created_at')
   const [searchValue, setSearchValue] = useState('')
@@ -51,9 +37,8 @@ function WorkItemPage({ user, getUser, setSessionOver, handleErrors }: WorkItemP
 
 
   const [inputValue, setInputValue] = useState('')
-  const [logouting, setLogouting] = useState(false)
   const draftManager = useWorkItemDraft()
-  const workItemListManager = useWorkItemsList({retryCount, topSelector, searchValue, orderingType, page, prioritySelector, prioritySortSelector, deadlineFilter, handleErrors})
+  const workItemListManager = useWorkItemsList({ topSelector, searchValue, orderingType, page, prioritySelector, prioritySortSelector, deadlineFilter, handleErrors})
   const mutationManager = useWorkItemMutations({ draftManager, topSelector, searchValue, workItemListManager, page, setPage, handleErrors, prioritySelector, deadlineFilter })
   const full_error = mutationManager.itemsError || workItemListManager.listErrors
 
@@ -72,67 +57,12 @@ function WorkItemPage({ user, getUser, setSessionOver, handleErrors }: WorkItemP
   }, [inputValue])
 
 
-  // ===== useEffect: health check =====
-  // useEffect(() => {
-  //   const controller = new AbortController()
-
-  //   async function checkHealth() {
-  //     setLoading(true)
-  //     setError('')
-  //     setHealth(null)
-
-  //     try {
-  //       const data = await getHealth(controller.signal)
-  //       setHealth(data)
-  //     } catch (error) {
-  //       if (controller.signal.aborted) return
-
-  //       setError(
-  //         error instanceof Error
-  //           ? error.message
-  //           : 'Did not receive an answer',
-  //       )
-  //     } finally {
-  //       if (!controller.signal.aborted) {
-  //         setLoading(false)
-  //       }
-  //     }
-  //   }
-
-  //   checkHealth()
-
-  //   return () => controller.abort()
-  // }, [retryCount])
-
-
-  // ===== handleSubmit =====
-
 
 
   // ===== RENDER =====
   return (
     <main>
 
-      {/* <p>{user && `Welcome ${user.username}`}</p> */}
-
-      {/* ===== Health check ===== */}
-      {/* <button
-        type="button"
-        onClick={() => setRetryCount((previous) => previous + 1)}
-        disabled={loading || workItemListManager.itemsLoading}
-      >
-        {loading || workItemListManager.itemsLoading ? 'Checking' : 'Checking again'}
-      </button> */}
-
-      {/* {loading && <p>Checking connection with server</p>}
-      {error && <p role="alert">Error: {error}</p>}
-
-      {health && (
-        <div>
-          <p>Сервіс: {health.service}</p>
-          <p>Статус: {health.status}</p>
-        </div>
-      )} */}
       <p></p>
 
 
@@ -246,31 +176,6 @@ function WorkItemPage({ user, getUser, setSessionOver, handleErrors }: WorkItemP
       {workItemListManager.workItems.length === 0 && !workItemListManager.itemsLoading && !full_error && (
         <p>There are no Work Items yet</p>
       )}
-
-
-      {/* ===== Create form ===== */}
-      {/* <form
-        className="workitem-form"
-        onSubmit={handleSubmit}>
-        <WorkItemForm
-          title={title}
-          description={description}
-          onTitleChange={setTitle}
-          onDescriptionChange={setDescription}
-          priority={priority}
-          onPriorityChange={setPriority}
-          priorities={priorities}
-          dueDate={dueDate}
-          onDueDateChange={setDueDate}
-        />
-
-        <button type="submit" disabled={mutationManager.creatingItem}>
-          {mutationManager.creatingItem ? 'Creating' : 'Submit'}
-        </button>
-      </form> */}
-
-
-
     </main>
   )
 }

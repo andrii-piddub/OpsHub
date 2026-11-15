@@ -209,13 +209,16 @@ function WorkItemsTable(props: WorkItemsTableProps) {
                 </td>
                 <td className="created-cell">
                   {isEditing ? (
-                    <input 
-                    type="date" 
-                    name="due_date" 
-                    value={props.draft.draftDueDate?.slice(0,10)??""}
-                    onChange={(event) => {
+                    <input
+                      type="date"
+                      name="due_date"
+                      value={props.draft.draftDueDate?.slice(0, 10) ?? ""}
+                      disabled={fieldsDisabled}
+
+                      onChange={(event) => {
                         props.updateDraft({ draftDueDate: event.target.value || null })
-                    }}
+                      }
+                      }
                     />
                   ) : item.due_date !== null ? (
                     <time dateTime={item.due_date}>

@@ -124,7 +124,8 @@ p {
   cursor: pointer;
 }
 
-.auth-submit:hover {
+.auth-submit:hover,
+.session-dialog__button:hover {
   filter: brightness(1.08);
 }
 
@@ -149,10 +150,6 @@ p {
 
 :is(.register-card, .login-card) .auth-submit {
   padding: 12px 16px;
-}
-
-:is(.register-card, .login-card) .auth-submit:hover:not(:disabled) {
-  filter: brightness(1.08);
 }
 
 :is(.register-card, .login-card) .auth-submit:disabled {
@@ -289,37 +286,11 @@ h1 {
   letter-spacing: -0.03em;
 }
 
-/* connection check button + health info */
-main>button {
-  padding: 6px 14px;
-  font: 500 0.875rem var(--body);
-  color: var(--ink);
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-main>button:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
 main>div:not(:has(table)) {
   display: flex;
   gap: 16px;
   font-size: 0.875rem;
   color: var(--muted);
-}
-
-main>div:not(:has(table)) p:first-child::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  margin-right: 8px;
-  border-radius: 50%;
-  background: var(--done-fg);
 }
 
 main>p {
@@ -381,7 +352,6 @@ main>p[role='alert'] {
 
 .workitem-filters select,
 .workitem-filters input {
-  box-sizing: border-box;
   width: 100%;
   min-width: 0;
   margin: 0;
@@ -407,11 +377,15 @@ textarea {
 
 /* ---------- table ---------- */
 main>div:has(table) {
-  flex: 1 0 100%;
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .table-wrap {
-  overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -419,30 +393,40 @@ main>div:has(table) {
 
 .work-table {
   width: 100%;
-  min-width: 1300px;
-  /* на вузьких екранах працює скрол у .table-wrap */
+  min-width: 0;
   table-layout: fixed;
-  /* ширини стовпчиків задає <colgroup>, а не вміст */
   border-collapse: collapse;
   text-align: left;
 }
 
-.work-table th {
+/* Override the fixed colgroup widths so all nine columns fit the container. */
+.work-table col:nth-child(1) { width: 5% !important; }
+.work-table col:nth-child(2) { width: 15% !important; }
+.work-table col:nth-child(3) { width: 19% !important; }
+.work-table col:nth-child(4) { width: 10% !important; }
+.work-table col:nth-child(5) { width: 12% !important; }
+.work-table col:nth-child(6) { width: 10% !important; }
+.work-table col:nth-child(7) { width: 9% !important; }
+.work-table col:nth-child(8) { width: 10% !important; }
+.work-table col:nth-child(9) { width: 10% !important; }
+
+.work-table th,
+.work-table td {
   padding: 12px 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.work-table th {
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--muted);
-  border-bottom: 1px solid var(--line);
-  white-space: nowrap;
+  overflow-wrap: anywhere;
   background: color-mix(in srgb, var(--ink) 4%, var(--surface));
 }
 
 .work-table td {
-  padding: 12px 10px;
   vertical-align: top;
-  border-bottom: 1px solid var(--line);
   overflow-wrap: anywhere;
-  /* довгий текст переноситься, а не розтягує стовпчик */
 }
 
 .work-table th:first-child,
@@ -461,11 +445,13 @@ main>div:has(table) {
 
 .work-table .row-actions {
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .work-table .btn {
   padding: 6px 10px;
-  white-space: nowrap;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .work-table input[type="date"] {
@@ -495,13 +481,21 @@ main>div:has(table) {
 
 .work-table select {
   width: 100%;
+  min-width: 0;
+  padding-inline: 2px;
+}
+
+.work-table .badge {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .work-table .created-cell {
   color: var(--muted);
   font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
 }
 
 .badge {
@@ -513,7 +507,8 @@ main>div:has(table) {
   white-space: nowrap;
 }
 
-.badge-OP {
+.badge-OP,
+.badge-priority-ME {
   color: var(--open-fg);
   background: var(--open-bg);
 }
@@ -523,20 +518,10 @@ main>div:has(table) {
   background: var(--prog-bg);
 }
 
-.badge-DN {
-  color: var(--done-fg);
-  background: var(--done-bg);
-}
-
-/* priority badges (окремі класи, щоб не плутати зі статусами) */
+.badge-DN,
 .badge-priority-LO {
   color: var(--done-fg);
   background: var(--done-bg);
-}
-
-.badge-priority-ME {
-  color: var(--open-fg);
-  background: var(--open-bg);
 }
 
 .badge-priority-HI {
@@ -554,7 +539,8 @@ main>div:has(table) {
   cursor: pointer;
 }
 
-.btn:hover:not(:disabled) {
+.btn:hover:not(:disabled),
+.pagination__btn:hover:not(:disabled) {
   border-color: var(--accent);
 }
 
@@ -564,7 +550,8 @@ main>div:has(table) {
   border-color: var(--accent);
 }
 
-.btn-save:hover:not(:disabled) {
+.btn-save:hover:not(:disabled),
+.workitem-form button[type='submit']:hover:not(:disabled) {
   filter: brightness(1.1);
 }
 
@@ -591,7 +578,6 @@ select:disabled {
 .edit-field {
   width: 100%;
   min-width: 0;
-  /* було 180px: саме воно розпирало стовпчик */
   min-height: 40px;
   resize: vertical;
   line-height: 1.4;
@@ -641,17 +627,11 @@ select:disabled {
   cursor: pointer;
 }
 
-.workitem-form button[type='submit']:hover:not(:disabled) {
-  filter: brightness(1.1);
-}
-
 /* ---------- accessibility ---------- */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
-
-/* ---------- search ---------- */
 
 /* ---------- pagination ---------- */
 .pagination {
@@ -673,15 +653,6 @@ select:disabled {
   border-radius: 6px;
   background: var(--surface);
   cursor: pointer;
-}
-
-.pagination__btn:hover:not(:disabled) {
-  border-color: var(--accent);
-}
-
-.pagination__btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 /* Session notification */
@@ -747,10 +718,7 @@ select:disabled {
   cursor: pointer;
 }
 
-.session-dialog__button:hover {
-  filter: brightness(1.08);
-}
-
+/* ---------- dashboard ---------- */
 .wrapper {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -759,22 +727,12 @@ select:disabled {
   margin: 24px 0;
 }
 
-.rectangle {
-  box-sizing: border-box;
-  width: 140px;
-  height: 100px;
-  border: 4px solid black;
-  flex-shrink: 0;
-}
-
-
 .rectangle1,
 .rectangle2,
 .rectangle3,
 .rectangle4,
 .rectangle5,
 .rectangle6 {
-  box-sizing: border-box;
   min-width: 0;
   min-height: 124px;
   padding: 20px;
@@ -789,7 +747,6 @@ select:disabled {
 
   font-family: var(--body);
 }
-
 
 .rectangle1 .label,
 .rectangle2 .label,
@@ -814,6 +771,7 @@ select:disabled {
   letter-spacing: -.04em;
 }
 
+/* ---------- workspace layout ---------- */
 .app-layout {
   --bg: #f7f8fa;
   --surface: #ffffff;
@@ -840,6 +798,35 @@ select:disabled {
   border-radius: 20px;
   box-shadow: 0 8px 32px rgb(24 33 47 / 3%);
   flex-direction: column;
+}
+
+.topbar {
+  display: grid;
+  gap: 8px;
+  padding: 24px clamp(20px, 3vw, 48px);
+  color: var(--ink);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  border-radius: 20px 20px 0 0;
+}
+
+.topbar > p {
+  color: var(--muted);
+  font-size: .875rem;
+  overflow-wrap: anywhere;
+}
+
+.topbar > p:last-child:not(:empty) {
+  color: var(--danger);
+}
+
+.topbar > p:empty {
+  display: none;
+}
+
+.main-workspace {
+  display: flex;
+  min-width: 0;
 }
 
 .sidebar {
@@ -892,18 +879,13 @@ select:disabled {
   color: var(--accent);
 }
 
-.app-layout .workspace-header {
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--line);
-}
-
 .app-layout .workspace-header h1 {
+  color: var(--accent);
   font-size: 24px;
   letter-spacing: -.04em;
 }
 
 .app-layout main > .wrapper {
-  display: grid;
   flex: 1 1 100%;
 }
 
@@ -944,10 +926,17 @@ select:disabled {
   }
 
   .app-layout {
-    display:flex;
-    flex-direction: column;
     min-height: calc(100svh - 24px);
     border-radius: 14px;
+  }
+
+  .topbar {
+    padding: 20px 16px;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .main-workspace {
+    flex-direction: column;
   }
 
   .sidebar {
@@ -987,11 +976,4 @@ select:disabled {
     justify-content: center;
     flex-wrap: wrap;
   }
-}
-.topbar{
-  background-color: lightgray;
-}
-.main-workspace{
-  display:flex;
-  flex-direction: row;
 }
