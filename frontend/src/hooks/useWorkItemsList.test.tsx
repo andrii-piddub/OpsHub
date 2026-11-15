@@ -45,6 +45,7 @@ test('get workItems list', async () => {
         previous: null,
     }
     vi.mocked(getWorkItems).mockResolvedValue(response)
+    const handleErrors = vi.fn(async () => { })
 
     const { result } = renderHook(() =>
         useWorkItemsList({
@@ -53,7 +54,7 @@ test('get workItems list', async () => {
             orderingType: '-created_at',
             prioritySelector:'All',
             page: 1,
-            handleErrors: vi.fn(async () => { }),
+            handleErrors,
             prioritySortSelector: '',
             deadlineFilter:'All'
         })
