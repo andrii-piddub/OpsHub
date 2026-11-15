@@ -3,6 +3,7 @@ import type { WorkItemPriority } from "../api/workitems"
 import { postWorkItems } from '../api/workitems'
 import { ApiErrors } from '../api/ApiError.ts'
 import type { FormEvent } from 'react'
+import { useNavigate } from "react-router";
 export function useWorkItem(handleErrors: (error: unknown,
     signal?: AbortSignal) => Promise<void>) {
     const [title, setTitle] = useState('')
@@ -16,6 +17,7 @@ export function useWorkItem(handleErrors: (error: unknown,
     const [dueDate, setDueDate] = useState<string | null>(null)
     const [creatingItem, setCreatingItem] = useState(false)
     const [createError, setCreateError] = useState('')
+    const navigate = useNavigate();
     async function createWorkItem(title: string, description: string, priority: WorkItemPriority, dueDate: string | null) {
         setCreatingItem(true);
         setCreateError('')
@@ -45,6 +47,8 @@ export function useWorkItem(handleErrors: (error: unknown,
         if (success === true) {
             setTitle('');
             setDescription('');
+
+            navigate('/workitem')
 
         }
 

@@ -1,7 +1,7 @@
 import type { WorkItemPriority } from '../api/workitems'
 import { useWorkItem } from '../hooks/useWorkItem' 
 
-type WorkItemFormPar ={
+export type WorkItemFormPar ={
   handleErrors: (error: unknown,
     signal?: AbortSignal) => Promise<void>
 }

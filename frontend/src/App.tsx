@@ -11,7 +11,7 @@ import { GuestRoute } from './components/GuestRoute.tsx'
 import { AppLayout } from "./components/AppLayout.tsx"
 import WorkItemDashboard from "./components/WorkItemDashboard.tsx"
 import {ApiErrors} from './api/ApiError.ts'
-import WorkItemForm from './components/WorkItemForm.tsx'
+import { CreateWorkitem } from "./pages/CreateItemPage.tsx"
 function App() {
   const [user, setUser] = useState<User | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
@@ -111,7 +111,7 @@ function App() {
           {/* <Route path="/workitem" element={<WorkItemPage user={user} getUser={setUser} setSessionOver={setSessionOver} />} /> */}
           <Route path="/dashboard" element={<WorkItemDashboard handleErrors={handleErrors} />} />
           <Route path="/workitem" element={<WorkItemPage handleErrors={handleErrors} />} />
-          <Route path="/workitem/create" element={<WorkItemForm handleErrors={handleErrors}/>} />
+          <Route path="/workitem/create" element={<CreateWorkitem handleErrors={handleErrors}/>} />
 
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
