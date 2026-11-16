@@ -27,7 +27,6 @@ export function useWorkItem(handleErrors: (error: unknown,
             setDueDate(null)
             return true
         } catch (error) {
-            console.log(error)
             await handleErrors(error)
             setCreateError(
                 error instanceof ApiErrors
