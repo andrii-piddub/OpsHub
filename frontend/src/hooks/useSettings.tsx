@@ -21,15 +21,10 @@ export function useSettings(handleErrors: (error: unknown,
             setRequesting(true)
             const data = await getAcumaticaEmployee(employee)
             const employees = data.employees
-            const found = employees[0]
-            if (found.EmployeeID?.value !== employee.acumaticaEmployeeID) {
-                setError('Acumatica returned a different Employee ID')
-                return
-            }
             if (employees.length === 0) {
                 setError('Employee not found')
                 return
-
+                
             } else if (employees.length != 1) {
                 setError('There are multiple employees')
                 return
@@ -37,7 +32,12 @@ export function useSettings(handleErrors: (error: unknown,
                 setError('Employee not found')
                 return
             }
-
+            const found = employees[0]
+            if (found.EmployeeID?.value !== employee.acumaticaEmployeeID) {
+                setError('Acumatica returned a different Employee ID')
+                return
+            }
+            
             setDisplayName(data.employees[0]?.DisplayName?.value)
             setEmployeeID(data.employees[0]?.EmployeeID?.value)
 
