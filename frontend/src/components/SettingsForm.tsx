@@ -32,7 +32,7 @@ export function SettingsForm({ settingsManager, user }: SettingsFormProps) {
 
       <button
         type="submit"
-      // disabled={creationManager.creatingItem}
+        disabled={settingsManager.requesting}
       >
         Find Employee in Acumatica
       </button>

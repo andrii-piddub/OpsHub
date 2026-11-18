@@ -185,7 +185,6 @@ def acumatica_employee(request):
         print("Acumatica status:", response.status_code)    
         print("Acumatica body:", response.text)
     except requests.RequestException:
-        print(response.text)
         return Response(
             {"error": "Не вдалося з’єднатися з Acumatica."},
             status=502,

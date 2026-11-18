@@ -21,7 +21,7 @@ export function AcumaticaEmployeeDialog(props: AcumaticaEmployeeDialogPar) {
     return (<>
 
 
-        dialogRef.current?.showModal()
+
         < dialog ref={dialogRef} className="acumatica-employee-dialog" >
             <p>
                 Is it your Name - {props.displayName}?

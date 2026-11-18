@@ -9,11 +9,15 @@ afterEach(() => {
 })
 
 test('submits the entered employee ID and displays an Acumatica authorization error', async () => {
-  const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 401 })
+  const fetchMock = vi.fn().mockResolvedValue({
+    ok: false,
+    status: 401,
+    json: async () => ({ code: 'acumatica_auth_required' }),
+  })
   vi.stubGlobal('fetch', fetchMock)
   const handleErrors = vi.fn(async () => {})
 
-  render(<Settings handleErrors={handleErrors} />)
+  render(<Settings handleErrors={handleErrors} user={null} setUser={vi.fn()} />)
   fireEvent.change(screen.getByLabelText('Title'), { target: { value: 'EMP001' } })
   fireEvent.click(screen.getByRole('button', { name: 'Find Employee in Acumatica' }))
 
