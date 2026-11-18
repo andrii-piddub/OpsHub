@@ -14,6 +14,7 @@ export function useSettings(handleErrors: (error: unknown,
     const [requesting,setRequesting]=useState(false)
     async function getEmployee(employee: AcumaticaEmployee = { acumaticaEmployeeID }) {
         setError('')
+        setErrorCode('')
         setDisplayName('')
         setEmployeeID('')
         try {
@@ -35,6 +36,12 @@ export function useSettings(handleErrors: (error: unknown,
             const found = employees[0]
             if (found.EmployeeID?.value !== employee.acumaticaEmployeeID) {
                 setError('Acumatica returned a different Employee ID')
+                return
+            }else if (found.DisplayName?.value === null){
+                setError('Display Name is empty')
+                return
+            }else if (!found.DisplayName?.value?.trim()){
+                setError('Display Name is empty')
                 return
             }
             
