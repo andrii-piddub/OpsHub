@@ -34,6 +34,8 @@ export function AppLayout(props: RequireAuthProps) {
             <NavLink className="sidebar-option1" to='/dashboard'>Dashboard</NavLink>
             <NavLink className="sidebar-option2" to='/workitem' end>Work items</NavLink>
             <NavLink className="sidebar-option3" to='/workitem/create'>Create Item</NavLink>
+            <NavLink className="sidebar-option4" to='/settings/'>Settings</NavLink>
+
           </nav>
         </aside>
         <div className='main-content'>

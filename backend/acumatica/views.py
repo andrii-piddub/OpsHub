@@ -7,6 +7,9 @@ from django.shortcuts import redirect
 import requests
 import time
 from django.http import JsonResponse
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
 
 
 def acumatica_connect(request):
@@ -84,7 +87,7 @@ def acumatica_callback(request):
         "refresh_token": tokens.get("refresh_token"),
         "expires_at": time.time() + int(tokens.get("expires_in", 0)),
     }
-    return HttpResponse("Токени Acumatica збережено в сесії.")
+    return redirect("http://localhost:5173/settings/")
 
 
 def acumatica_cases(request):
@@ -136,3 +139,72 @@ def acumatica_cases(request):
         )
 
     return JsonResponse({"cases": cases})
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def acumatica_employee(request):
+    tokens = request.session.get("acumatica_tokens", {})
+    access_token = tokens.get("access_token")
+    employee_id = request.GET.get("employee_id")
+
+    if not employee_id:
+        return JsonResponse(
+        {"error": "Потрібно передати employee_id."},
+        status=400,
+    )
+    if not access_token:
+        return Response(
+            {"code": "acumatica_auth_required",
+            "error": "Спочатку підключи Acumatica через /connect/."},
+            status=401,
+        )
+
+    base_url = settings.ACUMATICA_BASE_URL.rstrip("/")
+    endpoint = settings.ACUMATICA_ENDPOINT_NAME
+    version = settings.ACUMATICA_ENDPOINT_VERSION
+
+    url = f"{base_url}/entity/{endpoint}/{version}/Employee"
+    employee_id = employee_id.replace("'", "''")
+
+
+    try:
+        response = requests.get(
+            url,
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Accept": "application/json",
+            },
+            timeout=30,
+        params={
+         "$filter": f"EmployeeID eq '{employee_id}'",
+        "$expand": "ContactInfo",
+},
+
+            
+        )
+        print("Acumatica status:", response.status_code)    
+        print("Acumatica body:", response.text)
+    except requests.RequestException:
+        print(response.text)
+        return Response(
+            {"error": "Не вдалося з’єднатися з Acumatica."},
+            status=502,
+        )
+    if response.status_code != 200:
+        return Response(
+            {
+                "error": "Acumatica відхилила запит.",
+                "upstream_status": response.status_code,
+            },
+            status=502,
+        )
+
+    try:
+        employees = response.json()
+    except ValueError:
+        return Response(
+            {"error": "Acumatica повернула некоректний JSON."},
+            status=502,
+        )
+
+    return Response({"employees": employees})

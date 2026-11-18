@@ -1,5 +1,4 @@
 import WorkItemForm from "../components/WorkItemForm";
-import type {WorkItemFormPar} from '../components/WorkItemForm'
 import { useWorkItem } from "../hooks/useWorkItem";
 export type CreationWorkItemPar={
    handleErrors:(error: unknown,

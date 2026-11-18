@@ -1,4 +1,4 @@
-export type User = { id: number, username: string }
+export type User = { id: number, username: string, acumatica_employee_name :string, acumatica_employee_id:string }
 
 export async function getCsrf(): Promise<void> {
     const url = new URL('/api/v1/auth/csrf/', window.location.origin)
@@ -70,3 +70,19 @@ export async function register(username: string, password: string): Promise<void
         throw {status:response.status,data}
     }
 }
+
+export async function employee_acumatica_update(displayName:string, employee_id:string){
+    const response = await fetch(
+       `/api/v1/auth/me/acumatica/`,
+       {
+         method: 'PATCH',
+         headers: {
+           'Content-Type': 'application/json',
+           'X-CSRFToken': getCsrfToken()?? ''
+         },
+         body: JSON.stringify({ acumatica_employee_name: displayName, acumatica_employee_id:employee_id  }),
+       })
+ if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`)
+    }
+} 

@@ -1,4 +1,4 @@
-from .serializers import UserSerializer
+from .serializers import UserSerializer, AcumaticaEmployeeDataSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def auth_me(request):
-    return Response({'id':request.user.id,'username':request.user.username},status=status.HTTP_200_OK)
+    return Response({'id':request.user.id,'username':request.user.username,'acumatica_employee_id':request.user.acumatica_employee_id, 'acumatica_employee_name':request.user.acumatica_employee_name},status=status.HTTP_200_OK)
 
 @ensure_csrf_cookie
 @api_view(["GET"])
@@ -50,3 +50,12 @@ def login_app(request):
 def logout_app(request):
     logout(request)
     return Response(status=status.HTTP_200_OK)
+
+@api_view(["PATCH"])
+@csrf_protect
+@permission_classes([IsAuthenticated])
+def update_acumatica_employee_data(request):
+    serializer = AcumaticaEmployeeDataSerializer(request.user, data=request.data, partial=True)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=status.HTTP_200_OK)

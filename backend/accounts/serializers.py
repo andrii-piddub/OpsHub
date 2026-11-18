@@ -7,7 +7,7 @@ from .models import User
 class UserSerializer(serializers.ModelSerializer):
   class Meta:
     model = User
-    fields = ['username','password']
+    fields = ['username','password','acumatica_employee_id','acumatica_employee_name']
     extra_kwargs ={'password':{'write_only':True}}
     
   def validate(self, attrs):
@@ -19,3 +19,8 @@ class UserSerializer(serializers.ModelSerializer):
     return attrs
   def create(self,validated_data):
     return User.objects.create_user(**validated_data)
+
+class AcumaticaEmployeeDataSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = User
+    fields = ['acumatica_employee_id','acumatica_employee_name']
