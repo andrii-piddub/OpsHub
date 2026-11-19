@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'accounts',
     'core',
+    'acumatica',
 ]
 AUTH_USER_MODEL = "accounts.User"
 

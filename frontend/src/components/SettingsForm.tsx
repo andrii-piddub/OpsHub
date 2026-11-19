@@ -18,7 +18,7 @@ export function SettingsForm({ settingsManager, user }: SettingsFormProps) {
       }>
       <label
         htmlFor="title"
-      >Title</label>
+      >Acumatica Employee ID</label>
       <input
         id="title"
         type="text"

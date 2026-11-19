@@ -443,6 +443,50 @@ main>div:has(table) {
   background: color-mix(in srgb, var(--accent) 4%, var(--surface));
 }
 
+.support-cases-table-wrap {
+  min-width: 0;
+}
+
+.support-cases-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.support-cases-scroll {
+  overflow-x: auto;
+  border-radius: 0 0 10px 10px;
+}
+
+.support-cases-table {
+  table-layout: auto;
+}
+
+.support-cases-table th,
+.support-cases-table td {
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+
+.support-cases-table :is(th, td):nth-child(3) {
+  min-width: 14rem;
+  max-width: 22rem;
+  white-space: normal;
+}
+
+.support-cases-table :is(th, td):nth-child(17) {
+  min-width: 18rem;
+  max-width: 28rem;
+  white-space: pre-line;
+}
+
+.support-cases-table tbody tr:nth-child(even):not(:hover) {
+  background: color-mix(in srgb, var(--ink) 2%, var(--surface));
+}
+
 .work-table .row-actions {
   gap: 6px;
   flex-wrap: wrap;
@@ -894,7 +938,11 @@ select:disabled {
 .sidebar-option1,
 .sidebar-option2,
 .sidebar-option3,
-.sidebar-option4 {
+.sidebar-option4, 
+.sidebar-option5,
+.sidebar-option6
+
+{
  
 
   display: flex;
@@ -1012,4 +1060,8 @@ select:disabled {
     justify-content: center;
     flex-wrap: wrap;
   }
+}
+.sync {
+  padding: 10px;
+  margin: 10px;
 }

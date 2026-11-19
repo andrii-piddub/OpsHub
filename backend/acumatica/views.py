@@ -1,4 +1,5 @@
 from django.shortcuts import render
+import re
 import secrets
 from urllib.parse import urlencode
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -10,6 +11,15 @@ from django.http import JsonResponse
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from .models import SupportCases
+from django.utils import timezone
+from html import unescape
+from django.utils.html import strip_tags
+from .serializers import SupportCasesSerializer 
+
+def _case_value(case, field, default=None):
+    value = (case.get(field) or {}).get("value")
+    return default if value is None else value
 
 
 def acumatica_connect(request):
@@ -89,13 +99,14 @@ def acumatica_callback(request):
     }
     return redirect("http://localhost:5173/settings/")
 
-
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def acumatica_cases(request):
     tokens = request.session.get("acumatica_tokens", {})
     access_token = tokens.get("access_token")
 
     if not access_token:
-        return JsonResponse(
+        return Response(
             {"error": "Спочатку підключи Acumatica через /connect/."},
             status=401,
         )
@@ -107,6 +118,13 @@ def acumatica_cases(request):
     url = f"{base_url}/entity/{endpoint}/{version}/Case"
 
     try:
+        owner_name = request.user.acumatica_employee_name.strip()
+        if not owner_name:
+            return Response(
+        {"error": "Прив’яжи працівника Acumatica в Settings."},
+        status=400,
+    )
+        owner_name = owner_name.replace("'", "''")
         response = requests.get(
             url,
             headers={
@@ -114,15 +132,17 @@ def acumatica_cases(request):
                 "Accept": "application/json",
             },
             timeout=30,
+            params={"$filter": f"OwnerEmployeeName eq '{owner_name}'"},
+
         )
     except requests.RequestException:
-        return JsonResponse(
+        return Response(
             {"error": "Не вдалося з’єднатися з Acumatica."},
             status=502,
         )
 
     if response.status_code != 200:
-        return JsonResponse(
+        return Response(
             {
                 "error": "Acumatica відхилила запит.",
                 "upstream_status": response.status_code,
@@ -133,12 +153,52 @@ def acumatica_cases(request):
     try:
         cases = response.json()
     except ValueError:
-        return JsonResponse(
+        return Response(
             {"error": "Acumatica повернула некоректний JSON."},
             status=502,
         )
+    for case in cases:
+        raw_description = _case_value(case, "Description", "")
+        description_without_css = re.sub(
+            r"<style\b[^>]*>.*?</style\s*>", "", raw_description, flags=re.IGNORECASE | re.DOTALL
+        )
+        status = _case_value(case, "Status")
+        status_details = status if isinstance(status, dict) else {}
+        status_label = status_details.get("description") if isinstance(status, dict) else status
+        SupportCases.objects.update_or_create(
+            acumatica_uuid=case["id"],
+            defaults={
+                "case_id": case["CaseID"]["value"],
+                "business_account": _case_value(case, "BusinessAccount", ""),
+                "subject": _case_value(case, "Subject", ""),
+                "reason": _case_value(case, "Reason", ""),
+                "severity": _case_value(case, "Severity", ""),
+                "priority": _case_value(case, "Priority", ""),
+                "owner_employee_name": _case_value(case, "OwnerEmployeeName", ""),
+                "workgroup": _case_value(case, "Workgroup", ""),
+                "case_class": _case_value(case, "ClassID", ""),
+                "reported_on": _case_value(case, "DateReported"),
+                "last_incoming_activity": _case_value(case, "LastIncomingActivity"),
+                "last_outgoing_activity": _case_value(case, "LastOutgoingActivity"),
+                "contract": _case_value(case, "Contract", ""),
+                "billable": _case_value(case, "Billable"),
+                "active": _case_value(case, "IsActive"),
+                "acumatica_modified_at": _case_value(case, "LastModifiedDateTime"),
+                "description": unescape(strip_tags(description_without_css)).strip(),
+                "contact_name": _case_value(case, "ContactDisplayName", ""),
+                "contact_id": _case_value(case, "ContactID"),
+                "closed_at": _case_value(case, "ClosingDate"),
+                "acumatica_owner_ref": _case_value(case, "Owner", ""),
+                "status": status_label or "",
+                "status_code": status_details.get("id") or "",
+                "synced_at": timezone.now(),
+            },
+        )
+    saved_cases = SupportCases.objects.filter(owner_employee_name=request.user.acumatica_employee_name.strip(),
+)
 
-    return JsonResponse({"cases": cases})
+    return Response({"cases": SupportCasesSerializer(saved_cases, many=True).data,
+})
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])

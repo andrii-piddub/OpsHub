@@ -7,5 +7,4 @@ urlpatterns = [
     path("acumatica/callback/",acumatica_callback, name="acumatica_callback"),
     path("acumatica/cases/", acumatica_cases, name="acumatica_cases"),
     path("acumatica/employee/", acumatica_employee, name="acumatica_employee"),
-
 ]

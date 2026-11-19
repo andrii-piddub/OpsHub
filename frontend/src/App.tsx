@@ -10,9 +10,11 @@ import { Navigate } from "react-router"
 import { GuestRoute } from './components/GuestRoute.tsx'
 import { AppLayout } from "./components/AppLayout.tsx"
 import WorkItemDashboard from "./components/WorkItemDashboard.tsx"
+import {SupportCasePage} from './pages/SupportCasesPage.tsx'
 import {ApiErrors} from './api/ApiError.ts'
 import { CreateWorkitem } from "./pages/CreateItemPage.tsx"
 import { Settings } from "./pages/Settings.tsx"
+import CreateSupportCase from './components/CreateSupportCase.tsx'
 function App() {
   const [user, setUser] = useState<User | null>(null)
 
@@ -115,6 +117,10 @@ function App() {
           <Route path="/workitem" element={<WorkItemPage handleErrors={handleErrors} />} />
           <Route path="/workitem/create" element={<CreateWorkitem handleErrors={handleErrors}/>} />
           <Route path="/settings" element={<Settings handleErrors={handleErrors} user={user} setUser={setUser}/>} />
+          <Route path="/supportcases" element={<SupportCasePage  handleErrors={handleErrors}/>} />
+          <Route path="/supportcases" element={<CreateSupportCase />} />
+
+
 
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
