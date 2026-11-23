@@ -2,6 +2,7 @@ import { getSupportCases } from '../api/supportcases'
 import { useEffect, useState } from 'react';
 import type {SupportCases} from '../api/supportcases'
 import type {SupportCasesPar} from '../pages/SupportCasesPage'
+import { acumaticaConnect } from '../api/acumaticaEmployee'
 
 export function useSupportCasesList(props:SupportCasesPar) {
     const [casses,setCasses] = useState<SupportCases[]>([])
@@ -38,5 +39,5 @@ export function useSupportCasesList(props:SupportCasesPar) {
         })
     }, [refresh])
 
-    return {setRefresh, casses, casesLoading, casesErrors}
+    return {setRefresh, casses, casesLoading, casesErrors, acumaticaConnect}
 }

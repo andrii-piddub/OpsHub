@@ -6,10 +6,10 @@ export type AcumaticaEmployee = {
 }
 
 
-export function acumaticaConnect(): void {
+export function acumaticaConnect(source:string): void {
     window.location.assign(
-        "http://localhost:8000/api/v1/acumatica/connect/"
-    )
+        `http://localhost:8000/api/v1/acumatica/connect/?return_to=${encodeURIComponent(source)}`
+    )   
 }
 
 

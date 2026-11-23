@@ -25,6 +25,8 @@ def _case_value(case, field, default=None):
 def acumatica_connect(request):
     state = secrets.token_urlsafe(32)
     request.session["acumatica_oauth_state"] = state
+    return_to = request.GET.get("return_to", "settings")
+    request.session["acumatica_return_to"] = return_to
     params = {
         "response_type": "code",
         "client_id": settings.ACUMATICA_CLIENT_ID,
@@ -42,6 +44,12 @@ def acumatica_connect(request):
 def acumatica_callback(request):
     expected_state = request.session.pop("acumatica_oauth_state", None)
     received_state = request.GET.get("state")
+    return_to = request.session.pop("acumatica_return_to", "settings")
+    routes = {
+    "settings": "/settings/",
+    "supportcases": "/supportcases/",
+}
+
 
     if (
         not expected_state
@@ -97,8 +105,9 @@ def acumatica_callback(request):
         "refresh_token": tokens.get("refresh_token"),
         "expires_at": time.time() + int(tokens.get("expires_in", 0)),
     }
-    return redirect("http://localhost:5173/settings/")
-
+    return redirect(
+    f"http://localhost:5173{routes.get(return_to, '/settings/')}"
+)
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def acumatica_cases(request):

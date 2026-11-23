@@ -111,7 +111,7 @@ function App() {
         <Route path="/register" element={<RegisterForm />} />
       </Route>
       <Route element={<RequireAuth authLoading={authLoading} user={user} />}>
-        <Route element={<AppLayout authLoading={authLoading} user={user} setUser={setUser} />}>
+        <Route element={<AppLayout handleErrors={handleErrors} authLoading={authLoading} user={user} setUser={setUser} />}>
           {/* <Route path="/workitem" element={<WorkItemPage user={user} getUser={setUser} setSessionOver={setSessionOver} />} /> */}
           <Route path="/dashboard" element={<WorkItemDashboard handleErrors={handleErrors} />} />
           <Route path="/workitem" element={<WorkItemPage handleErrors={handleErrors} />} />

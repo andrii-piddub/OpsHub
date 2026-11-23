@@ -5,6 +5,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+import os
+import requests
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -59,3 +61,25 @@ def update_acumatica_employee_data(request):
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def FRED(request):
+    index_name = request.query_params.get('name')
+    FRED_API_KEY = os.environ["FRED_API_KEY"]
+    url = f"https://api.stlouisfed.org/fred/series/observations"
+    response = requests.get(url,params={
+    "series_id": index_name,
+    "api_key": os.environ["FRED_API_KEY"],
+    "file_type": "json",
+    "sort_order": "desc",
+    "limit": 5, 
+    }, timeout=50)
+    response.raise_for_status()
+    data = response.json() 
+    SP500 = data['observations'][0]['value']       
+    return Response(SP500, status=status.HTTP_200_OK)          

@@ -43,7 +43,7 @@ export function SettingsForm({ settingsManager, user }: SettingsFormProps) {
       <button
         type="button"
         disabled={settingsManager.errorCode !== 'acumatica_auth_required'}
-        onClick={settingsManager.acumaticaConnect}
+        onClick={()=>{settingsManager.acumaticaConnect("settings")}}
       >
         Connect to Acumatica
       </button>
