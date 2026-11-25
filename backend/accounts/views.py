@@ -98,7 +98,10 @@ def FRED(request):
         return response({'error_message':'Outside server send incorrect json'}, status=status.HTTP_502_BAD_GATEWAY)
     if not observation:
         return Response({'error_message':'There is no observation in response'}, status=status.HTTP_502_BAD_GATEWAY)
-    value = observation[0].get("value")
+    try:
+        value = observation[0].get("value")
+    except (AttributeError, KeyError, TypeError) as exc:
+        return Response({'error_message':'Wrong structure of Response'}, status=status.HTTP_502_BAD_GATEWAY)
     if value is None or value=='':
         return Response({'error_message':'Observation in response exist, but value of index is missed'}, status=status.HTTP_502_BAD_GATEWAY)
     try:
