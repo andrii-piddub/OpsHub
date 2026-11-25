@@ -12,121 +12,74 @@ export function useCurrenciesandIndices(
     const [crossError, setCrossError] = useState('')
     const [SP500Rate, setSP500Rate] = useState<string | null | number>(null)
     const [SP500Error, setSP500Error] = useState('')
-    const [nasdaqRate, setNasdaqRate]= useState<string | null>(null)
+    const [nasdaqRate, setNasdaqRate] = useState<string | null | number>(null)
     const [nasdaqError, setNasdaqError] = useState('')
-    const [DJIARate, setDJIARate] = useState<string | null>(null)
+    const [DJIARate, setDJIARate] = useState<string | null | number>(null)
     const [DJIAError, setDJIAError] = useState('')
-    const [updatedTime, setUpdatedTime]= useState<string | null | number>('')
+    const [updatedTime, setUpdatedTime] = useState<string | null | number>('')
     const [refresh, setRefresh] = useState(true)
     useEffect(() => {
         const controller = new AbortController()
         const { signal } = controller
 
-        
+
         async function loadUsdRate() {
             let dataUpdated = 0
-            try {
-                const usdData: { rate?: unknown }[] = await usdCurrenciesRate(signal)
-                const usdRate = usdData[0]?.rate
 
-                if (!signal.aborted) {
-                    setUsdRate(typeof usdRate === 'number' && Number.isFinite(usdRate) ? usdRate : null)
-                    dataUpdated++
-
-                }
-
-            } catch (error) {
-                if (!signal.aborted) {
-                    setUsdError(error instanceof Error ? error.message : 'Не вдалося завантажити USD/UAH')
-                    await handleErrors(error, signal)
-                }
+            const [usdData, eurData, crossData, SP500Data, nasdaqData, DJIAData] = await Promise.allSettled([usdCurrenciesRate(signal), eurCurrenciesRate(signal), crossCurrenciesRate(signal), SEIndexes('SP500', signal), SEIndexes('NASDAQCOM', signal), SEIndexes('DJIA', signal)])
+            if (signal.aborted) return
+            if (usdData.status === 'rejected') {
+                setUsdError(usdData.reason instanceof Error ? usdData.reason.message : 'Не вдалося завантажити USD/UAH')
+            } else if (usdData.status === 'fulfilled') {
+                setUsdRate(usdData.value[0]?.rate)
+                setUsdError("")
+                dataUpdated++
             }
-            try {
-                const eurData: { rate?: unknown }[] = await eurCurrenciesRate(signal)
-                const eurRate = eurData[0]?.rate
-                if (!signal.aborted) {
-                    setEurRate(typeof eurRate === 'number' && Number.isFinite(eurRate) ? eurRate : null)
-                    dataUpdated++
-
-                }
-
-            } catch (error) {
-                if (!signal.aborted) {
-                    setEurError(error instanceof Error ? error.message : 'Не вдалося завантажити EUR/UAH')
-                    await handleErrors(error, signal)
-                }
+            if (eurData.status === 'rejected') {
+                setEurError(eurData.reason instanceof Error ? eurData.reason.message : 'Не вдалося завантажити EUR/UAH')
+            } else if (eurData.status === 'fulfilled') {
+                setEurRate(eurData.value[0]?.rate)
+                setEurError("")
+                dataUpdated++
             }
-            try {
-                const crossData = await crossCurrenciesRate(signal)
-                const crossRate = crossData?.rate
-                if (!signal.aborted) {
-                    setCrossRate(typeof crossRate === 'number' ? crossRate : null)
-                    dataUpdated++
-
-                }
-
-            } catch (error) {
-                if (!signal.aborted) {
-                    setCrossError(error instanceof Error ? error.message : 'Не вдалося завантажити EUR/USD')
-                    await handleErrors(error, signal)
-                }
+            if (crossData.status === 'rejected') {
+                setCrossError(crossData.reason instanceof Error ? crossData.reason.message : 'Не вдалося завантажити EUR/USD')
+            } else if (crossData.status === 'fulfilled') {
+                setCrossRate(crossData.value?.rate)
+                dataUpdated++
             }
-            try {
-                const SP500Data = await SEIndexes('SP500', signal)
-                if (!signal.aborted) {
-                    setSP500Rate(SP500Data)
-                    dataUpdated++
-
-
-                }
-            } catch (error) {
-                if (!signal.aborted) {
-                    setSP500Error(error instanceof Error ? error.message : 'Не вдалося завантажити S&P500')
-                    await handleErrors(error, signal)
-                }
+            if (SP500Data.status === 'rejected') {
+                setSP500Error(SP500Data.reason instanceof Error ? SP500Data.reason.message : 'Не вдалося завантажити S&P500')
+            } else if (SP500Data.status === 'fulfilled') {
+                setSP500Rate(SP500Data.value)
+                setSP500Error("")
+                dataUpdated++
             }
-            try {
-                const nasdaqData = await SEIndexes('NASDAQCOM', signal)
-                if (!signal.aborted) {
-                    setNasdaqRate(nasdaqData)
-                    dataUpdated++
-
-
-                }
-            } catch (error) {
-                if (!signal.aborted) {
-                    setNasdaqError(error instanceof Error ? error.message : 'Не вдалося завантажити NASDAQCOM')
-                    await handleErrors(error, signal)
-                }
+            if (nasdaqData.status === 'rejected') {
+                setNasdaqError(nasdaqData.reason instanceof Error ? nasdaqData.reason.message : 'Не вдалося завантажити NASDAQ')
+            } else if (nasdaqData.status === 'fulfilled') {
+                setNasdaqRate(nasdaqData.value)
+                setNasdaqError("")
+                dataUpdated++
             }
-             try {
-                const DJIAData = await SEIndexes('DJIA', signal)
-                if (!signal.aborted) {
-                    setDJIARate(DJIAData)
-                    dataUpdated++
-
-
-                }
-            } catch (error) {
-                if (!signal.aborted) {
-                    setDJIAError(error instanceof Error ? error.message : 'Не вдалося завантажити DJIA')
-                    await handleErrors(error, signal)
-                }
+            if (DJIAData.status === 'rejected') {
+                setDJIAError(DJIAData.reason instanceof Error ? DJIAData.reason.message : 'Не вдалося завантажити Dow Jones Average')
+            } else if (DJIAData.status === 'fulfilled') {
+                setDJIARate(DJIAData.value)
+                setDJIAError("")
+                dataUpdated++
             }
-            if (dataUpdated === 6){
-               setUpdatedTime(dayjs().format('D MMMM HH:mm')) 
-
+            if (dataUpdated === 6) {
+                setUpdatedTime(dayjs().format('D MMMM HH:mm'))
             }
-
-
         }
 
         void loadUsdRate()
         return () => controller.abort()
-    }, [handleErrors,setUpdatedTime, refresh])
+    }, [handleErrors, setUpdatedTime, refresh])
 
     return {
-        usdRate, usdError, eurRate, eurError, crossRate, crossError, 
+        usdRate, usdError, eurRate, eurError, crossRate, crossError,
         SP500Rate, SP500Error, nasdaqRate, nasdaqError, DJIARate, DJIAError, updatedTime, setRefresh, refresh
     }
 }

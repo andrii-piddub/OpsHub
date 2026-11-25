@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 import os
 import requests
 
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def auth_me(request):
@@ -72,14 +73,30 @@ def FRED(request):
     index_name = request.query_params.get('name')
     FRED_API_KEY = os.environ["FRED_API_KEY"]
     url = f"https://api.stlouisfed.org/fred/series/observations"
-    response = requests.get(url,params={
-    "series_id": index_name,
-    "api_key": os.environ["FRED_API_KEY"],
-    "file_type": "json",
-    "sort_order": "desc",
-    "limit": 5, 
-    }, timeout=50)
-    response.raise_for_status()
+    try:
+        response = requests.get(url,params={
+        "series_id": index_name,
+        "api_key": os.environ["FRED_API_KEY"],
+        "file_type": "json",
+        "sort_order": "desc",
+        "limit": 5, 
+        }, timeout=50)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as exc:
+        answer = exc.response.json()
+        error_message = answer.get('error_message')
+        return Response({'error_message':f'{error_message}'},status=status.HTTP_400_BAD_REQUEST)
+        raise requests.exceptions.HTTPError(f'There is issue with {error_message}') from exc
     data = response.json() 
-    SP500 = data['observations'][0]['value']       
+    observation = data.get("observations")
+    if not observation:
+        raise ValueError('There is no obsevation in response')
+    SP500 = data['observations'][0]['value']
+    value = observation[0].get("value")
+    if value is None or value=='':
+        raise ValueError('Observation in response exist, but value of index is missed')
+    try:
+            SP500 = float(SP500)
+    except ValueError as exc:
+            raise ValueError('Value in response is not number') from exc 
     return Response(SP500, status=status.HTTP_200_OK)          
