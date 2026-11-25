@@ -33,7 +33,8 @@ export function useCurrenciesandIndices(
                 if (signal.aborted) return
                 if (usdData.status === 'rejected') {
                     setUsdError(usdData.reason instanceof Error ? usdData.reason.message : 'Не вдалося завантажити USD/UAH')
-                    setUpdatedTime('-')
+
+                    await handleErrors(usdData.reason, signal)                    
                 } else if (usdData.status === 'fulfilled') {
                     setUsdRate(usdData.value[0]?.rate)
                     setUsdError("")
@@ -41,7 +42,8 @@ export function useCurrenciesandIndices(
                 }
                 if (eurData.status === 'rejected') {
                     setEurError(eurData.reason instanceof Error ? eurData.reason.message : 'Не вдалося завантажити EUR/UAH')
-                    setUpdatedTime('-')
+
+                    await handleErrors(eurData.reason, signal)
                 } else if (eurData.status === 'fulfilled') {
                     setEurRate(eurData.value[0]?.rate)
                     setEurError("")
@@ -49,14 +51,17 @@ export function useCurrenciesandIndices(
                 }
                 if (crossData.status === 'rejected') {
                     setCrossError(crossData.reason instanceof Error ? crossData.reason.message : 'Не вдалося завантажити EUR/USD')
-                    setUpdatedTime('-')
+
+                    await handleErrors(crossData.reason, signal)
                 } else if (crossData.status === 'fulfilled') {
                     setCrossRate(crossData.value?.rate)
+                    setCrossError('')
                     dataUpdated++
                 }
                 if (SP500Data.status === 'rejected') {
                     setSP500Error(SP500Data.reason instanceof Error ? SP500Data.reason.message : 'Не вдалося завантажити S&P500')
-                    setUpdatedTime('-')
+
+                    await handleErrors(SP500Data.reason, signal)
                 } else if (SP500Data.status === 'fulfilled') {
                     setSP500Rate(SP500Data.value)
                     setSP500Error("")
@@ -64,7 +69,8 @@ export function useCurrenciesandIndices(
                 }
                 if (nasdaqData.status === 'rejected') {
                     setNasdaqError(nasdaqData.reason instanceof Error ? nasdaqData.reason.message : 'Не вдалося завантажити NASDAQ')
-                    setUpdatedTime('-')
+
+                    await handleErrors(nasdaqData.reason, signal)
                 } else if (nasdaqData.status === 'fulfilled') {
                     setNasdaqRate(nasdaqData.value)
                     setNasdaqError("")
@@ -72,7 +78,8 @@ export function useCurrenciesandIndices(
                 }
                 if (DJIAData.status === 'rejected') {
                     setDJIAError(DJIAData.reason instanceof Error ? DJIAData.reason.message : 'Не вдалося завантажити Dow Jones Average')
-                    setUpdatedTime('-')
+
+                    await handleErrors(DJIAData.reason, signal)
                 } else if (DJIAData.status === 'fulfilled') {
                     setDJIARate(DJIAData.value)
                     setDJIAError("")
@@ -80,9 +87,11 @@ export function useCurrenciesandIndices(
                 }
                 if (dataUpdated === 6) {
                     setUpdatedTime(dayjs().format('D MMMM HH:mm'))
+                }else{
+                   setUpdatedTime('-') 
                 }
             } catch (error) {
-                await handleErrors(error)
+                await handleErrors(error, signal)
                 setError(error instanceof ApiErrors ? error.message : 'Failed to get value')
                 
             }

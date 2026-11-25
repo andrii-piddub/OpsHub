@@ -91,9 +91,11 @@ def FRED(request):
         return Response({'error_message':f'Outside server do not answer'}, status=status.HTTP_504_GATEWAY_TIMEOUT)
     except requests.exceptions.ConnectionError as exc:
         return Response({'error_message':f'Can not connect to outside server '}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-    
-    data = response.json() 
-    observation = data.get("observations")
+    try:
+        data = response.json() 
+        observation = data.get("observations")
+    except requests.exceptions.JSONDecodeError as exc:
+        return response({'error_message':'Outside server send incorrect json'}, status=status.HTTP_502_BAD_GATEWAY)
     if not observation:
         return Response({'error_message':'There is no observation in response'}, status=status.HTTP_502_BAD_GATEWAY)
     value = observation[0].get("value")
@@ -103,6 +105,6 @@ def FRED(request):
         value = float(value)
         if math.isfinite(value) == False:
             return Response({'error_message':'Index value is infinite number'},status=status.HTTP_502_BAD_GATEWAY)
-    except ValueError as exc:
+    except (ValueError, TypeError) as exc:
         return Response({'error_message':'Value in response is not number'}, status=status.HTTP_502_BAD_GATEWAY)
     return Response(value, status=status.HTTP_200_OK)          
