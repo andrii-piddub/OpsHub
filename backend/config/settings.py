@@ -43,6 +43,12 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    CSRF_TRUSTED_ORIGINS.append(frontend_url)
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    CSRF_TRUSTED_ORIGINS.append(frontend_url)
 if "RENDER" in os.environ:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_SSL_REDIRECT = True
