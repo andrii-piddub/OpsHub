@@ -83,12 +83,13 @@ def FRED(request):
         "limit": 5, 
         }, timeout=50)
         response.raise_for_status()
-        answer = exc.response.json()
-        error_message = answer.get('error_message')
-    except requests.exceptions.HTTPError as exc:
-        return Response({'error_message':f'{error_message or 'Wrong answer from outside server'}'},status=status.HTTP_502_BAD_GATEWAY)
+        response.json()
     except requests.exceptions.JSONDecodeError as exc:
         return Response({'error_message':'Response is not json'}, status=status.HTTP_502_BAD_GATEWAY)
+    except requests.exceptions.HTTPError as exc:
+        answer = exc.response.json()
+        error_message = answer.get('error_message')
+        return Response({'error_message':f'{error_message or 'Wrong answer from outside server'}'},status=status.HTTP_502_BAD_GATEWAY)
     except requests.exceptions.Timeout as exc:
         return Response({'error_message':f'Outside server do not answer'}, status=status.HTTP_504_GATEWAY_TIMEOUT)
     except requests.exceptions.ConnectionError as exc:
