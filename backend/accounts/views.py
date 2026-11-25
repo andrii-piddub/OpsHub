@@ -95,7 +95,7 @@ def FRED(request):
         data = response.json() 
         observation = data.get("observations")
     except requests.exceptions.JSONDecodeError as exc:
-        return response({'error_message':'Outside server send incorrect json'}, status=status.HTTP_502_BAD_GATEWAY)
+        return Response({'error_message':'Outside server send incorrect json'}, status=status.HTTP_502_BAD_GATEWAY)
     if not observation:
         return Response({'error_message':'There is no observation in response'}, status=status.HTTP_502_BAD_GATEWAY)
     try:
