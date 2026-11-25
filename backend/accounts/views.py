@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 import os
 import requests
+import math
 
 
 @api_view(["GET"])
@@ -85,18 +86,23 @@ def FRED(request):
     except requests.exceptions.HTTPError as exc:
         answer = exc.response.json()
         error_message = answer.get('error_message')
-        return Response({'error_message':f'{error_message}'},status=status.HTTP_400_BAD_REQUEST)
-        raise requests.exceptions.HTTPError(f'There is issue with {error_message}') from exc
+        return Response({'error_message':f'{error_message or 'Wrong answer from outside server'}'},status=status.HTTP_502_BAD_GATEWAY)
+    except requests.exceptions.Timeout as exc:
+        return Response({'error_message':f'Outside server do not answer'}, status=status.HTTP_504_GATEWAY_TIMEOUT)
+    except requests.exceptions.ConnectionError as exc:
+        return Response({'error_message':f'Can not connect to outside server '}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    
     data = response.json() 
     observation = data.get("observations")
     if not observation:
-        raise ValueError('There is no obsevation in response')
-    SP500 = data['observations'][0]['value']
+        return Response({'error_message':'There is no observation in response'}, status=status.HTTP_502_BAD_GATEWAY)
     value = observation[0].get("value")
     if value is None or value=='':
-        raise ValueError('Observation in response exist, but value of index is missed')
+        return Response({'error_message':'Observation in response exist, but value of index is missed'}, status=status.HTTP_502_BAD_GATEWAY)
     try:
-            SP500 = float(SP500)
+        value = float(value)
+        if math.isfinite(value) == False:
+            return Response({'error_message':'Index value is infinite number'},status=status.HTTP_502_BAD_GATEWAY)
     except ValueError as exc:
-            raise ValueError('Value in response is not number') from exc 
-    return Response(SP500, status=status.HTTP_200_OK)          
+        return Response({'error_message':'Value in response is not number'}, status=status.HTTP_502_BAD_GATEWAY)
+    return Response(value, status=status.HTTP_200_OK)          

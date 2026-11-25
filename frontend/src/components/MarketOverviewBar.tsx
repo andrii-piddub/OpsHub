@@ -71,6 +71,7 @@ export function MarketOverviewBar(props:MarketOverviewBarPar){
             <button className='link-button' onClick={()=>props.marketOverviewManager.setRefresh(!props.marketOverviewManager.refresh)}><span aria-hidden="true">⟳ </span>Auto refresh</button>
           </div>
             <span>{props.marketOverviewManager.usdError || props.marketOverviewManager.eurError || props.marketOverviewManager.crossError || props.marketOverviewManager.SP500Error || props.marketOverviewManager.nasdaqError ||props.marketOverviewManager.DJIAError }</span>
+            <span>{props.marketOverviewManager.error}</span>
         </div>
     </>)
 }
